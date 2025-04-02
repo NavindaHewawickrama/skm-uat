@@ -1,5 +1,5 @@
-Sri Kantha Motors New Sales Applications
+Sri Kantha Motors New Sales Application
 
-Next.js(React framework)
-Tailwind CSS
+Next.js(React framework) </br>
+Tailwind CSS </br>
 Typescript
