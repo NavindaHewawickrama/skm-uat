@@ -1,26 +1,26 @@
 "use client";
 import React, { useState } from "react";
-import AppBar from "../components/Appbar";
-import SideNav from "../components/Sidenav";
-import Footer from "../components/Footer";
+import AppBar from "../../components/Appbar";
+import SideNav from "../../components/Sidenav";
+import Footer from "../../components/Footer";
 
 const Dashboard = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
-  
+
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
   };
 
   return (
-    <div className="h-screen bg-gray-100 flex flex-col overflow-hidden">
+    <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
       <AppBar toggleSideNav={toggleSideNav} />
-      
+
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
         {/* Side Navigation */}
         <SideNav isOpen={sideNavOpen} />
-        
+
         {/* Dashboard Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 p-4 lg:p-6">
@@ -30,7 +30,7 @@ const Dashboard = () => {
               {/* <SalesDonutChart deliveredCount={18898} /> */}
             </div>
           </div>
-          
+
           {/* Footer Component */}
           <Footer />
         </div>
