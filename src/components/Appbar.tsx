@@ -23,13 +23,15 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav }) => {
       
       {/* Division label */}
       <div className="p-4 flex justify-center">
+        <Link href="/dashboard">
         <Image
-        className="hidden lg:block"
+        className="hidden lg:block cursor-pointer"
           src="/images/logo-d.png"
           alt="Sri Kanta Motors"
           width={130}
           height={50}
         />
+        </Link>
       </div>
 
       

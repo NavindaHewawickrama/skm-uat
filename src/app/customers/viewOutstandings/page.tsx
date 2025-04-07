@@ -40,6 +40,153 @@ const OutstandingsPage: React.FC = () => {
       invoicedAmount: 43250.0,
       dueAmount: 43250.0,
     },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
+    {
+      customer: "ROYAL MOTORS SUPPLIES",
+      invoiceNo: "INV73523456",
+      invoiceDate: "3/18/2025, 11:22:45 AM",
+      invoicedAmount: 43250.0,
+      dueAmount: 43250.0,
+    },
   ];
 
   // Calculate total due amount
@@ -84,7 +231,17 @@ const OutstandingsPage: React.FC = () => {
           <div className="flex-1 p-4 overflow-auto">
             {/* Outstandings Card */}
             <div className="bg-white p-6 rounded-md shadow-sm mb-4">
-              <h2 className="text-lg font-bold mb-4">Outstanding Invoices</h2>
+            <div className="bg-gray-100 rounded-lg shadow-sm p-6 mb-6 w-full md:w-1/2 sm:w-full h-[50%]">
+              <h2 className="text-xl font-bold mb-6">Get Customer's</h2>
+              <div className="flex justify-start mb-6">
+                <button
+                  className="bg-green-500 w-[50%] md:w-[50%] sm:w-full text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none cursor-pointer"
+                  
+                >
+                  +
+                </button>
+              </div>
+            </div>
 
               {/* Total Due Amount Display */}
               <div className="mb-4">

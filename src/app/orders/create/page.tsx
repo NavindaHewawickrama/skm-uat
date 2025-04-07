@@ -111,7 +111,7 @@ const CreateOrderPage: React.FC = () => {
                   </label>
                   <div className="relative">
                     <select
-                      className="block w-full p-2 border border-gray-300 rounded appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="block w-full p-2 border border-gray-300 rounded appearance-none"
                       value={customer}
                       onChange={(e) => setCustomer(e.target.value)}
                     >
@@ -175,7 +175,7 @@ const CreateOrderPage: React.FC = () => {
                   </label>
                   <div className="relative">
                     <select
-                      className="block w-full p-2 border border-gray-300 rounded appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="block w-full p-2 border border-gray-300 rounded appearance-none"
                       value={paymentType}
                       onChange={(e) => setPaymentType(e.target.value)}
                     >
@@ -207,7 +207,7 @@ const CreateOrderPage: React.FC = () => {
                     Note:
                   </label>
                   <textarea
-                    className="block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="block w-full p-2 border border-gray-300 rounded"
                     rows={3}
                     value={notes}
                     onChange={(e) => setNotes(e.target.value)}
@@ -228,7 +228,7 @@ const CreateOrderPage: React.FC = () => {
                   </label>
                   <div className="relative">
                     <select
-                      className="block w-full p-2 border border-gray-300 rounded appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="block w-full p-2 border border-gray-300 rounded appearance-none"
                       value={currentItem.itemCode}
                       onChange={(e) =>
                         updateCurrentItem("itemCode", e.target.value)
@@ -262,7 +262,7 @@ const CreateOrderPage: React.FC = () => {
                   </label>
                   <div className="relative">
                     <select
-                      className="block w-full p-2 border border-gray-300 rounded appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="block w-full p-2 border border-gray-300 rounded appearance-none"
                       value={currentItem.itemName}
                       onChange={(e) =>
                         updateCurrentItem("itemName", e.target.value)
@@ -296,7 +296,7 @@ const CreateOrderPage: React.FC = () => {
                   </label>
                   <input
                     type="number"
-                    className="block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="block w-full p-2 border border-gray-300 rounded"
                     value={currentItem.unitPrice || ""}
                     onChange={(e) =>
                       updateCurrentItem(
@@ -316,7 +316,7 @@ const CreateOrderPage: React.FC = () => {
                   </label>
                   <input
                     type="number"
-                    className="block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="block w-full p-2 border border-gray-300 rounded"
                     value={currentItem.quantity || ""}
                     onChange={(e) =>
                       updateCurrentItem(
@@ -333,7 +333,7 @@ const CreateOrderPage: React.FC = () => {
                   </label>
                   <input
                     type="number"
-                    className="block w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="block w-full p-2 border border-gray-300 rounded"
                     value={currentItem.discount || ""}
                     onChange={(e) =>
                       updateCurrentItem(
@@ -359,7 +359,7 @@ const CreateOrderPage: React.FC = () => {
 
               <div className="flex justify-start mb-6">
                 <button
-                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none"
+                  className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none cursor-pointer"
                   onClick={addToList}
                 >
                   Add To List
@@ -420,7 +420,7 @@ const CreateOrderPage: React.FC = () => {
                             </td>
                             <td className="py-2 px-4 border-b text-center">
                               <button
-                                className="text-red-500 hover:text-red-700"
+                                className="text-red-500 hover:text-red-700 cursor-pointer"
                                 onClick={() => {
                                   const newItems = [...orderItems];
                                   const removedItem = newItems.splice(
@@ -463,8 +463,8 @@ const CreateOrderPage: React.FC = () => {
               {/* Submit Order Button */}
               {orderItems.length > 0 && (
                 <div className="mt-6 flex justify-end">
-                  <button className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 focus:outline-none">
-                    Submit Order
+                  <button className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 focus:outline-none cursor-pointer">
+                    Save
                   </button>
                 </div>
               )}
