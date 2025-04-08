@@ -5,6 +5,12 @@ import SideNav from "../../../components/Sidenav";
 import Footer from "../../../components/Footer";
 
 interface StockItem {
+  img: string;
+  description: string;
+  description2: string;
+  unitMeasure: string;
+  size: string;
+  reQuantity: string;
   itemCode: string;
   itemName: string;
   location: string;
@@ -36,6 +42,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1067",
@@ -46,6 +58,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1068",
@@ -56,6 +74,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1068",
@@ -66,6 +90,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1086",
@@ -76,6 +106,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1086",
@@ -86,6 +122,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1088",
@@ -96,6 +138,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1088",
@@ -106,6 +154,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -116,6 +170,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -126,6 +186,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -136,6 +202,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -146,6 +218,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -156,6 +234,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -166,6 +250,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -176,6 +266,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -186,6 +282,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -196,6 +298,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -206,6 +314,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -216,6 +330,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -226,6 +346,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -236,6 +362,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -246,6 +378,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -256,6 +394,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -266,6 +410,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -276,6 +426,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -286,6 +442,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -296,6 +458,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -306,6 +474,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -316,6 +490,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -326,6 +506,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -336,6 +522,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -346,6 +538,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -356,6 +554,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -366,6 +570,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -376,6 +586,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -386,6 +602,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -396,6 +618,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -406,6 +634,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -416,6 +650,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -426,6 +666,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
     {
       itemCode: "01-1115",
@@ -436,6 +682,12 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
+      img:"",
+      description:"-",
+      description2:"-",
+      unitMeasure:"kg",
+      size:"-",
+      reQuantity:"5"
     },
   ];
 
@@ -596,6 +848,24 @@ const StockView = () => {
                     <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
                       Sub Category
                     </th>
+                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                      Image
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                      Description
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                      Description 2
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                      Unit of Measure
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                      Size
+                    </th>
+                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                      Reorder Quantity
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
@@ -630,6 +900,24 @@ const StockView = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {item.subCategory}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.img}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.description}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.description2}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.unitMeasure}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.size}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                        {item.reQuantity}
                       </td>
                     </tr>
                   ))}

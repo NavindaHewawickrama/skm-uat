@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import AppBar from "@/components/Appbar";
 import SideNav from "@/components/Sidenav";
 import Footer from "@/components/Footer";
@@ -7,7 +7,7 @@ import Footer from "@/components/Footer";
 const RejectedOrdersPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [entriesPerPage, setEntriesPerPage] = useState(50);
+  const [entriesPerPage, setEntriesPerPage] = useState("50");
   const [currentPage, setCurrentPage] = useState(1);
 
   // Sample delivered orders data based on the screenshot
@@ -20,6 +20,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -29,6 +30,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -38,6 +40,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -47,6 +50,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -56,6 +60,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -65,6 +70,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -74,6 +80,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -83,6 +90,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -92,6 +100,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -101,6 +110,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -110,6 +120,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -119,6 +130,17 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
+    },
+    {
+      orderNo: "1710",
+      customer: "NEW HIGHLEVEL MOTORS",
+      salesRef: "manjula",
+      orderDate: "9/15/2020, 8:58:38 PM",
+      total: 327225,
+      itemDetails: "",
+      status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -128,6 +150,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -137,6 +160,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -146,6 +170,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -155,6 +180,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -164,6 +190,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -173,6 +200,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -182,6 +210,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -191,6 +220,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -200,6 +230,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -209,6 +240,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -218,6 +250,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -227,6 +260,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -236,6 +270,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -245,6 +280,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -254,6 +290,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -263,6 +300,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -272,6 +310,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -281,6 +320,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -290,6 +330,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -299,6 +340,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -308,6 +350,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -317,6 +360,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -326,6 +370,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -335,6 +380,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -344,6 +390,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -353,6 +400,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -362,6 +410,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -371,6 +420,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -380,6 +430,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -389,6 +440,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -398,6 +450,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -407,6 +460,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -416,6 +470,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -425,6 +480,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -434,6 +490,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -443,6 +500,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -452,6 +510,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -461,6 +520,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -470,6 +530,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -479,6 +540,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -488,6 +550,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
+      reason: "Out of Stock",
     },
     {
       orderNo: "1310",
@@ -497,15 +560,7 @@ const RejectedOrdersPage: React.FC = () => {
       total: 327225,
       itemDetails: "",
       status: "Rejected",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: "",
-      status: "Rejected",
+      reason: "Out of Stock",
     },
 
     // Additional dummy data to demonstrate pagination
@@ -527,28 +582,94 @@ const RejectedOrdersPage: React.FC = () => {
         itemDetails: "",
         note: i % 5 === 0 ? "Urgent delivery completed" : "",
         status: "Delivered",
+        reason: "Out of Stock",
       })),
   ];
 
   // Filter orders based on search query
-  const filteredOrders = rejectedOrders.filter(
-    (order) =>
-      order.orderNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.salesRef.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredOrders = useMemo(() => {
+    return rejectedOrders.filter(
+      (order) =>
+        order.orderNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.salesRef.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [rejectedOrders, searchQuery]);
 
-  // Calculate pagination
-  const indexOfLastOrder = currentPage * entriesPerPage;
-  const indexOfFirstOrder = indexOfLastOrder - entriesPerPage;
-  const currentOrders = filteredOrders.slice(
-    indexOfFirstOrder,
-    indexOfLastOrder
-  );
-  const totalPages = Math.ceil(filteredOrders.length / entriesPerPage);
+  const totalPages = useMemo(() => {
+    return Math.ceil(filteredOrders.length / parseInt(entriesPerPage));
+  }, [filteredOrders.length, entriesPerPage]);
+
+  const currentOrders = useMemo(() => {
+    const itemsPerPage = parseInt(entriesPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredOrders.slice(startIndex, endIndex);
+  }, [filteredOrders, currentPage, entriesPerPage]);
+
+  // Generate page numbers for pagination - copied from StockView
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxPagesToShow = 5;
+
+    if (totalPages <= maxPagesToShow) {
+      // If we have fewer pages than max, show all pages
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Always include first page
+      pages.push(1);
+
+      // Calculate start and end of page range
+      let start = Math.max(2, currentPage - 1);
+      let end = Math.min(totalPages - 1, currentPage + 1);
+
+      // Adjust if we're at edges
+      if (currentPage <= 2) {
+        end = 4;
+      } else if (currentPage >= totalPages - 1) {
+        start = totalPages - 3;
+      }
+
+      // Add ellipsis if needed before middle pages
+      if (start > 2) {
+        pages.push("...");
+      }
+
+      // Add middle pages
+      for (let i = start; i <= end; i++) {
+        pages.push(i);
+      }
+
+      // Add ellipsis if needed after middle pages
+      if (end < totalPages - 1) {
+        pages.push("...");
+      }
+
+      // Always include last page
+      if (totalPages > 1) {
+        pages.push(totalPages);
+      }
+    }
+
+    return pages;
+  };
+
+  const goToPage = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
+  };
+
+  // Handle entries per page change
+  const handleEntriesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setEntriesPerPage(e.target.value);
+    setCurrentPage(1); // Reset to first page when changing entries per page
   };
 
   return (
@@ -574,7 +695,7 @@ const RejectedOrdersPage: React.FC = () => {
                   <span className="mr-2">Show</span>
                   <select
                     value={entriesPerPage}
-                    onChange={(e) => setEntriesPerPage(Number(e.target.value))}
+                    onChange={handleEntriesChange}
                     className="border rounded px-2 py-1"
                   >
                     <option value={10}>10</option>
@@ -592,7 +713,7 @@ const RejectedOrdersPage: React.FC = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Type Here..."
-                    className="border rounded px-2 py-1 w-full md:w-auto focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="border rounded px-2 py-1 w-full md:w-auto focus:outline-none focus:ring-1"
                   />
                 </div>
               </div>
@@ -623,6 +744,9 @@ const RejectedOrdersPage: React.FC = () => {
                       <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                         Status
                       </th>
+                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                        Reason
+                      </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
@@ -646,7 +770,7 @@ const RejectedOrdersPage: React.FC = () => {
                             : order.total}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-indigo-600 text-white py-1 px-4 rounded hover:bg-indigo-700 focus:outline-none cursor-pointer">
+                          <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer">
                             View
                           </button>
                         </td>
@@ -655,6 +779,9 @@ const RejectedOrdersPage: React.FC = () => {
                             {order.status}
                           </span>
                         </td>
+                        <td className="px-4 py-3 border text-sm">
+                          {order.reason}
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -662,68 +789,60 @@ const RejectedOrdersPage: React.FC = () => {
               </div>
 
               {/* Pagination */}
-              {totalPages > 0 && (
-                <div className="flex justify-between items-center mt-4">
-                  <div className="text-sm text-gray-600">
-                    Showing {indexOfFirstOrder + 1} to{" "}
-                    {Math.min(indexOfLastOrder, filteredOrders.length)} of{" "}
-                    {filteredOrders.length} entries
-                  </div>
-                  <div className="flex space-x-1">
-                    <button
-                      onClick={() =>
-                        setCurrentPage(Math.max(1, currentPage - 1))
-                      }
-                      disabled={currentPage === 1}
-                      className={`px-3 py-1 rounded ${
-                        currentPage === 1
-                          ? "bg-gray-200 cursor-not-allowed"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
-                    >
-                      Previous
-                    </button>
-                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
-                      let pageNumber;
-                      if (totalPages <= 5) {
-                        pageNumber = i + 1;
-                      } else if (currentPage <= 3) {
-                        pageNumber = i + 1;
-                      } else if (currentPage >= totalPages - 2) {
-                        pageNumber = totalPages - 4 + i;
-                      } else {
-                        pageNumber = currentPage - 2 + i;
-                      }
-                      return (
-                        <button
-                          key={pageNumber}
-                          onClick={() => setCurrentPage(pageNumber)}
-                          className={`px-3 py-1 rounded ${
-                            currentPage === pageNumber
-                              ? "bg-blue-700 text-white"
-                              : "bg-blue-600 text-white hover:bg-blue-700"
-                          }`}
-                        >
-                          {pageNumber}
-                        </button>
-                      );
-                    })}
-                    <button
-                      onClick={() =>
-                        setCurrentPage(Math.min(totalPages, currentPage + 1))
-                      }
-                      disabled={currentPage === totalPages}
-                      className={`px-3 py-1 rounded ${
-                        currentPage === totalPages
-                          ? "bg-gray-200 cursor-not-allowed"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
-                    >
-                      Next
-                    </button>
-                  </div>
+              <div className="bg-white p-4 mt-4 flex flex-wrap justify-between items-center">
+                <div className="text-sm">
+                  Showing{" "}
+                  {filteredOrders.length > 0
+                    ? (currentPage - 1) * parseInt(entriesPerPage) + 1
+                    : 0}{" "}
+                  to{" "}
+                  {Math.min(
+                    currentPage * parseInt(entriesPerPage),
+                    filteredOrders.length
+                  )}{" "}
+                  of {filteredOrders.length} entries
                 </div>
-              )}
+                <div className="flex items-center space-x-1 mt-2 sm:mt-0">
+                  <button
+                    onClick={() => goToPage(currentPage - 1)}
+                    disabled={currentPage === 1}
+                    className={`px-3 py-1 border rounded cursor-pointer ${
+                      currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
+                    }`}
+                  >
+                    Previous
+                  </button>
+
+                  {getPageNumbers().map((page, index) => (
+                    <button
+                      key={index}
+                      onClick={() => typeof page === "number" && goToPage(page)}
+                      className={`px-3 py-1 border rounded ${
+                        page === currentPage
+                          ? "bg-blue-500 text-white"
+                          : page === "..."
+                          ? ""
+                          : "hover:bg-gray-100"
+                      }`}
+                      disabled={page === "..."}
+                    >
+                      {page}
+                    </button>
+                  ))}
+
+                  <button
+                    onClick={() => goToPage(currentPage + 1)}
+                    disabled={currentPage === totalPages || totalPages === 0}
+                    className={`px-3 py-1 border rounded cursor-pointer ${
+                      currentPage === totalPages || totalPages === 0
+                        ? "text-gray-400"
+                        : "hover:bg-gray-100"
+                    }`}
+                  >
+                    Next
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
