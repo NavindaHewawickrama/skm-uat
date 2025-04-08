@@ -3,13 +3,16 @@ import React, { useState } from "react";
 import AppBar from "@/components/Appbar";
 import SideNav from "@/components/Sidenav";
 import Footer from "@/components/Footer";
+import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 
 const PendingOrdersPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [entriesPerPage, setEntriesPerPage] = useState(50);
   const [currentPage, setCurrentPage] = useState(1);
+  const [listViewOpen, setListViewOpen] = useState(false);
 
+  //#region
   // Sample pending orders data
   const pendingOrders = [
     {
@@ -454,6 +457,8 @@ const PendingOrdersPage: React.FC = () => {
     },
   ];
 
+  //#endregion
+
   // Filter orders based on search query
   const filteredOrders = pendingOrders.filter(
     (order) =>
@@ -474,6 +479,10 @@ const PendingOrdersPage: React.FC = () => {
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
   };
+
+  const handleItemDetailsView = () => {
+    setListViewOpen(true)
+  }
 
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
@@ -580,7 +589,7 @@ const PendingOrdersPage: React.FC = () => {
                           {order.total.toFixed(2)}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-indigo-600 text-white py-1 px-4 rounded hover:bg-indigo-700 focus:outline-none cursor-pointer">
+                          <button className="bg-indigo-600 text-white py-1 px-4 rounded hover:bg-indigo-700 focus:outline-none cursor-pointer" onClick={handleItemDetailsView}>
                             View
                           </button>
                         </td>
@@ -593,7 +602,7 @@ const PendingOrdersPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded focus:outline-none cursor-pointer">
+                          <button className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded focus:outline-none cursor-pointer" >
                             Edit
                           </button>
                         </td>
@@ -617,11 +626,10 @@ const PendingOrdersPage: React.FC = () => {
                         setCurrentPage(Math.max(1, currentPage - 1))
                       }
                       disabled={currentPage === 1}
-                      className={`px-3 py-1 rounded ${
-                        currentPage === 1
-                          ? "bg-gray-200 cursor-not-allowed"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
+                      className={`px-3 py-1 rounded ${currentPage === 1
+                        ? "bg-gray-200 cursor-not-allowed"
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                        }`}
                     >
                       Previous
                     </button>
@@ -630,11 +638,10 @@ const PendingOrdersPage: React.FC = () => {
                         <button
                           key={pageNumber}
                           onClick={() => setCurrentPage(pageNumber)}
-                          className={`px-3 py-1 rounded ${
-                            currentPage === pageNumber
-                              ? "bg-blue-700 text-white"
-                              : "bg-blue-600 text-white hover:bg-blue-700"
-                          }`}
+                          className={`px-3 py-1 rounded ${currentPage === pageNumber
+                            ? "bg-blue-700 text-white"
+                            : "bg-blue-600 text-white hover:bg-blue-700"
+                            }`}
                         >
                           {pageNumber}
                         </button>
@@ -645,11 +652,10 @@ const PendingOrdersPage: React.FC = () => {
                         setCurrentPage(Math.min(totalPages, currentPage + 1))
                       }
                       disabled={currentPage === totalPages}
-                      className={`px-3 py-1 rounded ${
-                        currentPage === totalPages
-                          ? "bg-gray-200 cursor-not-allowed"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
+                      className={`px-3 py-1 rounded ${currentPage === totalPages
+                        ? "bg-gray-200 cursor-not-allowed"
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                        }`}
                     >
                       Next
                     </button>
@@ -657,8 +663,9 @@ const PendingOrdersPage: React.FC = () => {
                 </div>
               )}
             </div>
-          </div>
 
+          </div>
+          <ViewOrderEditPopupButton open={listViewOpen} onClose={() => setListViewOpen(false)} />
           {/* Footer Component */}
           <Footer />
         </div>
