@@ -653,7 +653,7 @@ const PendingOrdersPage: React.FC = () => {
                           {order.total.toFixed(2)}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-indigo-600 text-white py-1 px-4 rounded hover:bg-indigo-700 focus:outline-none cursor-pointer" onClick={handleItemDetailsView}>
+                          <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer" onClick={handleItemDetailsView}>
                             View
                           </button>
                         </td>
