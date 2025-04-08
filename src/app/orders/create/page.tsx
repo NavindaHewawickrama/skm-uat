@@ -148,7 +148,7 @@ const CreateOrderPage: React.FC = () => {
                     readOnly
                   />
                   <div className="flex justify-start mt-2">
-                    <button className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 focus:outline-none">
+                    <button className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-950 focus:outline-none cursor-pointer">
                       Report
                     </button>
                   </div>

@@ -17,6 +17,19 @@ interface UserData {
   isActive: boolean;
 }
 
+interface FormErrors {
+  username?: string;
+  password?: string;
+  confirmPassword?: string;
+  firstName?: string;
+  lastName?: string;
+  general?: string;
+  posName?:string;
+  email?:string,
+  telephone?:string;
+  role?:string
+}
+
 const CreateUserPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [userData, setUserData] = useState<UserData>({
@@ -32,7 +45,9 @@ const CreateUserPage: React.FC = () => {
     isActive: false,
   });
 
+  const [errors, setErrors] = useState<FormErrors>({});
   const [usersList, setUsersList] = useState<UserData[]>([]);
+  const [showUsersList, setShowUsersList] = useState(false);
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -42,33 +57,89 @@ const CreateUserPage: React.FC = () => {
     field: keyof UserData,
     value: string | boolean
   ) => {
+    // Clear error when field is modified
+    if (field in errors) {
+      setErrors(prev => {
+        const newErrors = {...prev};
+        delete newErrors[field as keyof FormErrors];
+        return newErrors;
+      });
+    }
+    
     setUserData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
 
-  const handleCreateUser = () => {
-    // Validation checks
-    if (
-      !userData.username ||
-      !userData.password ||
-      !userData.firstName ||
-      !userData.lastName
-    ) {
-      alert("Please fill in all required fields");
-      return;
+  const validateForm = (): boolean => {
+    const newErrors: FormErrors = {};
+    let isValid = true;
+
+    if (!userData.username) {
+      newErrors.username = "Username is required";
+      isValid = false;
+    }
+
+    if (!userData.password) {
+      newErrors.password = "Password is required";
+      isValid = false;
+    }
+
+    if (!userData.confirmPassword) {
+      newErrors.confirmPassword = "Re Type Password is required";
+      isValid = false;
+    }
+
+    if (!userData.firstName) {
+      newErrors.firstName = "First Name is required";
+      isValid = false;
+    }
+
+    if (!userData.lastName) {
+      newErrors.lastName = "Last Name is required";
+      isValid = false;
     }
 
     if (userData.password !== userData.confirmPassword) {
-      alert("Passwords do not match");
+      newErrors.confirmPassword = "Passwords do not match";
+      isValid = false;
+    }
+
+    if (!userData.posName) {
+      newErrors.posName = "POS Name is required";
+      isValid = false;
+    }
+
+    if (!userData.email) {
+      newErrors.email = "Email is required";
+      isValid = false;
+    }
+
+    if (!userData.telephone) {
+      newErrors.telephone = "Telephone Number is required";
+      isValid = false;
+    }
+
+    if (!userData.role) {
+      newErrors.role = "Role is required";
+      isValid = false;
+    }
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleCreateUser = () => {
+    // Validate form
+    if (!validateForm()) {
       return;
     }
 
     // Add user to list
     setUsersList([...usersList, userData]);
 
-    // Reset form
+    // Reset form and errors
     setUserData({
       username: "",
       password: "",
@@ -81,6 +152,7 @@ const CreateUserPage: React.FC = () => {
       role: "",
       isActive: false,
     });
+    setErrors({});
   };
 
   const handleReset = () => {
@@ -96,6 +168,11 @@ const CreateUserPage: React.FC = () => {
       role: "",
       isActive: false,
     });
+    setErrors({});
+  };
+
+  const toggleUsersList = () => {
+    setShowUsersList(!showUsersList);
   };
 
   return (
@@ -110,19 +187,29 @@ const CreateUserPage: React.FC = () => {
 
         {/* Content Area */}
         <div className="flex-1 overflow-auto p-6" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
-          <div className="bg-white p-6 rounded shadow w-full">
+          <div className="bg-white p-6 rounded shadow lg:w-[75%]">
             <h2 className="text-xl font-bold mb-6">Create User</h2>
+
+            {/* General error message */}
+            {errors.general && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-300 text-red-700 rounded">
+                {errors.general}
+              </div>
+            )}
 
             {/* User Name */}
             <div className="mb-4">
               <label className="block text-gray-700 font-semibold mb-2">User Name :</label>
               <input
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded"
+                className={`w-full p-2 border ${errors.username ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="Username"
                 value={userData.username}
                 onChange={(e) => handleInputChange("username", e.target.value)}
               />
+              {errors.username && (
+                <p className="text-red-500 text-sm mt-1">{errors.username}</p>
+              )}
             </div>
 
             {/* Password */}
@@ -130,11 +217,14 @@ const CreateUserPage: React.FC = () => {
               <label className="block text-gray-700 font-semibold mb-2">Password :</label>
               <input
                 type="password"
-                className="w-full p-2 border border-gray-300 rounded"
+                className={`w-full p-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="Password"
                 value={userData.password}
                 onChange={(e) => handleInputChange("password", e.target.value)}
               />
+              {errors.password && (
+                <p className="text-red-500 text-sm mt-1">{errors.password}</p>
+              )}
             </div>
 
             {/* Re-Type Password */}
@@ -144,13 +234,16 @@ const CreateUserPage: React.FC = () => {
               </label>
               <input
                 type="password"
-                className="w-full p-2 border border-gray-300 rounded"
+                className={`w-full p-2 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="Re-Type Password"
                 value={userData.confirmPassword}
                 onChange={(e) =>
                   handleInputChange("confirmPassword", e.target.value)
                 }
               />
+              {errors.confirmPassword && (
+                <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
+              )}
             </div>
 
             {/* First Name */}
@@ -158,11 +251,14 @@ const CreateUserPage: React.FC = () => {
               <label className="block text-gray-700 font-semibold mb-2">First Name :</label>
               <input
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded"
+                className={`w-full p-2 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="First Name"
                 value={userData.firstName}
                 onChange={(e) => handleInputChange("firstName", e.target.value)}
               />
+              {errors.firstName && (
+                <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
+              )}
             </div>
 
             {/* Last Name */}
@@ -170,11 +266,14 @@ const CreateUserPage: React.FC = () => {
               <label className="block text-gray-700 font-semibold mb-2">Last Name :</label>
               <input
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded"
+                className={`w-full p-2 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="Last Name"
                 value={userData.lastName}
                 onChange={(e) => handleInputChange("lastName", e.target.value)}
               />
+              {errors.lastName && (
+                <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
+              )}
             </div>
 
             {/* POS Name */}
@@ -182,11 +281,14 @@ const CreateUserPage: React.FC = () => {
               <label className="block text-gray-700 font-semibold mb-2">POS Name :</label>
               <input
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded"
+                className={`w-full p-2 border ${errors.posName ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="Contact Name Of POS System"
                 value={userData.posName}
                 onChange={(e) => handleInputChange("posName", e.target.value)}
               />
+              {errors.posName && (
+                <p className="text-red-500 text-sm mt-1">{errors.posName}</p>
+              )}
             </div>
 
             {/* E-Mail */}
@@ -194,11 +296,14 @@ const CreateUserPage: React.FC = () => {
               <label className="block text-gray-700 font-semibold mb-2">E-Mail :</label>
               <input
                 type="email"
-                className="w-full p-2 border border-gray-300 rounded"
+                className={`w-full p-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="Enter a valid e-mail"
                 value={userData.email}
                 onChange={(e) => handleInputChange("email", e.target.value)}
               />
+              {errors.email && (
+                <p className="text-red-500 text-sm mt-1">{errors.email}</p>
+              )}
             </div>
 
             {/* Telephone */}
@@ -206,11 +311,14 @@ const CreateUserPage: React.FC = () => {
               <label className="block text-gray-700 font-semibold mb-2">Telephone :</label>
               <input
                 type="text"
-                className="w-full p-2 border border-gray-300 rounded"
+                className={`w-full p-2 border ${errors.telephone ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="Enter a valid Number"
                 value={userData.telephone}
                 onChange={(e) => handleInputChange("telephone", e.target.value)}
               />
+              {errors.telephone && (
+                <p className="text-red-500 text-sm mt-1">{errors.telephone}</p>
+              )}
             </div>
 
             {/* Role */}
@@ -218,7 +326,7 @@ const CreateUserPage: React.FC = () => {
               <label className="block text-gray-700 font-semibold mb-2">Role :</label>
               <div className="relative">
                 <select
-                  className="w-full p-2 border border-gray-300 rounded appearance-none"
+                  className={`w-full p-2 border ${errors.role ? 'border-red-500' : 'border-gray-300'} rounded appearance-none`}
                   value={userData.role}
                   onChange={(e) => handleInputChange("role", e.target.value)}
                 >
@@ -243,6 +351,9 @@ const CreateUserPage: React.FC = () => {
                   </svg>
                 </div>
               </div>
+              {errors.role && (
+                <p className="text-red-500 text-sm mt-1">{errors.role}</p>
+              )}
             </div>
 
             {/* Is Active */}
@@ -261,9 +372,9 @@ const CreateUserPage: React.FC = () => {
             </div>
 
             {/* Buttons */}
-            <div className="flex space-x-2">
+            <div className="flex flex-wrap gap-2">
               <button
-                className="px-4 py-2 bg-blue-700 text-white rounded hover:bg-blue-800 cursor-pointer"
+                className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-950 cursor-pointer"
                 onClick={handleCreateUser}
               >
                 Create User
@@ -274,11 +385,17 @@ const CreateUserPage: React.FC = () => {
               >
                 Reset
               </button>
+              <button
+                className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700 cursor-pointer"
+                onClick={toggleUsersList}
+              >
+                {showUsersList ? "Hide Users" : "View Users"}
+              </button>
             </div>
           </div>
 
-          {/* User List */}
-          {usersList.length > 0 && (
+          {/* User List - Only shown when showUsersList is true */}
+          {showUsersList && usersList.length > 0 && (
             <div className="bg-white p-6 rounded shadow mt-6">
               <h2 className="text-xl font-semibold mb-4">User List</h2>
               <div className="overflow-x-auto">
@@ -370,6 +487,13 @@ const CreateUserPage: React.FC = () => {
                   </tbody>
                 </table>
               </div>
+            </div>
+          )}
+
+          {/* Message when View Users is clicked but no users exist */}
+          {showUsersList && usersList.length === 0 && (
+            <div className="bg-white p-6 rounded shadow mt-6 text-center">
+              <p className="text-gray-600">No users have been created yet.</p>
             </div>
           )}
         </div>

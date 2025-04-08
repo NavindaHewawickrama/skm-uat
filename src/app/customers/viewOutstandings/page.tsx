@@ -277,7 +277,7 @@ const OutstandingsPage: React.FC = () => {
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Type Here..."
-                    className="border rounded px-2 py-1 w-full md:w-auto focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="border rounded px-2 py-1 w-full md:w-auto focus:outline-none focus:ring-1"
                   />
                 </div>
               </div>
