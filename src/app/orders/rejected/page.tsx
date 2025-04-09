@@ -3,12 +3,15 @@ import React, { useState, useMemo } from "react";
 import AppBar from "@/components/Appbar";
 import SideNav from "@/components/Sidenav";
 import Footer from "@/components/Footer";
+import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 
 const RejectedOrdersPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [entriesPerPage, setEntriesPerPage] = useState("50");
   const [currentPage, setCurrentPage] = useState(1);
+  const [listViewOpen, setListViewOpen] = useState(false);
+  const [selectedOrder,setSelectedOrder] = useState([]);
 
   // Sample delivered orders data based on the screenshot
   const rejectedOrders = [
@@ -18,7 +21,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -28,7 +31,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -38,7 +41,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -48,7 +51,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -58,7 +61,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -68,7 +71,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -78,7 +81,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -88,7 +91,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -98,7 +101,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -108,7 +111,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -118,7 +121,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -128,7 +131,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -138,7 +141,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -148,7 +151,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -158,7 +161,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -168,7 +171,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -178,7 +181,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -188,7 +191,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -198,7 +201,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -208,7 +211,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -218,7 +221,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -228,7 +231,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -238,7 +241,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -248,7 +251,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -258,7 +261,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -268,7 +271,8 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -278,7 +282,8 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -288,7 +293,8 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -298,7 +304,8 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -308,7 +315,8 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -318,7 +326,8 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -328,7 +337,8 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -338,7 +348,8 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -348,7 +359,8 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -358,7 +370,8 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -368,7 +381,8 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -378,7 +392,8 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -388,7 +403,8 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -398,7 +414,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -408,7 +424,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -418,7 +434,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -428,7 +444,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -438,7 +454,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -448,7 +464,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -458,7 +474,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -468,7 +484,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -478,7 +494,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -488,7 +504,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -498,7 +514,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -508,7 +524,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -518,7 +534,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -528,7 +544,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -538,7 +554,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -548,7 +564,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -558,7 +574,7 @@ const RejectedOrdersPage: React.FC = () => {
       salesRef: "manjula",
       orderDate: "9/15/2020, 8:58:38 PM",
       total: 327225,
-      itemDetails: "",
+      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
       status: "Rejected",
       reason: "Out of Stock",
     },
@@ -666,6 +682,12 @@ const RejectedOrdersPage: React.FC = () => {
     setSideNavOpen(!sideNavOpen);
   };
 
+  const handleItemDetailsView = (order:any) => {
+    console.log(order);
+    setSelectedOrder(order);
+    setListViewOpen(true)
+  }
+
   // Handle entries per page change
   const handleEntriesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setEntriesPerPage(e.target.value);
@@ -770,7 +792,7 @@ const RejectedOrdersPage: React.FC = () => {
                             : order.total}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer">
+                          <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer" onClick={()=>handleItemDetailsView(order)}>
                             View
                           </button>
                         </td>
@@ -845,7 +867,7 @@ const RejectedOrdersPage: React.FC = () => {
               </div>
             </div>
           </div>
-
+          <ViewOrderEditPopupButton open={listViewOpen} onClose={() => setListViewOpen(false)} orderDetails={selectedOrder}/>
           {/* Footer Component */}
           <Footer />
         </div>

@@ -3,7 +3,7 @@ import React, { useState, useMemo } from "react";
 import AppBar from "@/components/Appbar";
 import SideNav from "@/components/Sidenav";
 import Footer from "@/components/Footer";
-import ViewOrderEditPopupButton from "@/components/ViewOrderEditPopupButton";
+import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 import ViewStatusPopup from "@/components/ViewStatusPopup";
 
 const PendingOrdersPage: React.FC = () => {
@@ -664,7 +664,7 @@ const PendingOrdersPage: React.FC = () => {
                           {order.total.toFixed(2)}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-indigo-600 text-white py-1 px-4 rounded hover:bg-indigo-700 focus:outline-none cursor-pointer" onClick={()=>handleItemDetailsView(order)}>
+                          <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer" onClick={()=>handleItemDetailsView(order)}>
                             View
                           </button>
                         </td>
