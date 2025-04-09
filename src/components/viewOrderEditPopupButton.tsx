@@ -12,15 +12,6 @@ interface ModalProps {
 
 const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDetails }) => {
   const router = useRouter();
-  const [nextModel, setNextModel] = useState(true);
-  const [changeModel, setChangeModel] = useState(false);
-  const [contactInfo, setContactInfo] = useState("");
-  const [verificationCode, setVerificationCode] = useState("");
-  const [enteredCode, setEnteredCode] = useState("");
-  const [resendAttempts, setResendAttempts] = useState(3); // Initialize resend attempts
-  const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   // console.log(orderDetails)
 
@@ -47,12 +38,12 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDe
             >
               <button type="button" className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500">
                 <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
             </p>
           </div>
-          <hr className="border-t-2 border-red-500 my-4" />
+          <hr className="border-t-2 border-gray-300 my-4" />
           <br />
           {/* Items Table */}
           <div className="flex justify-center" >
@@ -78,8 +69,8 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDe
                   </tr>
                 </thead>
                 <tbody className="text-center">
-                  {orderDetails.itemDetails.map((item: any) => (
-                    <tr>
+                  {orderDetails.itemDetails.map((item: any, index:any) => (
+                    <tr key={index}>
                       <td className="px-4 py-3 text-center text-sm">
                         {item.itemName}
                       </td>
@@ -100,6 +91,15 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDe
                 </tbody>
               </table>
             </div>
+          </div>
+          <div className="flex gap-2 mt-6">
+            {/* Generate Report Button */}
+            <button
+              onClick={() => router.push(`/report/${orderDetails.orderNo}`)}
+              className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 text-sm"
+            >
+              Report
+            </button>
           </div>
         </div>
       </div>

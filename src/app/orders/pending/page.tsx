@@ -3,7 +3,8 @@ import React, { useState, useMemo } from "react";
 import AppBar from "@/components/Appbar";
 import SideNav from "@/components/Sidenav";
 import Footer from "@/components/Footer";
-import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
+import ViewOrderEditPopupButton from "@/components/ViewOrderEditPopupButton";
+import ViewStatusPopup from "@/components/ViewStatusPopup";
 
 const PendingOrdersPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
@@ -11,7 +12,9 @@ const PendingOrdersPage: React.FC = () => {
   const [entriesPerPage, setEntriesPerPage] = useState("50");
   const [currentPage, setCurrentPage] = useState(1);
   const [listViewOpen, setListViewOpen] = useState(false);
-  const [selectedOrder,setSelectedOrder] = useState([])
+  const [selectedOrder,setSelectedOrder] = useState([]);
+  const [status,setStatus] = useState("");
+  const [statusViewOpen,setStatusViewOpen] = useState(false);
 
   //#region
   // Sample pending orders data
@@ -551,6 +554,11 @@ const PendingOrdersPage: React.FC = () => {
     setCurrentPage(1); // Reset to first page when changing entries per page
   };
 
+  function handleStatus(status: string): void {
+    setStatus(status);
+    setStatusViewOpen(true);
+  }
+
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
@@ -669,7 +677,7 @@ const PendingOrdersPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded focus:outline-none cursor-pointer" >
+                          <button className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded focus:outline-none cursor-pointer" onClick={()=>handleStatus(order.status)} >
                             Edit
                           </button>
                         </td>
@@ -735,6 +743,7 @@ const PendingOrdersPage: React.FC = () => {
 
           </div>
           <ViewOrderEditPopupButton open={listViewOpen} onClose={() => setListViewOpen(false)} orderDetails={selectedOrder}/>
+            <ViewStatusPopup open={statusViewOpen} onClose={()=> setStatusViewOpen(false)} status={status}/>
           {/* Footer Component */}
           <Footer />
         </div>

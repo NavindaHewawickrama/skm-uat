@@ -824,46 +824,46 @@ const StockView = () => {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-200">
                   <tr>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Item Code
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Item Name
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Location
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Stock
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Unit Price
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Item Cat.
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Category
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Sub Category
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Image
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Description
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Description 2
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Unit of Measure
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Size
                     </th>
-                    <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
+                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Reorder Quantity
                     </th>
                   </tr>
@@ -892,37 +892,37 @@ const StockView = () => {
                         )} */}
                         {item.location}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-center  text-sm text-gray-900">
                         {item.stock}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.unitPrice}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.itemCat}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.category}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.subCategory}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.img}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.description}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.description2}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.unitMeasure}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.size}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.reQuantity}
                       </td>
                     </tr>
