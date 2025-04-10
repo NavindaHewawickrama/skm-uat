@@ -3,9 +3,21 @@ import React, { useState, useEffect, useMemo } from "react";
 import AppBar from "../../../components/Appbar";
 import SideNav from "../../../components/Sidenav";
 import Footer from "../../../components/Footer";
+import productImage from "../../../../public/images/products/pro1.png";
+import ImagePopup from "@/components/ImagePopup";
+import producctImage2 from "../../../../public/images/products/pro2.png"
+
+interface Image {
+  src: string;
+  width: number;
+  height: number;
+  blurDataURL?: string; // Optional property
+  blurWidth?: number;   // Optional property
+  blurHeight?: number;  // Optional property
+}
 
 interface StockItem {
-  img: string;
+  img: Image;
   description: string;
   description2: string;
   unitMeasure: string;
@@ -26,6 +38,14 @@ const StockView = () => {
   const [entriesPerPage, setEntriesPerPage] = useState<string>("50");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [openImagePopup, setOpenImagePopup] = useState(false);
+
+  const defaultImage: Image = {
+    ...producctImage2, // Provide a default image URL or a placeholder
+    width: producctImage2.width,
+    height: producctImage2.height,
+  };
+  const [selectedProductImage,setSelectedProductImage] = useState<Image>(defaultImage);
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -42,7 +62,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -58,7 +78,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: producctImage2,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -74,7 +94,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -90,7 +110,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -106,7 +126,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -122,7 +142,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -138,7 +158,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -154,7 +174,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -170,7 +190,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -186,7 +206,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -202,7 +222,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -218,7 +238,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -234,7 +254,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -250,7 +270,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -266,7 +286,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -282,7 +302,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -298,7 +318,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -314,7 +334,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -330,7 +350,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -346,7 +366,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -362,7 +382,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -378,7 +398,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -394,7 +414,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -410,7 +430,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -426,7 +446,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -442,7 +462,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -458,7 +478,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -474,7 +494,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -490,7 +510,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -506,7 +526,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -522,7 +542,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -538,7 +558,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -554,7 +574,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -570,7 +590,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -586,7 +606,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -602,7 +622,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -618,7 +638,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -634,7 +654,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -650,7 +670,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -666,7 +686,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -682,7 +702,7 @@ const StockView = () => {
       itemCat: "TKK",
       category: "OIL SEAL",
       subCategory: "TOYOTA",
-      img: "",
+      img: productImage,
       description: "-",
       description2: "-",
       unitMeasure: "kg",
@@ -778,6 +798,12 @@ const StockView = () => {
     setEntriesPerPage(e.target.value);
   };
 
+  function handleViewImage(img: any): void {
+    setOpenImagePopup(true);
+    setSelectedProductImage(img);
+    console.log(img);
+  }
+
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
@@ -872,9 +898,8 @@ const StockView = () => {
                   {displayedItems.map((item, index) => (
                     <tr
                       key={index}
-                      className={`hover:bg-red ${
-                        item.location === "Warehouse" ? "bg-[#bbd2fc]" : ""
-                      }`}
+                      className={`hover:bg-red ${item.location === "Warehouse" ? "bg-[#bbd2fc]" : ""
+                        }`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {item.itemCode}
@@ -908,7 +933,10 @@ const StockView = () => {
                         {item.subCategory}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
-                        {item.img}
+                        {/* {item.img} */}
+                        <button className="bg-blue-900 hover:bg-blue-950 text-white py-1 px-4 rounded focus:outline-none cursor-pointer" onClick={() => handleViewImage(item.img)}>
+                          View
+                        </button>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.description}
@@ -947,9 +975,8 @@ const StockView = () => {
                 <button
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 border rounded cursor-pointer ${
-                    currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
-                  }`}
+                  className={`px-3 py-1 border rounded cursor-pointer ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
+                    }`}
                 >
                   Previous
                 </button>
@@ -958,13 +985,12 @@ const StockView = () => {
                   <button
                     key={index}
                     onClick={() => typeof page === "number" && goToPage(page)}
-                    className={`px-3 py-1 border rounded ${
-                      page === currentPage
-                        ? "bg-blue-500 text-white"
-                        : page === "..."
+                    className={`px-3 py-1 border rounded ${page === currentPage
+                      ? "bg-blue-500 text-white"
+                      : page === "..."
                         ? ""
                         : "hover:bg-gray-100"
-                    }`}
+                      }`}
                     disabled={page === "..."}
                   >
                     {page}
@@ -974,18 +1000,17 @@ const StockView = () => {
                 <button
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages || totalPages === 0}
-                  className={`px-3 py-1 border rounded cursor-pointer ${
-                    currentPage === totalPages || totalPages === 0
-                      ? "text-gray-400"
-                      : "hover:bg-gray-100"
-                  }`}
+                  className={`px-3 py-1 border rounded cursor-pointer ${currentPage === totalPages || totalPages === 0
+                    ? "text-gray-400"
+                    : "hover:bg-gray-100"
+                    }`}
                 >
                   Next
                 </button>
               </div>
             </div>
           </div>
-
+          <ImagePopup open={openImagePopup} onClose={() => setOpenImagePopup(false)} image={selectedProductImage}/>
           {/* Footer Component */}
           <Footer />
         </div>
