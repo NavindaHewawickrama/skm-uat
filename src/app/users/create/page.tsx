@@ -3,6 +3,7 @@ import React, { useState } from "react";
 import AppBar from "../../../components/Appbar";
 import SideNav from "../../../components/Sidenav";
 import Footer from "../../../components/Footer";
+import MultiSelectDropdown from "@/components/MultiSelectDropdown";
 
 interface UserData {
   username: string;
@@ -355,6 +356,9 @@ const CreateUserPage: React.FC = () => {
                 <p className="text-red-500 text-sm mt-1">{errors.role}</p>
               )}
             </div>
+
+            {/* location */}
+            <MultiSelectDropdown/>
 
             {/* Is Active */}
             <div className="mb-6">

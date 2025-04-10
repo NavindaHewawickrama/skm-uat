@@ -235,8 +235,8 @@ const CreateOrderPage: React.FC = () => {
                       }
                     >
                       <option value="">Select item code</option>
-                      <option value="item001">ITEM001</option>
-                      <option value="item002">ITEM002</option>
+                      <option value="item001">ITEM001 / 40+</option>
+                      <option value="item002">ITEM002 / 40+</option>
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                       <svg
@@ -258,7 +258,7 @@ const CreateOrderPage: React.FC = () => {
 
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
-                    Items by Name:
+                    Substitute Items:
                   </label>
                   <div className="relative">
                     <select
@@ -268,7 +268,7 @@ const CreateOrderPage: React.FC = () => {
                         updateCurrentItem("itemName", e.target.value)
                       }
                     >
-                      <option value="">Select item name</option>
+                      <option value="">Select substitute item name</option>
                       <option value="Product A">Product A</option>
                       <option value="Product B">Product B</option>
                     </select>
