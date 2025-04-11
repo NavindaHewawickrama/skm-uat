@@ -34,6 +34,23 @@ const Dashboard = () => {
             {/* Notices card */}
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 w-full md:w-1/2 sm:w-full">
               <h2 className="text-xl font-semibold mb-2">Notices</h2>
+              <ul className="space-y-2">
+                {/* Replace these URLs with your API response or static links */}
+                {[
+                  { name: "Notice 1 - Holiday Schedule", file: "/notices/notice1.pdf" },
+                  { name: "Notice 2 - Meeting Agenda", file: "/notices/notice2.pdf" },
+                ].map((doc, index) => (
+                  <li key={index}>
+                    <a
+                      href={`/view-pdf?file=${encodeURIComponent(doc.file)}`}
+                      target="_blank"
+                      className="text-blue-600 underline hover:text-blue-800"
+                    >
+                      📄 {doc.name}
+                    </a>
+                  </li>
+                ))}
+              </ul>
             </div>
           </div>
 
