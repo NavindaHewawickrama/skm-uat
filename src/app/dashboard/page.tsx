@@ -13,7 +13,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
+    <div className="min-h-screen w-screen bg-gray-100 flex flex-col">
       {/* App Bar */}
       <AppBar toggleSideNav={toggleSideNav} />
 
@@ -23,12 +23,17 @@ const Dashboard = () => {
         <SideNav isOpen={sideNavOpen} />
 
         {/* Dashboard Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="flex flex-col flex-grow overflow-auto">
           <div className="flex-1 p-4 lg:p-6">
             {/* Sales Order Card */}
-            <div className="bg-white rounded-lg shadow-sm p-6 mb-6 w-full md:w-1/2 sm:w-full h-[80%]">
+            <div className="bg-white rounded-lg shadow-sm p-6 mb-6 w-full md:w-1/2 sm:w-full">
               <h2 className="text-xl font-semibold mb-2">Total Sales Order's</h2>
-               <SalesChart deliveredCount={18898} />
+              <SalesChart deliveredCount={18898} />
+            </div>
+
+            {/* Notices card */}
+            <div className="bg-white rounded-lg shadow-sm p-6 mb-6 w-full md:w-1/2 sm:w-full">
+              <h2 className="text-xl font-semibold mb-2">Notices</h2>
             </div>
           </div>
 
