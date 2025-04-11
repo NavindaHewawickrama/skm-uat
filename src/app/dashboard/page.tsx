@@ -33,16 +33,17 @@ const Dashboard = () => {
 
             {/* Notices card */}
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 w-full md:w-1/2 sm:w-full">
-              <h2 className="text-xl font-semibold mb-2">Notices</h2>
+              <h2 className="text-xl font-semibold mb-2">Notices [March 14 2024 - April 14 2025]</h2>
               <ul className="space-y-2">
                 {/* Replace these URLs with your API response or static links */}
                 {[
-                  { name: "Notice 1 - Holiday Schedule", file: "/notices/notice1.pdf" },
-                  { name: "Notice 2 - Meeting Agenda", file: "/notices/notice2.pdf" },
+                  { name: "Notice 1 - Holiday Schedule", file: "/documents/nutrients-15-00155.pdf" },
+                  { name: "Notice 2 - Meeting Agenda", file: "/documents/s41598-025-88963-9 (1).pdf" },
                 ].map((doc, index) => (
                   <li key={index}>
                     <a
-                      href={`/view-pdf?file=${encodeURIComponent(doc.file)}`}
+                     // href={`/view-pdf?file=${encodeURIComponent(doc.file)}`}
+                     href={doc.file}
                       target="_blank"
                       className="text-blue-600 underline hover:text-blue-800"
                     >
