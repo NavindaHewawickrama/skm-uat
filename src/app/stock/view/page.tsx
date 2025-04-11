@@ -17,7 +17,7 @@ interface Image {
 }
 
 interface StockItem {
-  img: Image;
+  img: any;
   description: string;
   description2: string;
   unitMeasure: string;

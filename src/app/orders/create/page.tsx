@@ -16,7 +16,7 @@ interface OrderItem {
 const CreateOrderPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [customer, setCustomer] = useState("");
-  const [location,setLocation] = useState("");
+  const [location, setLocation] = useState("");
   const [paymentType, setPaymentType] = useState("");
   const [notes, setNotes] = useState("");
   const [totalDueAmount, setTotalDueAmount] = useState(0);
@@ -106,38 +106,38 @@ const CreateOrderPage: React.FC = () => {
               <h2 className="text-lg font-bold mb-4">Order</h2>
               {/*Location*/}
               <div className="mb-4 w-sm">
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Location:
-                  </label>
-                  <div className="relative">
-                    <select
-                      className="block w-sm p-2 border border-gray-300 rounded appearance-none"
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
+                <label className="block text-gray-700 font-medium mb-2">
+                  Location:
+                </label>
+                <div className="relative">
+                  <select
+                    className="block w-sm p-2 border border-gray-300 rounded appearance-none"
+                    value={location}
+                    onChange={(e) => setLocation(e.target.value)}
+                  >
+                    <option value="">Select a Location</option>
+                    <option value="warehouse1">Warehouse 1</option>
+                    <option value="warehouse2">Warehouse 2</option>
+                  </select>
+                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg
+                      className="h-4 w-4"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
                     >
-                      <option value="">Select a Location</option>
-                      <option value="warehouse1">Warehouse 1</option>
-                      <option value="warehouse2">Warehouse 2</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
                   </div>
                 </div>
+              </div>
               {/* Customer and Totals Row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">    
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Customer:
@@ -181,7 +181,7 @@ const CreateOrderPage: React.FC = () => {
                   />
                   <div className="flex justify-start mt-2">
                     <button className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-950 focus:outline-none cursor-pointer">
-                      Report
+                      View Details
                     </button>
                   </div>
                 </div>
