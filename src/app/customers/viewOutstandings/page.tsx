@@ -3,12 +3,14 @@ import React, { useState } from "react";
 import AppBar from "@/components/Appbar";
 import SideNav from "@/components/Sidenav";
 import Footer from "@/components/Footer";
+import CustomerSelectionPopup from "@/components/CustomerSelectionPopup";
 
 const OutstandingsPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [entriesPerPage, setEntriesPerPage] = useState(50);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isCustomerPopupOpen, setIsCustomerPopupOpen] = useState(false);
 
   // Sample outstandings data
   const outstandingInvoices = [
@@ -199,7 +201,7 @@ const OutstandingsPage: React.FC = () => {
   const filteredInvoices = outstandingInvoices.filter(
     (invoice) =>
       invoice.invoiceNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      invoice.customer.toLowerCase().includes(searchQuery.toLowerCase()) 
+      invoice.customer.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   // Calculate pagination
@@ -215,6 +217,19 @@ const OutstandingsPage: React.FC = () => {
     setSideNavOpen(!sideNavOpen);
   };
 
+  const handleOpenCustomerPopup = () => {
+    setIsCustomerPopupOpen(true);
+  };
+
+  const handleCloseCustomerPopup = () => {
+    setIsCustomerPopupOpen(false);
+  };
+
+  const handleAddCustomers = (selectedCustomers: string[]) => {
+    // Handle the selected customers
+    console.log("Selected customers:", selectedCustomers);
+    // You would typically fetch invoices for these customers here
+  };
 
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
@@ -231,17 +246,17 @@ const OutstandingsPage: React.FC = () => {
           <div className="flex-1 p-4 overflow-auto">
             {/* Outstandings Card */}
             <div className="bg-white p-6 rounded-md shadow-sm mb-4">
-            <div className="bg-gray-100 rounded-lg shadow-sm p-6 mb-6 w-full md:w-1/2 sm:w-full h-[50%]">
-              <h2 className="text-xl font-bold mb-6">Get Customer's</h2>
-              <div className="flex justify-start mb-6">
-                <button
-                  className="bg-green-500 w-[50%] md:w-[50%] sm:w-full text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none cursor-pointer"
-                  
-                >
-                  +
-                </button>
+              <div className="bg-gray-100 rounded-lg shadow-sm p-6 mb-6 w-full md:w-1/2 sm:w-full h-[50%]">
+                <h2 className="text-xl font-bold mb-6">Get Customer's</h2>
+                <div className="flex justify-start mb-6">
+                  <button
+                    className="bg-green-500 w-[50%] md:w-[50%] sm:w-full text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none cursor-pointer"
+                    onClick={handleOpenCustomerPopup}
+                  >
+                    +
+                  </button>
+                </div>
               </div>
-            </div>
 
               {/* Total Due Amount Display */}
               <div className="mb-4">
@@ -287,7 +302,6 @@ const OutstandingsPage: React.FC = () => {
                 <table className="min-w-full bg-white border border-gray-200">
                   <thead className="bg-gray-200">
                     <tr>
-                      
                       <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                         Customer
                       </th>
@@ -386,7 +400,12 @@ const OutstandingsPage: React.FC = () => {
               )}
             </div>
           </div>
-
+          {/* Customer Selection Popup */}
+          <CustomerSelectionPopup
+            open={isCustomerPopupOpen}
+            onClose={handleCloseCustomerPopup}
+            onAdd={handleAddCustomers}
+          />
           {/* Footer Component */}
           <Footer />
         </div>
