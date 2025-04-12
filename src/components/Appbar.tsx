@@ -2,6 +2,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import NotificationPopup from "./NotificationPopup";
 
 interface AppBarProps {
   toggleSideNav: () => void;
@@ -12,6 +13,7 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav }) => {
   const [alertDropdownOpen, setAlertDropdownOpen] = useState(false);
   const alertDropdownRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
+  const [openNotificationPopup, setOpenNotificationPopup] = useState(false);
 
 
   // Close dropdown when clicking outside
@@ -49,6 +51,10 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav }) => {
     setProfileDropdownOpen(!profileDropdownOpen);
     setAlertDropdownOpen(false); // close the other
   };
+
+  const handleNotificationPopupOpen =() => {
+    setOpenNotificationPopup(true);
+  }
 
   return (
     <div className="w-full bg-blue-900 text-white h-18 flex items-center justify-between px-4">
@@ -128,7 +134,7 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav }) => {
                 </ul>
               </div>
               <div className="border-t border-gray-200 p-2">
-                <button className="w-[50%] bg-blue-900 text-white rounded-md py-2 hover:bg-blue-700">
+                <button className="w-[50%] bg-blue-900 text-white rounded-md py-2 hover:bg-blue-700" onClick={handleNotificationPopupOpen}>
                   View All
                 </button>
               </div>
@@ -225,6 +231,7 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav }) => {
 
 
         </div>
+        <NotificationPopup open={openNotificationPopup} onClose={() => setOpenNotificationPopup(false)} />
       </div>
     </div>
   );
