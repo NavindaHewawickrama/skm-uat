@@ -117,56 +117,17 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav }) => {
                   Notifications
                 </div>
               </div>
-              <div className="py-1">
-                <Link href="/user/ResetPassword">
-                  <button
-                    className="px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left flex items-center cursor-pointer"
-                    onClick={() => {
-                      setAlertDropdownOpen(false);
-                      // Add reset password logic here
-                    }}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-3 text-gray-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                      />
-                    </svg>
-                    Hi
-                  </button>
-                </Link>
-                <Link href="/">
-                  <button
-                    className="px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left flex items-center cursor-pointer"
-                    onClick={() => {
-                      setAlertDropdownOpen(false);
-                    }}
-                  >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-3 text-gray-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                      />
-                    </svg>
-                    Hi Hi
-                  </button>
-                </Link>
+              <div className="p-1">
+                <ul className="space-y-2">
+                  <li className="text-gray-800 text-sm hover:bg-gray-200 p-2">Notice 1: Your appointment is scheduled for tomorrow.</li>
+                  <li className="text-gray-800 text-sm hover:bg-gray-200 p-2">Notice 2: New updates are available for your application.</li>
+                  <li className="text-gray-800 text-sm hover:bg-gray-200 p-2">Notice 3: Your password will expire in 3 days.</li>
+                </ul>
+              </div>
+              <div className="border-t border-gray-200 p-2">
+                <button className="w-[50%] bg-blue-900 text-white rounded-md py-2 hover:bg-blue-700">
+                  View All
+                </button>
               </div>
             </div>
           )}
