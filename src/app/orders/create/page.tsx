@@ -503,10 +503,10 @@ const CreateOrderPage: React.FC = () => {
             </div>
 
             {/* Order Form */}
-            <div className="bg-white p-6 rounded-md shadow-sm mb-4">
-              <h2 className="text-lg font-bold mb-4">Listed Order Items</h2>
+            {/* <div className="bg-white p-6 rounded-md shadow-sm mb-4">
+              <h2 className="text-lg font-bold mb-4">Listed Order Items</h2> */}
               {/* Customer and Totals Row */}
-              <div className="bg-white overflow-x-auto overflow-y-auto shadow-sm">
+              {/* <div className="bg-white overflow-x-auto overflow-y-auto shadow-sm">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-200">
                     <tr>
@@ -534,8 +534,8 @@ const CreateOrderPage: React.FC = () => {
                     </tr>
                   </thead>
                 </table>
-              </div>
-            </div>
+              </div> */}
+            {/* </div> */}
           </div>
 
           {/* Footer Component */}

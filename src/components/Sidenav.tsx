@@ -87,6 +87,19 @@ const SideNav: React.FC<SideNavProps> = ({ isOpen }) => {
         },
       ],
     },
+    {
+      icon: "notices",
+      label: "Notices",
+      href: "/notices",
+      expanded: false,
+      subItems: [
+        {
+          label: "Create Notices",
+          href: "/notices/create",
+          active: false
+        },
+      ],
+    },
   ]);
 
   // Only update active states when pathname changes, not on every render
