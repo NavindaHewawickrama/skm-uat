@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import AppBar from "../../../components/Appbar";
 import SideNav from "../../../components/Sidenav";
 import Footer from "../../../components/Footer";
+import {jsPDF} from "jspdf";
+import autoTable from "jspdf-autotable"; 
 
 interface OrderItem {
   itemCode: string;
@@ -11,6 +13,14 @@ interface OrderItem {
   quantity: number;
   discount: number;
   total: number;
+}
+
+interface CustomerOutstandingData {
+  customerName: string;
+  invoiceNumber: string;
+  invoiceDate: string;
+  invoicedAmount: number;
+  dueAmount: number;
 }
 
 const CreateOrderPage: React.FC = () => {
@@ -32,6 +42,38 @@ const CreateOrderPage: React.FC = () => {
     discount: 0,
     total: 0,
   });
+
+  const outstandingData: CustomerOutstandingData[] = [
+    {
+      customerName: "ABC Corporation",
+      invoiceNumber: "INV-001",
+      invoiceDate: "2025-04-15",
+      invoicedAmount: 5000,
+      dueAmount: 5000,
+    },
+    {
+      customerName: "ABC Corporation",
+      invoiceNumber: "INV-002",
+      invoiceDate: "2025-04-25",
+      invoicedAmount: 3500,
+      dueAmount: 3500,
+    },
+    {
+      customerName: "XYZ Industries",
+      invoiceNumber: "INV-003",
+      invoiceDate: "2025-05-01",
+      invoicedAmount: 7500,
+      dueAmount: 7500,
+    },
+    {
+      customerName: "Smith Enterprises",
+      invoiceNumber: "INV-004",
+      invoiceDate: "2025-05-10",
+      invoicedAmount: 2200,
+      dueAmount: 2200,
+    },
+  ];
+
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -88,6 +130,70 @@ const CreateOrderPage: React.FC = () => {
     });
   };
 
+  const generatePDF = () => {
+    const pdf = new jsPDF();
+
+    pdf.setFontSize(18);
+    pdf.text("Customer Outstanding Report", 105, 15, { align: "center" });
+
+    const currentDate = new Date().toLocaleDateString("en-US");
+    pdf.setFontSize(10);
+    pdf.text(currentDate, 195, 15, { align: "right" });
+
+    const tableColumn = [
+      "Customer Name",
+      "Invoice Number",
+      "Invoice Date",
+      "Invoiced Amount",
+      "Due Amount",
+    ];
+    const tableRows = outstandingData.map((item) => [
+      item.customerName,
+      item.invoiceNumber,
+      item.invoiceDate,
+      `${item.invoicedAmount.toFixed(2)}`,
+      `${item.dueAmount.toFixed(2)}`,
+    ]);
+
+    autoTable(pdf, {
+      head: [tableColumn],
+      body: tableRows,
+      startY: 25,
+      theme: "grid",
+      styles: { fontSize: 10, cellPadding: 3 },
+      headStyles: {
+        fillColor: [200, 200, 200],
+        textColor: [0, 0, 0],
+        fontStyle: "bold",
+      },
+      alternateRowStyles: { fillColor: [245, 245, 245] },
+    });
+
+    const totalDue = outstandingData.reduce(
+      (sum, item) => sum + item.dueAmount,
+      0
+    );
+
+    const finalY = pdf.lastAutoTable?.finalY || 60;
+    pdf.setFontSize(12);
+    pdf.text(
+      `Total Outstanding: ${totalDue.toFixed(2)}`,
+      195,
+      finalY + 10,
+      { align: "right" }
+    );
+
+    const blob = pdf.output("blob");
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+  };
+
+  const handleViewDetails = () => {
+    generatePDF();
+  };
+
+  
+
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
@@ -105,13 +211,13 @@ const CreateOrderPage: React.FC = () => {
             <div className="bg-white p-6 rounded-md shadow-sm mb-4">
               <h2 className="text-lg font-bold mb-4">Order</h2>
               {/*Location*/}
-              <div className="mb-4 w-sm">
+              <div className="mb-4 w-[250px]">
                 <label className="block text-gray-700 font-medium mb-2">
                   Location:
                 </label>
                 <div className="relative">
                   <select
-                    className="block w-sm p-2 border border-gray-300 rounded appearance-none"
+                    className="block w-full p-2 border border-gray-300 rounded appearance-none"
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                   >
@@ -180,7 +286,7 @@ const CreateOrderPage: React.FC = () => {
                     readOnly
                   />
                   <div className="flex justify-start mt-2">
-                    <button className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-950 focus:outline-none cursor-pointer">
+                    <button onClick={handleViewDetails} className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-950 focus:outline-none cursor-pointer">
                       View Details
                     </button>
                   </div>
