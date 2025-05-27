@@ -5,32 +5,51 @@ import SideNav from "../../../components/Sidenav";
 import Footer from "../../../components/Footer";
 import productImage from "../../../../public/images/products/pro1.png";
 import ImagePopup from "@/components/ImagePopup";
-import producctImage2 from "../../../../public/images/products/pro2.png"
+import producctImage2 from "../../../../public/images/products/pro2.png";
 
 interface Image {
   src: string;
   width: number;
   height: number;
-  blurDataURL?: string; // Optional property
-  blurWidth?: number;   // Optional property
-  blurHeight?: number;  // Optional property
+  blurDataURL?: string;
+  blurWidth?: number;
+  blurHeight?: number;
 }
 
 interface StockItem {
-  img: any;
+  img?: any;
   description: string;
   description2: string;
-  unitMeasure: string;
+  unitOfMeasure: string;
   size: string;
-  reQuantity: string;
+  reorderQuantity: number;
   itemCode: string;
   itemName: string;
   location: string;
   stock: number | string;
   unitPrice: number;
-  itemCat: string;
+  itemCategory: string;
   category: string;
   subCategory: string;
+  image?: string;
+}
+
+// API Response Interface
+interface ApiStockItem {
+  itemCode: string;
+  itemName: string;
+  location: string;
+  stock: string;
+  unitPrice: number;
+  itemCategory: string;
+  category: string;
+  subCategory: string;
+  description: string;
+  description2: string;
+  unitOfMeasure: string;
+  size: string;
+  reorderQuantity: number;
+  image?: string;
 }
 
 const StockView = () => {
@@ -39,677 +58,69 @@ const StockView = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [openImagePopup, setOpenImagePopup] = useState(false);
+  const [stockItems, setStockItems] = useState<StockItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const defaultImage: Image = {
-    ...producctImage2, // Provide a default image URL or a placeholder
+    ...producctImage2,
     width: producctImage2.width,
     height: producctImage2.height,
   };
-  const [selectedProductImage,setSelectedProductImage] = useState<Image>(defaultImage);
+  const [selectedProductImage, setSelectedProductImage] =
+    useState<Image>(defaultImage);
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
   };
 
-  // Sample data
-  const stockItems: StockItem[] = [
-    {
-      itemCode: "01-1067",
-      itemName: "38X74X11 T1067 LH50/60/70 DRIVE PINION",
-      location: "Head Office",
-      stock: "20",
-      unitPrice: 720,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1067",
-      itemName: "38X74X11 T1067 LH50/60/70 DRIVE PINION",
-      location: "Warehouse",
-      stock: "40+",
-      unitPrice: 720,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: producctImage2,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1068",
-      itemName: "38X44X18 T1068 COASTER RB2 R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 490,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1068",
-      itemName: "38X44X18 T1068 COASTER RB2 R/W OUTER",
-      location: "Warehouse",
-      stock: "40+",
-      unitPrice: 490,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1086",
-      itemName: "50X70X9 T1086 HIACE R/W INNER",
-      location: "Head Office",
-      stock: "20",
-      unitPrice: 690,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1086",
-      itemName: "50X70X9 T1086 HIACE R/W INNER",
-      location: "Warehouse",
-      stock: "40+",
-      unitPrice: 690,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1088",
-      itemName: "50X68X9 T1088 HIACE FRONT WHEEL",
-      location: "Head Office",
-      stock: "0",
-      unitPrice: 960,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1088",
-      itemName: "50X68X9 T1088 HIACE FRONT WHEEL",
-      location: "Warehouse",
-      stock: "0",
-      unitPrice: 960,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-2004",
-      itemName: "73X74X11 T1067 LH50/60/70 DRIVE PINION",
-      location: "Warehouse",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-    {
-      itemCode: "01-1115",
-      itemName: "48X62X9X24 T1115 HIACE R/W OUTER",
-      location: "Head Office",
-      stock: "10",
-      unitPrice: 790,
-      itemCat: "TKK",
-      category: "OIL SEAL",
-      subCategory: "TOYOTA",
-      img: productImage,
-      description: "-",
-      description2: "-",
-      unitMeasure: "kg",
-      size: "-",
-      reQuantity: "5",
-    },
-  ];
+  // Fetch stock data from API
+  useEffect(() => {
+    const fetchStockData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const response = await fetch("/api/stock");
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch stock data: ${response.status}`);
+        }
+
+        const apiData: ApiStockItem[] = await response.json();
+
+        // Transform API data to match component interface
+        const transformedData: StockItem[] = apiData.map((item) => ({
+          itemCode: item.itemCode,
+          itemName: item.itemName,
+          location: item.location,
+          stock: item.stock,
+          unitPrice: item.unitPrice,
+          itemCategory: item.itemCategory,
+          category: item.category,
+          subCategory: item.subCategory,
+          description: item.description,
+          description2: item.description2,
+          unitOfMeasure: item.unitOfMeasure,
+          size: item.size,
+          reorderQuantity: item.reorderQuantity,
+          image: item.image,
+          img: item.image ? item.image : productImage,
+        }));
+
+        setStockItems(transformedData);
+      } catch (err) {
+        console.error("Error fetching stock data:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to fetch stock data"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStockData();
+  }, []);
 
   // Filter items based on search query
   const filteredItems = useMemo(() => {
@@ -744,41 +155,32 @@ const StockView = () => {
     const maxPagesToShow = 5;
 
     if (totalPages <= maxPagesToShow) {
-      // If we have fewer pages than max, show all pages
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Always include first page
       pages.push(1);
-
-      // Calculate start and end of page range
       let start = Math.max(2, currentPage - 1);
       let end = Math.min(totalPages - 1, currentPage + 1);
 
-      // Adjust if we're at edges
       if (currentPage <= 2) {
         end = 4;
       } else if (currentPage >= totalPages - 1) {
         start = totalPages - 3;
       }
 
-      // Add ellipsis if needed before middle pages
       if (start > 2) {
         pages.push("...");
       }
 
-      // Add middle pages
       for (let i = start; i <= end; i++) {
         pages.push(i);
       }
 
-      // Add ellipsis if needed after middle pages
       if (end < totalPages - 1) {
         pages.push("...");
       }
 
-      // Always include last page
       if (totalPages > 1) {
         pages.push(totalPages);
       }
@@ -793,28 +195,73 @@ const StockView = () => {
     }
   };
 
-  // Handle entries per page change
   const handleEntriesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setEntriesPerPage(e.target.value);
   };
 
   function handleViewImage(img: any): void {
     setOpenImagePopup(true);
-    setSelectedProductImage(img);
+
+    if (typeof img === "string") {
+      setSelectedProductImage({
+        src: img,
+        width: 400,
+        height: 300,
+      });
+    } else {
+      setSelectedProductImage(img);
+    }
     console.log(img);
+  }
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
+        <AppBar toggleSideNav={toggleSideNav} />
+        <div className="flex flex-1 overflow-hidden">
+          <SideNav isOpen={sideNavOpen} />
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="mt-4 text-lg text-gray-600">
+                Loading stock data...
+              </p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
+        <AppBar toggleSideNav={toggleSideNav} />
+        <div className="flex flex-1 overflow-hidden">
+          <SideNav isOpen={sideNavOpen} />
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-red-500 text-6xl mb-4">⚠️</div>
+              <h2 className="text-2xl font-bold text-red-600 mb-2">
+                Error Loading Data
+              </h2>
+              <p className="text-gray-600 mb-4">{error}</p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
   }
 
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-      {/* App Bar */}
       <AppBar toggleSideNav={toggleSideNav} />
 
-      {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Side Navigation */}
         <SideNav isOpen={sideNavOpen} />
 
-        {/* Stock View Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 p-4 overflow-auto">
             {/* Table Controls */}
@@ -833,15 +280,17 @@ const StockView = () => {
                 </select>
                 <span>entries</span>
               </div>
-              <div className="flex items-center space-x-2 mt-2 sm:mt-0">
-                <span>Search:</span>
-                <input
-                  type="text"
-                  className="border rounded p-1 w-48"
-                  placeholder="Type Here..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
+              <div className="flex items-center space-x-4 mt-2 sm:mt-0">
+                <div className="flex items-center space-x-2">
+                  <span>Search:</span>
+                  <input
+                    type="text"
+                    className="border rounded p-1 w-48"
+                    placeholder="Type Here..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                  />
+                </div>
               </div>
             </div>
 
@@ -897,9 +346,10 @@ const StockView = () => {
                 <tbody className="divide-y divide-gray-200">
                   {displayedItems.map((item, index) => (
                     <tr
-                      key={index}
-                      className={`hover:bg-red ${item.location === "Warehouse" ? "bg-[#bbd2fc]" : ""
-                        }`}
+                      key={`${item.itemCode}-${item.location}-${index}`}
+                      className={`hover:bg-red ${
+                        item.location === "Warehouse" ? "bg-[#bbd2fc]" : ""
+                      }`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {item.itemCode}
@@ -908,23 +358,16 @@ const StockView = () => {
                         {item.itemName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {/* {item.location === "Warehouse" ? (
-                          <span className="px-2 py-1 bg-red-500 text-white rounded">
-                            {item.location}
-                          </span>
-                        ) : (
-                          <span className="text-gray-900">{item.location}</span>
-                        )} */}
                         {item.location}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center  text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.stock}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.unitPrice}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
-                        {item.itemCat}
+                        {item.itemCategory}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.category}
@@ -933,8 +376,12 @@ const StockView = () => {
                         {item.subCategory}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
-                        {/* {item.img} */}
-                        <button className="bg-blue-900 hover:bg-blue-950 text-white py-1 px-4 rounded focus:outline-none cursor-pointer" onClick={() => handleViewImage(item.img)}>
+                        <button
+                          className="bg-blue-900 hover:bg-blue-950 text-white py-1 px-4 rounded focus:outline-none cursor-pointer"
+                          onClick={() =>
+                            handleViewImage(item.img || item.image)
+                          }
+                        >
                           View
                         </button>
                       </td>
@@ -945,19 +392,20 @@ const StockView = () => {
                         {item.description2}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
-                        {item.unitMeasure}
+                        {item.unitOfMeasure}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.size}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
-                        {item.reQuantity}
+                        {item.reorderQuantity}
                       </td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
+
             <div className="bg-white p-4 mt-4 flex flex-wrap justify-between items-center">
               <div className="text-sm">
                 Showing{" "}
@@ -975,8 +423,9 @@ const StockView = () => {
                 <button
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 border rounded cursor-pointer ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
-                    }`}
+                  className={`px-3 py-1 border rounded cursor-pointer ${
+                    currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
+                  }`}
                 >
                   Previous
                 </button>
@@ -985,12 +434,13 @@ const StockView = () => {
                   <button
                     key={index}
                     onClick={() => typeof page === "number" && goToPage(page)}
-                    className={`px-3 py-1 border rounded ${page === currentPage
-                      ? "bg-blue-500 text-white"
-                      : page === "..."
+                    className={`px-3 py-1 border rounded ${
+                      page === currentPage
+                        ? "bg-blue-500 text-white"
+                        : page === "..."
                         ? ""
                         : "hover:bg-gray-100"
-                      }`}
+                    }`}
                     disabled={page === "..."}
                   >
                     {page}
@@ -1000,18 +450,22 @@ const StockView = () => {
                 <button
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages || totalPages === 0}
-                  className={`px-3 py-1 border rounded cursor-pointer ${currentPage === totalPages || totalPages === 0
-                    ? "text-gray-400"
-                    : "hover:bg-gray-100"
-                    }`}
+                  className={`px-3 py-1 border rounded cursor-pointer ${
+                    currentPage === totalPages || totalPages === 0
+                      ? "text-gray-400"
+                      : "hover:bg-gray-100"
+                  }`}
                 >
                   Next
                 </button>
               </div>
             </div>
           </div>
-          <ImagePopup open={openImagePopup} onClose={() => setOpenImagePopup(false)} image={selectedProductImage}/>
-          {/* Footer Component */}
+          <ImagePopup
+            open={openImagePopup}
+            onClose={() => setOpenImagePopup(false)}
+            image={selectedProductImage}
+          />
           <Footer />
         </div>
       </div>
