@@ -203,8 +203,9 @@ const StockView = () => {
     setOpenImagePopup(true);
 
     if (typeof img === "string") {
+      const base64Image = `data:image/jpeg;base64,${img}`;
       setSelectedProductImage({
-        src: img,
+        src: base64Image,
         width: 400,
         height: 300,
       });
@@ -348,7 +349,7 @@ const StockView = () => {
                     <tr
                       key={`${item.itemCode}-${item.location}-${index}`}
                       className={`hover:bg-red ${
-                        item.location === "Warehouse" ? "bg-[#bbd2fc]" : ""
+                        item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : "bg-[#ffffff]"
                       }`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+// get roles, locations, sales persons details
 export async function GET(request: NextRequest) {
   try {
     const response = await fetch('http://173.212.233.90:8090/api/User/GetUserCreationDetails', {
@@ -29,3 +30,5 @@ export async function GET(request: NextRequest) {
     );
   }
 }
+
+//created by Praven Bimsara 5/27/2025
