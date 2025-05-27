@@ -280,11 +280,11 @@ const CreateUserPage: React.FC = () => {
 
             {/* POS Name */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">POS Name :</label>
+              <label className="block text-gray-700 font-semibold mb-2">Sales Person Name :</label>
               <input
                 type="text"
                 className={`w-full p-2 border ${errors.posName ? 'border-red-500' : 'border-gray-300'} rounded`}
-                placeholder="Contact Name Of POS System"
+                placeholder="Sales Person Name"
                 value={userData.posName}
                 onChange={(e) => handleInputChange("posName", e.target.value)}
               />
