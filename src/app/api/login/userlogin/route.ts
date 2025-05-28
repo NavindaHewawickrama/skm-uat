@@ -1,31 +1,39 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   try {
-    // Get user credentials from request body
     const body = await request.json();
+    const { usernameOrEmail, password, rememberme } = body;
 
-    // Send POST request to external login API
     const response = await fetch('http://173.212.233.90:8090/api/User/login', {
       method: 'POST',
-      body: JSON.stringify(body),
+      body: JSON.stringify({ usernameOrEmail, password }),
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
     const data = await response.json();
 
-    return NextResponse.json(data, {
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
+    // ✅ Store token in HttpOnly cookie
+    const cookieStore = cookies();
+    (await cookieStore).set({
+      name: 'acctoken',
+      value: data.acctoken, // adjust according to actual token field in API response
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: rememberme ? 60 * 60 * 24 * 7 : undefined, // 7 days if rememberMe is true
     });
+
+    return NextResponse.json({ message: 'Login successful' }, { status: 200 });
+
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(
@@ -34,5 +42,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
-// Created by Navinda Hewawickrama - 5/27/2025
