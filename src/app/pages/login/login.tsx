@@ -23,11 +23,12 @@ const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/login', {
+      const response = await fetch('/api/login/userlogin', {
         method: 'POST',
         body: JSON.stringify({
-          usernameOrEmail: 'yourUsername',
-          password: 'yourPassword',
+          usernameOrEmail: username,
+          password: password,
+          rememberme: rememberMe
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -35,8 +36,12 @@ const LoginPage = () => {
       });
 
       if (response.status === 200) {
-        router.push("/dashboard");
         handleShowAlert('success', response.statusText);
+        console.log(response);
+        //sessionStorage.setItem('acctoken',response.)
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 2000);
       } else {
         console.log(response);
         handleShowAlert('error', response.statusText)

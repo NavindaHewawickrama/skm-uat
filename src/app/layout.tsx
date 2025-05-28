@@ -8,7 +8,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        <title>Sri Kantha Motor's Sales App</title>
+        <title>Sri Kantha Motor &apos; s Sales App</title>
       </head>
       <body>
         {children}
