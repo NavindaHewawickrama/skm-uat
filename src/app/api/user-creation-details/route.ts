@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 // get roles, locations, sales persons details
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const response = await fetch('http://173.212.233.90:8090/api/User/GetUserCreationDetails', {
       method: 'GET',
