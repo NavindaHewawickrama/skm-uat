@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
 
 interface ModalProps {
   open: boolean;
@@ -10,7 +9,6 @@ interface ModalProps {
 }
 
 const ViewStatus: React.FC<ModalProps> = ({ open, onClose, status }) => {
-  const router = useRouter();
   const [selectedStatus, setSelectedStatus] = useState(status);
   const [trackingNumber, setTrackingNumber] = useState("");
   const [deliveryPerson, setDeliveryPerson] = useState("");

@@ -1,10 +1,14 @@
 import { NextResponse } from 'next/server';
 
-// get roles, locations, sales persons details
-export async function GET() {
+export async function POST(request: Request) {
   try {
-    const response = await fetch('http://173.212.233.90:8090/api/User/GetUserCreationDetails', {
-      method: 'GET',
+    // Get user credentials from request body
+    const body = await request.json();
+
+    // Send POST request to external login API
+    const response = await fetch('http://173.212.233.90:8090/api/User/login', {
+      method: 'POST',
+      body: JSON.stringify(body),
       headers: {
         'Content-Type': 'application/json',
       },
@@ -15,7 +19,7 @@ export async function GET() {
     }
 
     const data = await response.json();
-    
+
     return NextResponse.json(data, {
       status: 200,
       headers: {
@@ -23,12 +27,12 @@ export async function GET() {
       },
     });
   } catch (error) {
-    console.error('Error fetching user creation details:', error);
+    console.error('Login error:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch user creation details' },
+      { error: 'Failed to login user' },
       { status: 500 }
     );
   }
 }
 
-//created by Praven Bimsara 5/27/2025
+// Created by Navinda Hewawickrama - 5/27/2025

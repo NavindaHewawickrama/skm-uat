@@ -2,23 +2,67 @@
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import Alert from '../../../components/Alert';
 
 const LoginPage = () => {
   const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleShowAlert = (type: React.SetStateAction<string>, message: React.SetStateAction<string>) => {
+    setAlertType(type);
+    setAlertMessage(message);
+    setShowAlert(true);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    router.push("/dashboard");
+    try {
+      const response = await fetch('/api/login/userlogin', {
+        method: 'POST',
+        body: JSON.stringify({
+          usernameOrEmail: username,
+          password: password,
+          rememberme: rememberMe
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.status === 200) {
+        handleShowAlert('success', response.statusText);
+        console.log(response);
+        //sessionStorage.setItem('acctoken',response.)
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 2000);
+      } else {
+        console.log(response);
+        handleShowAlert('error', response.statusText)
+      }
+    } catch (error) {
+      console.error(error);
+      handleShowAlert('error', 'Problem Loggin In...')
+    }
   };
 
   return (
     <div className="h-screen w-full bg-gray-100 flex flex-col justify-between overflow-hidden">
       {/* Main content area */}
       <div className="flex items-center justify-center px-4">
+        {showAlert && (
+          <Alert
+            message={alertMessage}
+            type={alertType}
+            duration={5000}
+          />
+        )}
         <div className="bg-white p-8 mt-24 h-[450px] rounded-lg w-full max-w-md border-[6px] border-double border-blue-950">
           {/* Logo */}
           <div className="flex justify-center mb-8">

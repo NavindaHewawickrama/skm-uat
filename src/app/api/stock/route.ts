@@ -1,7 +1,7 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 //get stock details
-export async function GET(request: NextRequest) {
+export async function GET() {
   try {
     const response = await fetch('http://173.212.233.90:8090/api/Business/GetStockDetails', {
       method: 'GET',
