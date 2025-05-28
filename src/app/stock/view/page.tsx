@@ -84,7 +84,7 @@ const StockView = () => {
         const response = await fetch("/api/stock");
 
         if (!response.ok) {
-          throw new Error(`Failed to fetch stock data: ${response.status}`);
+          throw new Error("Failed to fetch stock data");
         }
 
         const apiData: ApiStockItem[] = await response.json();
