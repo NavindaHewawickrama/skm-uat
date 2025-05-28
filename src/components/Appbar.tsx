@@ -3,12 +3,14 @@ import React, { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import NotificationPopup from "./NotificationPopup";
+import { useRouter } from "next/navigation";
 
 interface AppBarProps {
   toggleSideNav: () => void;
 }
 
 const AppBar: React.FC<AppBarProps> = ({ toggleSideNav }) => {
+  const router = useRouter();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [alertDropdownOpen, setAlertDropdownOpen] = useState(false);
   const alertDropdownRef = useRef<HTMLDivElement>(null);
@@ -52,8 +54,26 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav }) => {
     setAlertDropdownOpen(false); // close the other
   };
 
-  const handleNotificationPopupOpen =() => {
+  const handleNotificationPopupOpen = () => {
     setOpenNotificationPopup(true);
+  }
+
+  const handleLogoutClick = async () => {
+    setProfileDropdownOpen(false);
+    try {
+      await fetch('/api/logout');
+      // Optionally clear any local/session storage
+      sessionStorage.clear();
+      localStorage.clear();
+      router.push('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  }
+
+  const handleReserPasswordClicked = () => {
+    setProfileDropdownOpen(false);
+    router.push("/user/ResetPassword");
   }
 
   return (
@@ -176,13 +196,9 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav }) => {
                 </div>
               </div>
               <div className="py-1">
-                <Link href="/user/ResetPassword">
                   <button
                     className="px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left flex items-center cursor-pointer"
-                    onClick={() => {
-                      setProfileDropdownOpen(false);
-                      // Add reset password logic here
-                    }}
+                    onClick={handleReserPasswordClicked}
                   >
                     <svg
                       xmlns="http://www.w3.org/2000/svg"
@@ -200,31 +216,29 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav }) => {
                     </svg>
                     Reset Password
                   </button>
-                </Link>
-                <Link href="/">
-                  <button
-                    className="px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left flex items-center cursor-pointer"
-                    onClick={() => {
-                      setProfileDropdownOpen(false);
-                    }}
+                <button
+                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left flex items-center cursor-pointer"
+                  // onClick={() => {
+                  //   setProfileDropdownOpen(false);
+                  // }}
+                  onClick={handleLogoutClick}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-3 text-gray-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-3 text-gray-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
-                      />
-                    </svg>
-                    Logout
-                  </button>
-                </Link>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    />
+                  </svg>
+                  Logout
+                </button>
               </div>
             </div>
           )}

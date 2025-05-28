@@ -13,6 +13,7 @@ export async function POST(request: Request) {
         'Content-Type': 'application/json',
       },
     });
+    console.log(response);
 
     if (!response.ok) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
