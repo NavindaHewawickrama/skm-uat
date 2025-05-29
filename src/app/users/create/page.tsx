@@ -315,13 +315,6 @@ const CreateUserPage: React.FC = () => {
               </div>
             )}
 
-            {/* Success notice */}
-            {errors.notice && (
-              <div className="mb-4 p-3 bg-green-50 border border-green-300 text-green-700 rounded">
-                {errors.notice}
-              </div>
-            )}
-
             {/* User Name */}
             <div className="mb-4">
               <label className="block text-gray-700 font-semibold mb-2">User Name :</label>
