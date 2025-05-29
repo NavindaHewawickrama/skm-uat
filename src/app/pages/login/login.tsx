@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Alert from '../../../components/Alert';
@@ -13,6 +13,22 @@ const LoginPage = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('');
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch('/api/login/checkAuth');
+        const data = await res.json();
+        if (data.authenticated) {
+          router.push("/dashboard"); // Redirect if already logged in
+        }
+      } catch (error) {
+        console.error("Auth check failed:", error);
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   const handleShowAlert = (type: React.SetStateAction<string>, message: React.SetStateAction<string>) => {
     setAlertType(type);
@@ -36,8 +52,9 @@ const LoginPage = () => {
       });
 
       if (response.status === 200) {
+        const data = await response.json();
         handleShowAlert('success', response.statusText);
-        console.log(response);
+        console.log(data);
         //sessionStorage.setItem('acctoken',response.)
         setTimeout(() => {
           router.push("/dashboard");
@@ -138,3 +155,5 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
+
+//created by Praveen Bimsara
