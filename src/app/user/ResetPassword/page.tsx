@@ -110,7 +110,7 @@ const ResetPassword = () => {
 
     try {
       // Fixed API endpoint to match your backend route
-      const response = await fetch('/api/reset-password', {
+      const response = await fetch('/api/user/resetPassword', {
         method: 'POST',
         body: JSON.stringify({
           userId: 4,
@@ -129,7 +129,7 @@ const ResetPassword = () => {
         setFormSubmitted(true);
         
         setTimeout(() => {
-          router.push("/login"); 
+          router.push("/"); 
         }, 2000);
       } else {
         handleShowAlert('error', data.error || 'Password reset failed');
