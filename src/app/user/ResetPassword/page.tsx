@@ -18,6 +18,7 @@ const ResetPassword = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleShowAlert = (type: React.SetStateAction<string>, message: React.SetStateAction<string>) => {
     setAlertType(type);
@@ -25,7 +26,6 @@ const ResetPassword = () => {
     setShowAlert(true);
   };
 
-  // Add validation state
   const [errors, setErrors] = useState({
     newPassword: "",
     confirmPassword: ""
@@ -49,7 +49,31 @@ const ResetPassword = () => {
     }
   }, [newPassword, confirmPassword]);
 
-  //validating the new password == confirm password
+  // const validatePassword = (password: string) => {
+  //   const minLength = 8;
+  //   const hasUpperCase = /[A-Z]/.test(password);
+  //   const hasLowerCase = /[a-z]/.test(password);
+  //   const hasNumbers = /\d/.test(password);
+  //   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
+
+  //   if (password.length < minLength) {
+  //     return "Password must be at least 8 characters long";
+  //   }
+  //   if (!hasUpperCase) {
+  //     return "Password must contain at least one uppercase letter";
+  //   }
+  //   if (!hasLowerCase) {
+  //     return "Password must contain at least one lowercase letter";
+  //   }
+  //   if (!hasNumbers) {
+  //     return "Password must contain at least one number";
+  //   }
+  //   if (!hasSpecialChar) {
+  //     return "Password must contain at least one special character";
+  //   }
+  //   return "";
+  // };
+
   const validateForm = () => {
     const newErrors = {
       newPassword: "",
@@ -60,7 +84,7 @@ const ResetPassword = () => {
     if (!newPassword) {
       newErrors.newPassword = "Password is required";
       isValid = false;
-    }
+    } 
 
     if (!confirmPassword) {
       newErrors.confirmPassword = "Confirm password is required";
@@ -73,18 +97,23 @@ const ResetPassword = () => {
     setErrors(newErrors);
     return isValid;
   };
-//handling submit
+
+  // Fixed API endpoint and error handling
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
       return;
     }
+
+    setIsLoading(true);
+
     try {
-      const response = await fetch('/api/login/userlogin', {
+      // Fixed API endpoint to match your backend route
+      const response = await fetch('/api/reset-password', {
         method: 'POST',
         body: JSON.stringify({
-          userId: 1,
+          userId: 4,
           newPassword: newPassword,
           confirmPassword: confirmPassword
         }),
@@ -93,23 +122,24 @@ const ResetPassword = () => {
         },
       });
 
-      if (response.status === 200) {
-        const data = await response.json();
-        handleShowAlert('success', response.statusText);
-        console.log(data);
-        //sessionStorage.setItem('acctoken',response.)
+      const data = await response.json();
+
+      if (response.ok) {
+        handleShowAlert('success', 'Password reset successfully!');
+        setFormSubmitted(true);
+        
         setTimeout(() => {
-          router.push("/dashboard");
+          router.push("/login"); 
         }, 2000);
       } else {
-        console.log(response);
-        handleShowAlert('error', response.statusText)
+        handleShowAlert('error', data.error || 'Password reset failed');
       }
     } catch (error) {
-      console.error(error);
-      handleShowAlert('error', 'Problem Loggin In...')
+      console.error('Password reset error:', error);
+      handleShowAlert('error', 'Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
-
   };
 
   const handleReset = () => {
@@ -141,7 +171,7 @@ const ResetPassword = () => {
 
               {formSubmitted ? (
                 <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
-                  <p>Password reset successfully!</p>
+                  <p>Password reset successfully! Redirecting to login...</p>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit}>
@@ -155,14 +185,17 @@ const ResetPassword = () => {
                         type={showNewPassword ? "text" : "password"}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.newPassword ? "border-red-500" : "border-gray-300"
-                          }`}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 ${
+                          errors.newPassword ? "border-red-500" : "border-gray-300"
+                        }`}
                         placeholder="Enter new password"
+                        disabled={isLoading}
                       />
                       <button
                         type="button"
                         className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-red-400 cursor-pointer"
                         onClick={() => setShowNewPassword(!showNewPassword)}
+                        disabled={isLoading}
                       >
                         {showNewPassword ? "Hide" : "Show"}
                       </button>
@@ -170,6 +203,7 @@ const ResetPassword = () => {
                     {errors.newPassword && (
                       <p className="text-red-500 text-sm mt-1">{errors.newPassword}</p>
                     )}
+
                   </div>
 
                   <div className="mb-6">
@@ -182,14 +216,17 @@ const ResetPassword = () => {
                         type={showConfirmPassword ? "text" : "password"}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                          }`}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 ${
+                          errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                        }`}
                         placeholder="Confirm new password"
+                        disabled={isLoading}
                       />
                       <button
                         type="button"
                         className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 text-red-400 cursor-pointer"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                        disabled={isLoading}
                       >
                         {showConfirmPassword ? "Hide" : "Show"}
                       </button>
@@ -202,14 +239,24 @@ const ResetPassword = () => {
                   <div className="flex space-x-4">
                     <button
                       type="submit"
-                      className="bg-blue-900 text-white px-4 py-2 rounded-md hover:bg-blue-950 focus:outline-none focus:ring-blue-500 cursor-pointer"
+                      disabled={isLoading}
+                      className={`px-4 py-2 rounded-md focus:outline-none text-white ${
+                        isLoading 
+                          ? 'bg-gray-400 cursor-not-allowed' 
+                          : 'bg-blue-900 hover:bg-blue-950 focus:ring-blue-500 cursor-pointer'
+                      }`}
                     >
-                      Submit
+                      {isLoading ? 'Resetting...' : 'Submit'}
                     </button>
                     <button
                       type="button"
                       onClick={handleReset}
-                      className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 focus:outline-none focus:ring-red-500 cursor-pointer"
+                      disabled={isLoading}
+                      className={`px-4 py-2 rounded-md focus:outline-none text-white ${
+                        isLoading 
+                          ? 'bg-gray-400 cursor-not-allowed' 
+                          : 'bg-red-500 hover:bg-red-600 focus:ring-red-500 cursor-pointer'
+                      }`}
                     >
                       Reset
                     </button>
@@ -235,5 +282,3 @@ const ResetPassword = () => {
 };
 
 export default ResetPassword;
-
-//created by Navinda Hewawickrama and Praveen Bimsara on 5/27/2025
