@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       secure: true,
       sameSite: 'strict',
       path: '/',
-      maxAge: rememberme ? 60 * 60 * 24 * 7 : undefined, // 7 days if rememberMe is true
+      maxAge: rememberme ? 60 * 60 * 24 * 7 : 60 * 60, // 7 days if rememberMe is true
     });
 
     return NextResponse.json({ message: 'Login successful' }, { status: 200 });
@@ -43,3 +43,5 @@ export async function POST(request: Request) {
     );
   }
 }
+
+//created by Navinda Hewawickrama and Praveen Bimsara May 2025

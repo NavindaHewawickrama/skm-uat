@@ -81,10 +81,13 @@ const StockView = () => {
         setLoading(true);
         setError(null);
 
-        const response = await fetch("/api/stock");
+        const response = await fetch("/api/stock", {
+          method: "GET",
+          credentials: "include",
+        });
 
         if (!response.ok) {
-          throw new Error("Failed to fetch stock data");
+          throw Error("Failed to fetch stock data");
         }
 
         const apiData: ApiStockItem[] = await response.json();
@@ -212,7 +215,7 @@ const StockView = () => {
     } else {
       setSelectedProductImage(img);
     }
-    console.log(img);
+    //console.log(img);
   }
 
   if (loading) {
@@ -348,9 +351,8 @@ const StockView = () => {
                   {displayedItems.map((item, index) => (
                     <tr
                       key={`${item.itemCode}-${item.location}-${index}`}
-                      className={`hover:bg-red ${
-                        item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : "bg-[#ffffff]"
-                      }`}
+                      className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : "bg-[#ffffff]"
+                        }`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                         {item.itemCode}
@@ -424,9 +426,8 @@ const StockView = () => {
                 <button
                   onClick={() => goToPage(currentPage - 1)}
                   disabled={currentPage === 1}
-                  className={`px-3 py-1 border rounded cursor-pointer ${
-                    currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
-                  }`}
+                  className={`px-3 py-1 border rounded cursor-pointer ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
+                    }`}
                 >
                   Previous
                 </button>
@@ -435,13 +436,12 @@ const StockView = () => {
                   <button
                     key={index}
                     onClick={() => typeof page === "number" && goToPage(page)}
-                    className={`px-3 py-1 border rounded ${
-                      page === currentPage
+                    className={`px-3 py-1 border rounded ${page === currentPage
                         ? "bg-blue-500 text-white"
                         : page === "..."
-                        ? ""
-                        : "hover:bg-gray-100"
-                    }`}
+                          ? ""
+                          : "hover:bg-gray-100"
+                      }`}
                     disabled={page === "..."}
                   >
                     {page}
@@ -451,11 +451,10 @@ const StockView = () => {
                 <button
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages || totalPages === 0}
-                  className={`px-3 py-1 border rounded cursor-pointer ${
-                    currentPage === totalPages || totalPages === 0
+                  className={`px-3 py-1 border rounded cursor-pointer ${currentPage === totalPages || totalPages === 0
                       ? "text-gray-400"
                       : "hover:bg-gray-100"
-                  }`}
+                    }`}
                 >
                   Next
                 </button>

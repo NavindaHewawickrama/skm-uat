@@ -4,8 +4,9 @@ import { NextResponse } from 'next/server';
 // get stock details
 export async function GET() {
   try {
-    const cookieStore = cookies();
-    const acctoken = (await cookieStore).get('acctoken')?.value;
+    const cookieStore = await cookies(); 
+    const acctoken = cookieStore.get('acctoken')?.value;
+
 
     if (!acctoken) {
       return NextResponse.json(

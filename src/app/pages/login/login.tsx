@@ -55,7 +55,6 @@ const LoginPage = () => {
         const data = await response.json();
         handleShowAlert('success', response.statusText);
         console.log(data);
-        //sessionStorage.setItem('acctoken',response.)
         setTimeout(() => {
           router.push("/dashboard");
         }, 2000);
