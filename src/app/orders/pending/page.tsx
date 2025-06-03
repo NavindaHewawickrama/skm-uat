@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import AppBar from "@/components/Appbar";
 import SideNav from "@/components/Sidenav";
 import Footer from "@/components/Footer";
@@ -12,9 +12,11 @@ const PendingOrdersPage: React.FC = () => {
   const [entriesPerPage, setEntriesPerPage] = useState("50");
   const [currentPage, setCurrentPage] = useState(1);
   const [listViewOpen, setListViewOpen] = useState(false);
-  const [selectedOrder,setSelectedOrder] = useState([]);
-  const [status,setStatus] = useState("");
-  const [statusViewOpen,setStatusViewOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState([]);
+  const [status, setStatus] = useState("");
+  const [statusViewOpen, setStatusViewOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   //#region
   // Sample pending orders data
@@ -26,7 +28,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/5/2025, 4:39:15 PM",
       type: "credit",
       total: 91672.5,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "",
       status: "Pending",
     },
@@ -37,7 +39,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/5/2025, 4:43:53 PM",
       type: "credit",
       total: 72547.5,
-      itemDetails: [{itemName:"Light",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Tires",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Light", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Tires", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "",
       status: "Pending",
     },
@@ -48,7 +50,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/6/2025, 10:12:30 AM",
       type: "credit",
       total: 56832.75,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Urgent delivery",
       status: "Processing",
     },
@@ -59,7 +61,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 9:45:22 AM",
       type: "credit",
       total: 43250.0,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "",
       status: "Pending",
     },
@@ -70,7 +72,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -81,7 +83,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -92,7 +94,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -103,7 +105,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -114,7 +116,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -125,7 +127,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -136,7 +138,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -147,7 +149,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -158,7 +160,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -169,7 +171,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -180,7 +182,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -191,7 +193,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -202,7 +204,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -213,7 +215,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -224,7 +226,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -235,7 +237,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -246,7 +248,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Processing",
     },
@@ -257,7 +259,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -268,7 +270,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Processing",
     },
@@ -279,7 +281,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -290,7 +292,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -301,7 +303,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -312,7 +314,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -323,7 +325,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -334,7 +336,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -345,7 +347,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -356,7 +358,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Processing",
     },
@@ -367,7 +369,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Processing",
     },
@@ -378,7 +380,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -389,7 +391,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -400,7 +402,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -411,7 +413,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Processing",
     },
@@ -422,7 +424,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -433,7 +435,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -444,7 +446,7 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
@@ -455,13 +457,66 @@ const PendingOrdersPage: React.FC = () => {
       orderDate: "4/7/2025, 2:18:47 PM",
       type: "credit",
       total: 67895.25,
-      itemDetails: [{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+      itemDetails: [{ itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
       note: "Confirm availability",
       status: "Pending",
     },
   ];
 
   //#endregion
+
+
+  // Fetch pending order data from API
+  useEffect(() => {
+    const fetchStockData = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const userId = 5;  // remove this when can
+        const response = await fetch(`/api/orders?userId=${userId}`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw Error("Failed to fetch pending order data");
+        }
+
+        // const apiData: ApiStockItem[] = await response.json();
+
+        // Transform API data to match component interface
+        // const transformedData: StockItem[] = apiData.map((item) => ({
+        //   itemCode: item.itemCode,
+        //   itemName: item.itemName,
+        //   location: item.location,
+        //   stock: item.stock,
+        //   unitPrice: item.unitPrice,
+        //   itemCategory: item.itemCategory,
+        //   category: item.category,
+        //   subCategory: item.subCategory,
+        //   description: item.description,
+        //   description2: item.description2,
+        //   unitOfMeasure: item.unitOfMeasure,
+        //   size: item.size,
+        //   reorderQuantity: item.reorderQuantity,
+        //   image: item.image,
+        //   img: item.image ? item.image : productImage,
+        // }));
+
+        // setStockItems(transformedData);
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+        setError(
+          err instanceof Error ? err.message : "Failed to fetch pending order data"
+        );
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStockData();
+  }, []);
+
 
   // Filter orders based on search query
   const filteredOrders = useMemo(() => {
@@ -543,7 +598,7 @@ const PendingOrdersPage: React.FC = () => {
     setSideNavOpen(!sideNavOpen);
   };
 
-  const handleItemDetailsView = (order:any) => {
+  const handleItemDetailsView = (order: any) => {
     console.log(order);
     setSelectedOrder(order);
     setListViewOpen(true)
@@ -557,6 +612,47 @@ const PendingOrdersPage: React.FC = () => {
   function handleStatus(status: string): void {
     setStatus(status);
     setStatusViewOpen(true);
+  }
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
+        <AppBar toggleSideNav={toggleSideNav} />
+        <div className="flex flex-1 overflow-hidden">
+          <SideNav isOpen={sideNavOpen} />
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="mt-4 text-lg text-gray-600">
+                Loading pending orders data...
+              </p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
+        <AppBar toggleSideNav={toggleSideNav} />
+        <div className="flex flex-1 overflow-hidden">
+          <SideNav isOpen={sideNavOpen} />
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-red-500 text-6xl mb-4">⚠️</div>
+              <h2 className="text-2xl font-bold text-red-600 mb-2">
+                Error Loading Data
+              </h2>
+              <p className="text-gray-600 mb-4">{error}</p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
   }
 
   return (
@@ -664,7 +760,7 @@ const PendingOrdersPage: React.FC = () => {
                           {order.total.toFixed(2)}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer" onClick={()=>handleItemDetailsView(order)}>
+                          <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer" onClick={() => handleItemDetailsView(order)}>
                             View
                           </button>
                         </td>
@@ -677,7 +773,7 @@ const PendingOrdersPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded focus:outline-none cursor-pointer" onClick={()=>handleStatus(order.status)} >
+                          <button className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded focus:outline-none cursor-pointer" onClick={() => handleStatus(order.status)} >
                             Edit
                           </button>
                         </td>
@@ -742,8 +838,8 @@ const PendingOrdersPage: React.FC = () => {
             </div>
 
           </div>
-          <ViewOrderEditPopupButton open={listViewOpen} onClose={() => setListViewOpen(false)} orderDetails={selectedOrder}/>
-            <ViewStatusPopup open={statusViewOpen} onClose={()=> setStatusViewOpen(false)} status={status}/>
+          <ViewOrderEditPopupButton open={listViewOpen} onClose={() => setListViewOpen(false)} orderDetails={selectedOrder} />
+          <ViewStatusPopup open={statusViewOpen} onClose={() => setStatusViewOpen(false)} status={status} />
           {/* Footer Component */}
           <Footer />
         </div>
