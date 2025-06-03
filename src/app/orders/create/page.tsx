@@ -37,6 +37,7 @@ const CreateOrderPage: React.FC = () => {
   const [selectedCustomer, setSelectedCustomer] = useState([]);
   const [selectedCustomerDueAmount, setSelectedCustomerDueAmount] = useState(0);
   const [selectedCustomerTotal, setSelectedCustomerTotal] = useState(0);
+  const [paymentTypes, setPaymentTypes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -99,6 +100,7 @@ const CreateOrderPage: React.FC = () => {
         console.log(data);
         setLocations(data.locations);
         setCustomers(data.customers);
+        setPaymentTypes(data.paymentTypes);
       }
     } catch (err) {
       console.error("Error fetching pending order data:", err);
@@ -235,7 +237,7 @@ const CreateOrderPage: React.FC = () => {
 
       const creditLimit = Number(selected.creditLimit) || 0;
       const balanceCredit = Number(selected.balanceCredit ?? 0);
-      const customerTotal = creditLimit - balanceCredit;
+      const customerTotal = creditLimit - balanceCredit; // this might not be the correct calculation for this part check again
 
       setSelectedCustomerTotal(customerTotal);
     }
@@ -376,9 +378,11 @@ const CreateOrderPage: React.FC = () => {
                       onChange={(e) => setPaymentType(e.target.value)}
                     >
                       <option value="">Select payment type</option>
-                      <option value="cash">Cash</option>
-                      <option value="credit">Credit Card</option>
-                      <option value="bank">Bank Transfer</option>
+                      {paymentTypes.map((type: any, index) => (
+                        <option key={index} value={type.code}>
+                          {type.name}
+                        </option>
+                      ))}
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                       <svg
