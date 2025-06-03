@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppBar from "../../components/Appbar";
 import SideNav from "../../components/Sidenav";
 import Footer from "../../components/Footer";
@@ -7,6 +7,31 @@ import SalesChart from "@/components/SalesChart";
 
 const Dashboard = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
+
+  useEffect(() => {
+    const fetchUserDetails = async () => {
+      try {
+        const response = await fetch('/api/dashboard/userDetails', {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw Error("Failed to fetch data");
+        }else{
+          const data = await response.json();
+          console.log(data);
+        }
+
+
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+
+      }
+    }
+
+    fetchUserDetails();
+  }, [])
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -42,8 +67,8 @@ const Dashboard = () => {
                 ].map((doc, index) => (
                   <li key={index}>
                     <a
-                     // href={`/view-pdf?file=${encodeURIComponent(doc.file)}`}
-                     href={doc.file}
+                      // href={`/view-pdf?file=${encodeURIComponent(doc.file)}`}
+                      href={doc.file}
                       target="_blank"
                       className="text-blue-600 underline hover:text-blue-800"
                     >

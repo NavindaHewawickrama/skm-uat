@@ -12,6 +12,8 @@ interface ModalProps {
 const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDetails }) => {
   const router = useRouter();
 
+  console.log(orderDetails);
+
   if (!open) return null;
 
   return (
@@ -68,10 +70,10 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDe
                   </tr>
                 </thead>
                 <tbody className="text-center">
-                  {orderDetails.itemDetails.map((item: any, index: any) => (
+                  {orderDetails.map((item: any, index: any) => (
                     <tr key={index} className="border-b border-gray-100">
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
-                        {item.itemName}
+                        {item.description}
                       </td>
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
                         {item.unitPrice}
@@ -80,10 +82,10 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDe
                         {item.quantity}
                       </td>
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
-                        {item.discount}
+                        {item.discountPercent}
                       </td>
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
-                        {item.total}
+                        {/* {item.description} */}
                       </td>
                     </tr>
                   ))}
