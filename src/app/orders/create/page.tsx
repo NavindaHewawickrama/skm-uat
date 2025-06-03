@@ -1,10 +1,10 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppBar from "../../../components/Appbar";
 import SideNav from "../../../components/Sidenav";
 import Footer from "../../../components/Footer";
-import {jsPDF} from "jspdf";
-import autoTable from "jspdf-autotable"; 
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 
 interface OrderItem {
   itemCode: string;
@@ -32,6 +32,13 @@ const CreateOrderPage: React.FC = () => {
   const [totalDueAmount, setTotalDueAmount] = useState(0);
   const [total, setTotal] = useState(0);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
+  const [locations, setLocations] = useState([]);
+  const [customers, setCustomers] = useState([]);
+  const [selectedCustomer, setSelectedCustomer] = useState([]);
+  const [selectedCustomerDueAmount, setSelectedCustomerDueAmount] = useState(0);
+  const [selectedCustomerTotal, setSelectedCustomerTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   // Current item being added
   const [currentItem, setCurrentItem] = useState<OrderItem>({
@@ -74,6 +81,32 @@ const CreateOrderPage: React.FC = () => {
     },
   ];
 
+  useEffect(() => {
+    fetchUserCustomerDetails();
+  }, [])
+
+  const fetchUserCustomerDetails = async () => {
+    try {
+      const response = await fetch(`/api/userCustomerDetails`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw Error("Failed to fetch pending order data");
+      } else {
+        const data = await response.json();
+        console.log(data);
+        setLocations(data.locations);
+        setCustomers(data.customers);
+      }
+    } catch (err) {
+      console.error("Error fetching pending order data:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch pending order data"
+      );
+    }
+  };
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -192,7 +225,25 @@ const CreateOrderPage: React.FC = () => {
     generatePDF();
   };
 
-  
+  const handleCustomerChange = (customerCode: string) => {
+    setCustomer(customerCode);
+
+    const selected = customers.find((c: any) => c.customerCode === customerCode);
+    if (selected) {
+      setSelectedCustomer(selected);
+      setSelectedCustomerDueAmount(selected.dueAmount);
+
+      const creditLimit = Number(selected.creditLimit) || 0;
+      const balanceCredit = Number(selected.balanceCredit ?? 0);
+      const customerTotal = creditLimit - balanceCredit;
+
+      setSelectedCustomerTotal(customerTotal);
+    }
+  };
+
+
+
+
 
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
@@ -221,10 +272,14 @@ const CreateOrderPage: React.FC = () => {
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                   >
-                    <option value="">Select a Location</option>
-                    <option value="warehouse1">Warehouse 1</option>
-                    <option value="warehouse2">Warehouse 2</option>
+                    <option value="" disabled>Select a Location</option>
+                    {locations.map((loc: any, index) => (
+                      <option key={index} value={loc.locationCode}>
+                        {loc.locationName}
+                      </option>
+                    ))}
                   </select>
+
                   <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                     <svg
                       className="h-4 w-4"
@@ -252,11 +307,14 @@ const CreateOrderPage: React.FC = () => {
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
                       value={customer}
-                      onChange={(e) => setCustomer(e.target.value)}
+                      onChange={(e) => handleCustomerChange(e.target.value)} // pass the code
                     >
                       <option value="">Select a customer</option>
-                      <option value="customer1">Customer 1</option>
-                      <option value="customer2">Customer 2</option>
+                      {customers.map((customer: any, index) => (
+                        <option value={customer.customerCode} key={index}>
+                          {customer.customerName}
+                        </option>
+                      ))}
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                       <svg
@@ -282,7 +340,7 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
-                    value={totalDueAmount.toFixed(2)}
+                    value={selectedCustomerDueAmount}
                     readOnly
                   />
                   <div className="flex justify-start mt-2">
@@ -299,7 +357,7 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
-                    value={total.toFixed(2)}
+                    value={selectedCustomerTotal}
                     readOnly
                   />
                 </div>
@@ -611,8 +669,8 @@ const CreateOrderPage: React.FC = () => {
             {/* Order Form */}
             {/* <div className="bg-white p-6 rounded-md shadow-sm mb-4">
               <h2 className="text-lg font-bold mb-4">Listed Order Items</h2> */}
-              {/* Customer and Totals Row */}
-              {/* <div className="bg-white overflow-x-auto overflow-y-auto shadow-sm">
+            {/* Customer and Totals Row */}
+            {/* <div className="bg-white overflow-x-auto overflow-y-auto shadow-sm">
                 <table className="min-w-full divide-y divide-gray-200">
                   <thead className="bg-gray-200">
                     <tr>
