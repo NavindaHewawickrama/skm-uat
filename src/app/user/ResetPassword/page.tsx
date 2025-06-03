@@ -113,7 +113,6 @@ const ResetPassword = () => {
       const response = await fetch('/api/user/resetPassword', {
         method: 'POST',
         body: JSON.stringify({
-          userId: 4,
           newPassword: newPassword,
           confirmPassword: confirmPassword
         }),
