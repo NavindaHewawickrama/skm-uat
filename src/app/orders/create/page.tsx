@@ -23,9 +23,33 @@ interface CustomerOutstandingData {
   dueAmount: number;
 }
 
+interface Customer {
+  customerCode: string;
+  customerName: string;
+  dueAmount: number;
+  creditAllowed: boolean;
+  creditLimit: number;
+  balanceCredit: number;
+  // add more fields if necessary
+}
+
+interface SubstituteItem {
+  itemCode: string;
+  itemName: string;
+  unitPrice: number;
+}
+
+interface Item {
+  itemCode: string;
+  itemName: string;
+  substituteItems: SubstituteItem[];
+  unitprice: string;
+}
+
+
+
 const CreateOrderPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
-  const [customer, setCustomer] = useState("");
   const [location, setLocation] = useState("");
   const [paymentType, setPaymentType] = useState("");
   const [notes, setNotes] = useState("");
@@ -33,11 +57,16 @@ const CreateOrderPage: React.FC = () => {
   const [total, setTotal] = useState(0);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [locations, setLocations] = useState([]);
-  const [customers, setCustomers] = useState([]);
-  const [selectedCustomer, setSelectedCustomer] = useState([]);
-  const [selectedCustomerDueAmount, setSelectedCustomerDueAmount] = useState(0);
-  const [selectedCustomerTotal, setSelectedCustomerTotal] = useState(0);
+  const [customers, setCustomers] = useState<Customer[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
+  const [selectedCustomerDueAmount, setSelectedCustomerDueAmount] = useState<number>(0);
+  const [selectedCustomerTotal, setSelectedCustomerTotal] = useState<number>(0);
+  const [customer, setCustomer] = useState<string>('');
   const [paymentTypes, setPaymentTypes] = useState([]);
+  const [itemsList, setItemsList] = useState<Item[]>([]);
+  const [selectedItem, setSelectedItem] = useState("");
+  const [selectedItemUnitPrice, setSelectedItemUnitPrice] = useState("");
+  const [substitutedItemsList, setSubstitutedItemsList] = useState<SubstituteItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -101,6 +130,7 @@ const CreateOrderPage: React.FC = () => {
         setLocations(data.locations);
         setCustomers(data.customers);
         setPaymentTypes(data.paymentTypes);
+        setItemsList(data.items);
       }
     } catch (err) {
       console.error("Error fetching pending order data:", err);
@@ -121,19 +151,7 @@ const CreateOrderPage: React.FC = () => {
     return totalBeforeDiscount - discountAmount;
   };
 
-  // Update current item field
-  const updateCurrentItem = (
-    field: keyof OrderItem,
-    value: string | number
-  ) => {
-    setCurrentItem((prev) => {
-      const updated = { ...prev, [field]: value };
-      // Recalculate total
-      updated.total =
-        updated.unitPrice * updated.quantity * (1 - updated.discount / 100);
-      return updated;
-    });
-  };
+
 
   // Add item to order list
   const addToList = () => {
@@ -230,19 +248,45 @@ const CreateOrderPage: React.FC = () => {
   const handleCustomerChange = (customerCode: string) => {
     setCustomer(customerCode);
 
-    const selected = customers.find((c: any) => c.customerCode === customerCode);
+    const selected = customers.find((c) => c.customerCode === customerCode);
     if (selected) {
       setSelectedCustomer(selected);
       setSelectedCustomerDueAmount(selected.dueAmount);
 
       const creditLimit = Number(selected.creditLimit) || 0;
       const balanceCredit = Number(selected.balanceCredit ?? 0);
-      const customerTotal = creditLimit - balanceCredit; // this might not be the correct calculation for this part check again
+      const customerTotal = creditLimit - balanceCredit;
 
       setSelectedCustomerTotal(customerTotal);
     }
   };
 
+  // Update current item field
+  const updateCurrentItem = (
+    field: keyof OrderItem,
+    value: string
+  ) => {
+    setSelectedItem(value);
+    
+    const selected = itemsList.find((item) => item.itemCode === value);
+    console.log(selected);
+    if (selected) {
+      setSelectedItemUnitPrice(selected.unitprice);
+      setSubstitutedItemsList(
+        Array.isArray(selected.substituteItems) ? selected.substituteItems : []
+      );
+    } else {
+      setSubstitutedItemsList([]); // ensure fallback
+    }
+    // setCurrentItem((prev) => {
+    //   const updated = { ...prev, [field]: value };
+    //   // Recalculate total
+    //   updated.total =
+    //     updated.unitPrice * updated.quantity * (1 - updated.discount / 100);
+    //   return updated;
+    // });
+    console.log(value);
+  };
 
 
 
@@ -429,14 +473,17 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                      value={currentItem.itemCode}
+                      value={selectedItem}
                       onChange={(e) =>
                         updateCurrentItem("itemCode", e.target.value)
                       }
                     >
                       <option value="">Select item code</option>
-                      <option value="item001">ITEM001 / 40+</option>
-                      <option value="item002">ITEM002 / 40+</option>
+                      {itemsList.map((item: any, index) => (
+                        <option key={index} value={item.itemCode}>
+                          {item.itemCode}
+                        </option>
+                      ))}
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                       <svg
@@ -463,15 +510,20 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                      value={currentItem.itemName}
-                      onChange={(e) =>
-                        updateCurrentItem("itemName", e.target.value)
-                      }
+                      // value={currentItem.itemName}
+                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
-                      <option value="">Select substitute item name</option>
-                      <option value="Product A">Product A</option>
-                      <option value="Product B">Product B</option>
+                      {substitutedItemsList && substitutedItemsList.length === 0 ? (
+                        <option value="" disabled>No substitute items available</option>
+                      ) : (
+                        substitutedItemsList.map((item: any, index: number) => (
+                          <option key={index} value={item.itemName}>
+                            {item.itemName}
+                          </option>
+                        ))
+                      )}
                     </select>
+
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                       <svg
                         className="h-4 w-4"
@@ -497,13 +549,14 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="number"
                     className="block w-full p-2 border border-gray-300 rounded"
-                    value={currentItem.unitPrice || ""}
-                    onChange={(e) =>
-                      updateCurrentItem(
-                        "unitPrice",
-                        parseFloat(e.target.value) || 0
-                      )
-                    }
+                    value={selectedItemUnitPrice}
+                    // onChange={(e) =>
+                    //   updateCurrentItem(
+                    //     "unitPrice",
+                    //     parseFloat(e.target.value) || 0
+                    //   )
+                    // }
+                    disabled
                   />
                 </div>
               </div>
