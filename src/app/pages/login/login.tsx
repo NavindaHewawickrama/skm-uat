@@ -13,6 +13,7 @@ const LoginPage = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -38,6 +39,9 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setIsLoading(true);
+    setShowAlert(false); 
+    
     try {
       const response = await fetch('/api/login/userlogin', {
         method: 'POST',
@@ -51,20 +55,27 @@ const LoginPage = () => {
         },
       });
 
-      if (response.status === 200) {
-        const data = await response.json();
-        handleShowAlert('success', response.statusText);
-        console.log(data);
+      const data = await response.json();
+
+      if (response.ok) {
+        // Success case
+        handleShowAlert('success', 'Login successful! Redirecting to dashboard...');
+        console.log('Login successful:', data);
+        
         setTimeout(() => {
           router.push("/dashboard");
         }, 2000);
       } else {
-        console.log(response);
-        handleShowAlert('error', response.statusText)
+        // Error case - error message from the API response
+        const errorMessage = data.error || 'Login failed. Please try again.';
+        handleShowAlert('error', errorMessage);
+        console.error('Login failed:', data);
       }
     } catch (error) {
-      console.error(error);
-      handleShowAlert('error', 'Problem Loggin In...')
+      console.error('Network or unexpected error:', error);
+      handleShowAlert('error', 'Network error. Please check your connection and try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -100,6 +111,7 @@ const LoginPage = () => {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -111,6 +123,7 @@ const LoginPage = () => {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                disabled={isLoading}
               />
             </div>
 
@@ -121,6 +134,7 @@ const LoginPage = () => {
                 className="h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
+                disabled={isLoading}
               />
               <label
                 htmlFor="remember-me"
@@ -132,9 +146,14 @@ const LoginPage = () => {
 
             <button
               type="submit"
-              className="w-full bg-red-500 hover:bg-red-600 text-white font-medium py-2 px-4 mt-4 rounded-md transition duration-300 cursor-pointer"
+              disabled={isLoading}
+              className={`w-full font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${
+                isLoading 
+                  ? 'bg-gray-400 cursor-not-allowed' 
+                  : 'bg-red-500 hover:bg-red-600 cursor-pointer'
+              } text-white`}
             >
-              Log In
+              {isLoading ? 'Logging in...' : 'Log In'}
             </button>
           </form>
         </div>
