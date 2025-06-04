@@ -1,9 +1,11 @@
 "use client";
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import AppBar from "@/components/Appbar";
 import SideNav from "@/components/Sidenav";
 import Footer from "@/components/Footer";
 import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
+
+
 
 const RejectedOrdersPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
@@ -11,604 +13,642 @@ const RejectedOrdersPage: React.FC = () => {
   const [entriesPerPage, setEntriesPerPage] = useState("50");
   const [currentPage, setCurrentPage] = useState(1);
   const [listViewOpen, setListViewOpen] = useState(false);
-  const [selectedOrder,setSelectedOrder] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [rejectedOrders, setRejectedOrders] = useState([]);
+
+  // Fetch rejected order data from API
+  useEffect(() => {
+
+
+    fetchRejectedOrdersData();
+  }, []);
+
+
+  const fetchRejectedOrdersData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await fetch(`/api/orders/rejected`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw Error("Failed to fetch pending order data");
+      } else {
+        const data = await response.json();
+        console.log(data);
+        setRejectedOrders(data);
+      }
+    } catch (err) {
+      console.error("Error fetching pending order data:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch pending order data"
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   }
 
   // Sample delivered orders data based on the screenshot
-  const rejectedOrders = [
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1710",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+  // const rejectedOrders = [
+  //   ,
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1710",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
 
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
 
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
 
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
 
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
 
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
 
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
 
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
 
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
 
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
 
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
 
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
 
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
 
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
-    {
-      orderNo: "1310",
-      customer: "NEW HIGHLEVEL MOTORS",
-      salesRef: "manjula",
-      orderDate: "9/15/2020, 8:58:38 PM",
-      total: 327225,
-      itemDetails: [{itemName:"Gel Pump",unitPrice:"500",quantity:"500",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"8",discount:"12",total:"250.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Tires",unitPrice:"100",quantity:"5",discount:"12",total:"2500.00"},{itemName:"Oil Pump",unitPrice:"500",quantity:"5",discount:"12",total:"2500.00"}],
-      status: "Rejected",
-      reason: "Out of Stock",
-    },
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
+  //   {
+  //     orderNo: "1310",
+  //     customer: "NEW HIGHLEVEL MOTORS",
+  //     salesRef: "manjula",
+  //     orderDate: "9/15/2020, 8:58:38 PM",
+  //     total: 327225,
+  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
+  //     status: "Rejected",
+  //     reason: "Out of Stock",
+  //   },
 
-    // Additional dummy data to demonstrate pagination
-    ...Array(30)
-      .fill(0)
-      .map((_, i) => ({
-        orderNo: `${20000 + i}`,
-        customer: [
-          "SUPREME AUTO PARTS",
-          "LATHIKA MOTORS",
-          "NEW VISION SPARES",
-          "AUTO WORLD",
-          "SRI LANKA MOTORS",
-        ][i % 5],
-        salesRef: ["manjula", "mahesh", "danushka"][i % 3],
-        orderDate: "9/16/2020, 10:30:00 AM",
-        type: "credit",
-        total: 15000 + i * 1000,
-        itemDetails: "",
-        note: i % 5 === 0 ? "Urgent delivery completed" : "",
-        status: "Delivered",
-        reason: "Out of Stock",
-      })),
-  ];
+  //   // Additional dummy data to demonstrate pagination
+  //   ...Array(30)
+  //     .fill(0)
+  //     .map((_, i) => ({
+  //       orderNo: `${20000 + i}`,
+  //       customer: [
+  //         "SUPREME AUTO PARTS",
+  //         "LATHIKA MOTORS",
+  //         "NEW VISION SPARES",
+  //         "AUTO WORLD",
+  //         "SRI LANKA MOTORS",
+  //       ][i % 5],
+  //       salesRef: ["manjula", "mahesh", "danushka"][i % 3],
+  //       orderDate: "9/16/2020, 10:30:00 AM",
+  //       type: "credit",
+  //       total: 15000 + i * 1000,
+  //       itemDetails: "",
+  //       note: i % 5 === 0 ? "Urgent delivery completed" : "",
+  //       status: "Delivered",
+  //       reason: "Out of Stock",
+  //     })),
+  // ];
 
   // Filter orders based on search query
   const filteredOrders = useMemo(() => {
     return rejectedOrders.filter(
-      (order) =>
-        order.orderNo.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.customer.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.salesRef.toLowerCase().includes(searchQuery.toLowerCase())
+      (order: any) =>
+        order.orderNumber ||
+        order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.salesPersonName.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [rejectedOrders, searchQuery]);
 
@@ -682,7 +722,7 @@ const RejectedOrdersPage: React.FC = () => {
     setSideNavOpen(!sideNavOpen);
   };
 
-  const handleItemDetailsView = (order:any) => {
+  const handleItemDetailsView = (order: any) => {
     console.log(order);
     setSelectedOrder(order);
     setListViewOpen(true)
@@ -693,6 +733,47 @@ const RejectedOrdersPage: React.FC = () => {
     setEntriesPerPage(e.target.value);
     setCurrentPage(1); // Reset to first page when changing entries per page
   };
+
+  if (loading) {
+    return (
+      <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
+        <AppBar toggleSideNav={toggleSideNav} />
+        <div className="flex flex-1 overflow-hidden">
+          <SideNav isOpen={sideNavOpen} />
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="mt-4 text-lg text-gray-600">
+                Loading pending orders data...
+              </p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
+        <AppBar toggleSideNav={toggleSideNav} />
+        <div className="flex flex-1 overflow-hidden">
+          <SideNav isOpen={sideNavOpen} />
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-red-500 text-6xl mb-4">⚠️</div>
+              <h2 className="text-2xl font-bold text-red-600 mb-2">
+                Error Loading Data
+              </h2>
+              <p className="text-gray-600 mb-4">{error}</p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
@@ -772,27 +853,27 @@ const RejectedOrdersPage: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {currentOrders.map((order, index) => (
+                    {currentOrders.map((order: any, index) => (
                       <tr key={index} className="hover:bg-gray-50">
                         <td className="px-4 py-3 border text-sm">
                           {order.orderNo}
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.customer}
+                          {order.customerName}
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.salesRef}
+                          {order.salesPersonName}
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.orderDate}
+                          {order.orderDate.split('T')[0]}
                         </td>
                         <td className="px-4 py-3 border text-sm text-right">
-                          {typeof order.total === "number"
-                            ? order.total.toFixed(2)
-                            : order.total}
+                          {typeof order.totalAmount === "number"
+                            ? order.totalAmount.toFixed(2)
+                            : order.totalAmount}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer" onClick={()=>handleItemDetailsView(order)}>
+                          <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer" onClick={() => handleItemDetailsView(order)}>
                             View
                           </button>
                         </td>
@@ -802,7 +883,7 @@ const RejectedOrdersPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.reason}
+                          {order.rejectReason}
                         </td>
                       </tr>
                     ))}
@@ -828,9 +909,8 @@ const RejectedOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`px-3 py-1 border rounded cursor-pointer ${
-                      currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
-                    }`}
+                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
+                      }`}
                   >
                     Previous
                   </button>
@@ -839,13 +919,12 @@ const RejectedOrdersPage: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => typeof page === "number" && goToPage(page)}
-                      className={`px-3 py-1 border rounded ${
-                        page === currentPage
-                          ? "bg-blue-500 text-white"
-                          : page === "..."
+                      className={`px-3 py-1 border rounded ${page === currentPage
+                        ? "bg-blue-500 text-white"
+                        : page === "..."
                           ? ""
                           : "hover:bg-gray-100"
-                      }`}
+                        }`}
                       disabled={page === "..."}
                     >
                       {page}
@@ -855,11 +934,10 @@ const RejectedOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages || totalPages === 0}
-                    className={`px-3 py-1 border rounded cursor-pointer ${
-                      currentPage === totalPages || totalPages === 0
-                        ? "text-gray-400"
-                        : "hover:bg-gray-100"
-                    }`}
+                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === totalPages || totalPages === 0
+                      ? "text-gray-400"
+                      : "hover:bg-gray-100"
+                      }`}
                   >
                     Next
                   </button>
@@ -867,7 +945,7 @@ const RejectedOrdersPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <ViewOrderEditPopupButton open={listViewOpen} onClose={() => setListViewOpen(false)} orderDetails={selectedOrder}/>
+          <ViewOrderEditPopupButton open={listViewOpen} onClose={() => setListViewOpen(false)} orderDetails={selectedOrder} />
           {/* Footer Component */}
           <Footer />
         </div>
