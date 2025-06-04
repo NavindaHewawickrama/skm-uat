@@ -81,10 +81,10 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, status }) => {
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="block w-full border border-gray-300 rounded-md p-2"
             >
-              <option value="pending">Pending</option>
-              <option value="processing">Processing</option>
-              <option value="delivered">Delivered</option>
-              <option value="rejected">Rejected</option>
+              <option value="1">Pending</option>
+              <option value="2">Processing</option>
+              <option value="3">Delivered</option>
+              <option value="4">Rejected</option>
             </select>
           </div>
 

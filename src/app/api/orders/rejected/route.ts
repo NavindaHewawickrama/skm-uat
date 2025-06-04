@@ -1,8 +1,31 @@
 import { cookies } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
+
+interface JwtPayload {
+    nameid: string;
+    // add more fields if needed
+}
+
+// Helper to decode base64url to JSON
+function decodeJWT(token: string): JwtPayload | null {
+    try {
+        const payload = token.split('.')[1]; // JWT is [header].[payload].[signature]
+        const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+            atob(base64)
+                .split('')
+                .map((c) => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
+                .join('')
+        );
+        return JSON.parse(jsonPayload);
+    } catch (err) {
+        console.error("Invalid token:", err);
+        return null;
+    }
+}
 
 // get rejected order details
-export async function GET(request: NextRequest) {
+export async function GET() {
     try {
         const cookieStore = await cookies();
         const acctoken = cookieStore.get('acctoken')?.value;
@@ -14,13 +37,13 @@ export async function GET(request: NextRequest) {
             );
         }
 
-        // ✅ Get userId from query string
-        const { searchParams } = new URL(request.url);
-        const userId = searchParams.get('userId');
+        // ✅ Decode token to get userId
+        const decoded = decodeJWT(acctoken);
+        const userId = decoded?.nameid;
 
         if (!userId) {
             return NextResponse.json(
-                { error: 'Bad Request: userId is required' },
+                { error: 'Invalid token: userId missing' },
                 { status: 400 }
             );
         }
@@ -54,3 +77,5 @@ export async function GET(request: NextRequest) {
         );
     }
 }
+
+//created by Navinda Hewawickrama & Praveen Bimsara

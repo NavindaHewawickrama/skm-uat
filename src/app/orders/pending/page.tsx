@@ -37,29 +37,6 @@ const PendingOrdersPage: React.FC = () => {
           console.log(data);
           setPendingOrders(data);
         }
-
-        // const apiData: ApiStockItem[] = await response.json();
-
-        // Transform API data to match component interface
-        // const transformedData: StockItem[] = apiData.map((item) => ({
-        //   itemCode: item.itemCode,
-        //   itemName: item.itemName,
-        //   location: item.location,
-        //   stock: item.stock,
-        //   unitPrice: item.unitPrice,
-        //   itemCategory: item.itemCategory,
-        //   category: item.category,
-        //   subCategory: item.subCategory,
-        //   description: item.description,
-        //   description2: item.description2,
-        //   unitOfMeasure: item.unitOfMeasure,
-        //   size: item.size,
-        //   reorderQuantity: item.reorderQuantity,
-        //   image: item.image,
-        //   img: item.image ? item.image : productImage,
-        // }));
-
-        // setStockItems(transformedData);
       } catch (err) {
         console.error("Error fetching pending order data:", err);
         setError(
@@ -165,9 +142,10 @@ const PendingOrdersPage: React.FC = () => {
     setCurrentPage(1); // Reset to first page when changing entries per page
   };
 
-  function handleStatus(status: string): void {
-    setStatus(status);
+  const handleStatus = (order: any) => {
+    // setStatus(status);
     setStatusViewOpen(true);
+    console.log(order);
   }
 
   if (loading) {
@@ -329,7 +307,7 @@ const PendingOrdersPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded focus:outline-none cursor-pointer" onClick={() => handleStatus(order.status)} >
+                          <button className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded focus:outline-none cursor-pointer" onClick={() => handleStatus(order)} >
                             Edit
                           </button>
                         </td>
