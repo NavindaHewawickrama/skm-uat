@@ -25,7 +25,6 @@ const PendingOrdersPage: React.FC = () => {
       try {
         setLoading(true);
         setError(null);
-        const userId = 5;  // remove this when can
         const response = await fetch(`/api/orders/pending`, {
           method: "GET",
           credentials: "include",
