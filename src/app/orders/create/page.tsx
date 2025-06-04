@@ -8,7 +8,7 @@ import autoTable from "jspdf-autotable";
 
 interface OrderItem {
   itemCode: string;
-  itemName: string;
+  description: string;
   unitPrice: number;
   quantity: number;
   discount: number;
@@ -65,7 +65,10 @@ const CreateOrderPage: React.FC = () => {
   const [paymentTypes, setPaymentTypes] = useState([]);
   const [itemsList, setItemsList] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState("");
+  const [selectedItemName, setSelectedItemName] = useState("");
   const [selectedItemUnitPrice, setSelectedItemUnitPrice] = useState("");
+  const [selectedItemQuantity, setSelectedItemQuantity] = useState(0);
+  const [selectedItemDiscount, setSelectedItemDiscount] = useState(0);
   const [substitutedItemsList, setSubstitutedItemsList] = useState<SubstituteItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -146,41 +149,55 @@ const CreateOrderPage: React.FC = () => {
 
   // Calculate item total
   const calculateItemTotal = () => {
-    const totalBeforeDiscount = currentItem.unitPrice * currentItem.quantity;
-    const discountAmount = totalBeforeDiscount * (currentItem.discount / 100);
-    return totalBeforeDiscount - discountAmount;
+    let totalFull = (parseFloat(selectedItemUnitPrice) * selectedItemQuantity);
+    let discount = totalFull * (selectedItemDiscount / 100);
+    let total = totalFull - discount;
+    return total;
   };
 
 
 
   // Add item to order list
   const addToList = () => {
-    if (
-      !currentItem.itemCode ||
-      !currentItem.itemName ||
-      currentItem.quantity <= 0
-    ) {
-      alert("Please fill in all required fields");
-      return;
+    if (orderItems.length >= 14) {
+      alert("You can only add 14 items to your order");
+    } else {
+      if (
+        !selectedItem ||
+        !selectedItemQuantity ||
+        !selectedCustomer || !paymentType || !location
+      ) {
+        alert("Please fill in all required fields");
+        return;
+      }
+
+      const newItem = {
+        itemCode: selectedItem,
+        description: selectedItemName,
+        unitPrice: parseFloat(selectedItemUnitPrice),
+        quantity: selectedItemQuantity,
+        discount: selectedItemDiscount,
+        total: calculateItemTotal()
+      }
+
+
+      //const newItem = { ...currentItem, total: calculateItemTotal() };
+      setOrderItems([...orderItems, newItem]);
+
+      // Update order totals
+      const newTotal = total + newItem.total;
+      setTotal(newTotal);
+      setTotalDueAmount(newTotal);
+
+      // Reset current item
+      setSelectedItem("");
+      setSelectedItemName("");
+      setSelectedItemUnitPrice("");
+      setSelectedItemQuantity(0);
+      setSelectedItemDiscount(0);
+
     }
 
-    const newItem = { ...currentItem, total: calculateItemTotal() };
-    setOrderItems([...orderItems, newItem]);
-
-    // Update order totals
-    const newTotal = total + newItem.total;
-    setTotal(newTotal);
-    setTotalDueAmount(newTotal);
-
-    // Reset current item
-    setCurrentItem({
-      itemCode: "",
-      itemName: "",
-      unitPrice: 0,
-      quantity: 0,
-      discount: 0,
-      total: 0,
-    });
   };
 
   const generatePDF = () => {
@@ -267,11 +284,10 @@ const CreateOrderPage: React.FC = () => {
     value: string
   ) => {
     setSelectedItem(value);
-    
     const selected = itemsList.find((item) => item.itemCode === value);
-    console.log(selected);
     if (selected) {
       setSelectedItemUnitPrice(selected.unitprice);
+      setSelectedItemName(selected.itemName);
       setSubstitutedItemsList(
         Array.isArray(selected.substituteItems) ? selected.substituteItems : []
       );
@@ -287,6 +303,22 @@ const CreateOrderPage: React.FC = () => {
     // });
     console.log(value);
   };
+
+  const handleSave = async () => {
+    try {
+      const dataBody = {
+        customerCode: selectedCustomer,
+        locationCode: location,
+        paymentMethodCode: paymentType,
+        totalAmount: 0,
+        items: orderItems
+      }
+
+
+    } catch (error) {
+      console.error('Network or unexpected error:', error);
+    }
+  }
 
 
 
@@ -510,8 +542,8 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                      // value={currentItem.itemName}
-                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
+                    // value={currentItem.itemName}
+                    // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
                       {substitutedItemsList && substitutedItemsList.length === 0 ? (
                         <option value="" disabled>No substitute items available</option>
@@ -570,13 +602,8 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="number"
                     className="block w-full p-2 border border-gray-300 rounded"
-                    value={currentItem.quantity || ""}
-                    onChange={(e) =>
-                      updateCurrentItem(
-                        "quantity",
-                        parseInt(e.target.value) || 0
-                      )
-                    }
+                    value={selectedItemQuantity}
+                    onChange={(e) => setSelectedItemQuantity(parseInt(e.target.value))}
                   />
                 </div>
 
@@ -587,13 +614,8 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="number"
                     className="block w-full p-2 border border-gray-300 rounded"
-                    value={currentItem.discount || ""}
-                    onChange={(e) =>
-                      updateCurrentItem(
-                        "discount",
-                        parseFloat(e.target.value) || 0
-                      )
-                    }
+                    value={selectedItemDiscount}
+                    onChange={(e) => setSelectedItemDiscount(parseInt(e.target.value))}
                   />
                 </div>
 
@@ -604,7 +626,7 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
-                    value={calculateItemTotal().toFixed(2)}
+                    value={calculateItemTotal() ? calculateItemTotal().toFixed(2) : 0}
                     readOnly
                   />
                 </div>
@@ -657,7 +679,7 @@ const CreateOrderPage: React.FC = () => {
                               {item.itemCode}
                             </td>
                             <td className="py-2 px-4 border-b">
-                              {item.itemName}
+                              {item.description}
                             </td>
                             <td className="py-2 px-4 border-b text-right">
                               {item.unitPrice.toFixed(2)}
@@ -707,6 +729,11 @@ const CreateOrderPage: React.FC = () => {
                             </td>
                           </tr>
                         ))}
+                        <tr>
+                          <td colSpan={3} className="py-2 px-4 border-b text-center">Total</td>
+                          <td className="py-2 px-4 border-b text-right"></td>
+                          <td colSpan={2} className="py-2 px-4 border-b text-right"></td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
@@ -716,7 +743,7 @@ const CreateOrderPage: React.FC = () => {
               {/* Submit Order Button */}
               {orderItems.length > 0 && (
                 <div className="mt-6 flex justify-end">
-                  <button className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 focus:outline-none cursor-pointer">
+                  <button onClick={handleSave} className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 focus:outline-none cursor-pointer">
                     Save
                   </button>
                 </div>
