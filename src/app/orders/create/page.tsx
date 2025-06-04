@@ -8,7 +8,7 @@ import autoTable from "jspdf-autotable";
 
 interface OrderItem {
   itemCode: string;
-  itemName: string;
+  description: string;
   unitPrice: number;
   quantity: number;
   discount: number;
@@ -65,6 +65,7 @@ const CreateOrderPage: React.FC = () => {
   const [paymentTypes, setPaymentTypes] = useState([]);
   const [itemsList, setItemsList] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState("");
+  const [selectedItemName, setSelectedItemName] = useState("");
   const [selectedItemUnitPrice, setSelectedItemUnitPrice] = useState("");
   const [selectedItemQuantity, setSelectedItemQuantity] = useState(0);
   const [selectedItemDiscount, setSelectedItemDiscount] = useState(0);
@@ -158,32 +159,45 @@ const CreateOrderPage: React.FC = () => {
 
   // Add item to order list
   const addToList = () => {
-    if (
-      !selectedItem ||
-      !selectedItemQuantity || 
-      !selectedCustomer || !paymentType
-    ) {
-      alert("Please fill in all required fields");
-      return;
+    if (orderItems.length >= 14) {
+      alert("You can only add 14 items to your order");
+    } else {
+      if (
+        !selectedItem ||
+        !selectedItemQuantity ||
+        !selectedCustomer || !paymentType || !location
+      ) {
+        alert("Please fill in all required fields");
+        return;
+      }
+
+      const newItem = {
+        itemCode: selectedItem,
+        description: selectedItemName,
+        unitPrice: parseFloat(selectedItemUnitPrice),
+        quantity: selectedItemQuantity,
+        discount: selectedItemDiscount,
+        total: calculateItemTotal()
+      }
+
+
+      //const newItem = { ...currentItem, total: calculateItemTotal() };
+      setOrderItems([...orderItems, newItem]);
+
+      // Update order totals
+      const newTotal = total + newItem.total;
+      setTotal(newTotal);
+      setTotalDueAmount(newTotal);
+
+      // Reset current item
+      setSelectedItem("");
+      setSelectedItemName("");
+      setSelectedItemUnitPrice("");
+      setSelectedItemQuantity(0);
+      setSelectedItemDiscount(0);
+
     }
 
-    const newItem = { ...currentItem, total: calculateItemTotal() };
-    setOrderItems([...orderItems, newItem]);
-
-    // Update order totals
-    const newTotal = total + newItem.total;
-    setTotal(newTotal);
-    setTotalDueAmount(newTotal);
-
-    // Reset current item
-    setCurrentItem({
-      itemCode: "",
-      itemName: "",
-      unitPrice: 0,
-      quantity: 0,
-      discount: 0,
-      total: 0,
-    });
   };
 
   const generatePDF = () => {
@@ -273,6 +287,7 @@ const CreateOrderPage: React.FC = () => {
     const selected = itemsList.find((item) => item.itemCode === value);
     if (selected) {
       setSelectedItemUnitPrice(selected.unitprice);
+      setSelectedItemName(selected.itemName);
       setSubstitutedItemsList(
         Array.isArray(selected.substituteItems) ? selected.substituteItems : []
       );
@@ -288,6 +303,22 @@ const CreateOrderPage: React.FC = () => {
     // });
     console.log(value);
   };
+
+  const handleSave = async () => {
+    try {
+      const dataBody = {
+        customerCode: selectedCustomer,
+        locationCode: location,
+        paymentMethodCode: paymentType,
+        totalAmount: 0,
+        items: orderItems
+      }
+
+
+    } catch (error) {
+      console.error('Network or unexpected error:', error);
+    }
+  }
 
 
 
@@ -595,7 +626,7 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
-                    value={calculateItemTotal().toFixed(2)}
+                    value={calculateItemTotal() ? calculateItemTotal().toFixed(2) : 0}
                     readOnly
                   />
                 </div>
@@ -648,7 +679,7 @@ const CreateOrderPage: React.FC = () => {
                               {item.itemCode}
                             </td>
                             <td className="py-2 px-4 border-b">
-                              {item.itemName}
+                              {item.description}
                             </td>
                             <td className="py-2 px-4 border-b text-right">
                               {item.unitPrice.toFixed(2)}
@@ -698,6 +729,11 @@ const CreateOrderPage: React.FC = () => {
                             </td>
                           </tr>
                         ))}
+                        <tr>
+                          <td colSpan={3} className="py-2 px-4 border-b text-center">Total</td>
+                          <td className="py-2 px-4 border-b text-right"></td>
+                          <td colSpan={2} className="py-2 px-4 border-b text-right"></td>
+                        </tr>
                       </tbody>
                     </table>
                   </div>
@@ -707,7 +743,7 @@ const CreateOrderPage: React.FC = () => {
               {/* Submit Order Button */}
               {orderItems.length > 0 && (
                 <div className="mt-6 flex justify-end">
-                  <button className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 focus:outline-none cursor-pointer">
+                  <button onClick={handleSave} className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 focus:outline-none cursor-pointer">
                     Save
                   </button>
                 </div>
