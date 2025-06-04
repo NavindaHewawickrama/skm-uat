@@ -55,6 +55,7 @@ const CreateOrderPage: React.FC = () => {
   const [notes, setNotes] = useState("");
   const [totalDueAmount, setTotalDueAmount] = useState(0);
   const [total, setTotal] = useState(0);
+  const [orderTotal, setOrderTotal] = useState(0);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [locations, setLocations] = useState([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
@@ -182,7 +183,11 @@ const CreateOrderPage: React.FC = () => {
 
 
       //const newItem = { ...currentItem, total: calculateItemTotal() };
-      setOrderItems([...orderItems, newItem]);
+      const updatedOrderItems = [...orderItems, newItem];
+      setOrderItems(updatedOrderItems);
+
+      const newOrderTotal = updatedOrderItems.reduce((acc, item) => acc + item.total, 0);
+      setOrderTotal(newOrderTotal);
 
       // Update order totals
       const newTotal = total + newItem.total;
@@ -306,14 +311,46 @@ const CreateOrderPage: React.FC = () => {
 
   const handleSave = async () => {
     try {
-      const dataBody = {
-        customerCode: selectedCustomer,
-        locationCode: location,
-        paymentMethodCode: paymentType,
-        totalAmount: 0,
-        items: orderItems
-      }
+      // const dataBody = {
+      //   customerCode: selectedCustomer,
+      //   locationCode: location,
+      //   paymentMethodCode: paymentType,
+      //   totalAmount: orderTotal,
+      //   items: orderItems
+      // }
 
+      const response = await fetch('/api/orders/create', {
+        method: 'POST',
+        body: JSON.stringify({
+          customerCode: selectedCustomer?.customerCode,
+          locationCode: location,
+          paymentMethodCode: paymentType,
+          totalAmount: orderTotal,
+          items: orderItems
+        }), headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      console.log(response);
+      const data = await response.json();
+
+      if (response.status === 200) {
+        // Success case
+        //handleShowAlert('success', 'Login successful! Redirecting to dashboard...');
+        console.log('Order successful:', data);
+        setSelectedCustomer(null);
+        setLocation("");
+        setPaymentType("");
+        setOrderItems([]);
+        // setTimeout(() => {
+        //   router.push("/dashboard");
+        // }, 2000);
+      } else {
+        // Error case - error message from the API response
+        const errorMessage = data.error || 'Order failed. Please try again.';
+        // handleShowAlert('error', errorMessage);
+        console.error('Order failed:', data);
+      }
 
     } catch (error) {
       console.error('Network or unexpected error:', error);
@@ -732,7 +769,7 @@ const CreateOrderPage: React.FC = () => {
                         <tr>
                           <td colSpan={3} className="py-2 px-4 border-b text-center">Total</td>
                           <td className="py-2 px-4 border-b text-right"></td>
-                          <td colSpan={2} className="py-2 px-4 border-b text-right"></td>
+                          <td colSpan={2} className="py-2 px-4 border-b text-right">{orderTotal.toFixed(2)}</td>
                         </tr>
                       </tbody>
                     </table>
