@@ -5,6 +5,7 @@ import SideNav from "../../../components/Sidenav";
 import Footer from "../../../components/Footer";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import Alert from "../../../components/Alert";
 
 interface OrderItem {
   itemCode: string;
@@ -46,8 +47,6 @@ interface Item {
   unitprice: string;
 }
 
-
-
 const CreateOrderPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [location, setLocation] = useState("");
@@ -59,10 +58,13 @@ const CreateOrderPage: React.FC = () => {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [locations, setLocations] = useState([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
-  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(null);
-  const [selectedCustomerDueAmount, setSelectedCustomerDueAmount] = useState<number>(0);
+  const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
+    null
+  );
+  const [selectedCustomerDueAmount, setSelectedCustomerDueAmount] =
+    useState<number>(0);
   const [selectedCustomerTotal, setSelectedCustomerTotal] = useState<number>(0);
-  const [customer, setCustomer] = useState<string>('');
+  const [customer, setCustomer] = useState<string>("");
   const [paymentTypes, setPaymentTypes] = useState([]);
   const [itemsList, setItemsList] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState("");
@@ -70,9 +72,15 @@ const CreateOrderPage: React.FC = () => {
   const [selectedItemUnitPrice, setSelectedItemUnitPrice] = useState("");
   const [selectedItemQuantity, setSelectedItemQuantity] = useState(0);
   const [selectedItemDiscount, setSelectedItemDiscount] = useState(0);
-  const [substitutedItemsList, setSubstitutedItemsList] = useState<SubstituteItem[]>([]);
+  const [substitutedItemsList, setSubstitutedItemsList] = useState<
+    SubstituteItem[]
+  >([]);
   const [loading, setLoading] = useState(true);
+
   const [error, setError] = useState<string | null>(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
 
   // Current item being added
   const [currentItem, setCurrentItem] = useState<OrderItem>({
@@ -117,7 +125,16 @@ const CreateOrderPage: React.FC = () => {
 
   useEffect(() => {
     fetchUserCustomerDetails();
-  }, [])
+  }, []);
+
+  const handleShowAlert = (
+    type: React.SetStateAction<string>,
+    message: React.SetStateAction<string>
+  ) => {
+    setAlertType(type);
+    setAlertMessage(message);
+    setShowAlert(true);
+  };
 
   const fetchUserCustomerDetails = async () => {
     try {
@@ -139,7 +156,9 @@ const CreateOrderPage: React.FC = () => {
     } catch (err) {
       console.error("Error fetching pending order data:", err);
       setError(
-        err instanceof Error ? err.message : "Failed to fetch pending order data"
+        err instanceof Error
+          ? err.message
+          : "Failed to fetch pending order data"
       );
     }
   };
@@ -150,25 +169,25 @@ const CreateOrderPage: React.FC = () => {
 
   // Calculate item total
   const calculateItemTotal = () => {
-    let totalFull = (parseFloat(selectedItemUnitPrice) * selectedItemQuantity);
+    let totalFull = parseFloat(selectedItemUnitPrice) * selectedItemQuantity;
     let discount = totalFull * (selectedItemDiscount / 100);
     let total = totalFull - discount;
     return total;
   };
 
-
-
   // Add item to order list
   const addToList = () => {
     if (orderItems.length >= 14) {
-      alert("You can only add 14 items to your order");
+      // alert("You can only add 14 items to your order");
     } else {
       if (
         !selectedItem ||
         !selectedItemQuantity ||
-        !selectedCustomer || !paymentType || !location
+        !selectedCustomer ||
+        !paymentType ||
+        !location
       ) {
-        alert("Please fill in all required fields");
+        handleShowAlert("error", "Please fill in all required fields");
         return;
       }
 
@@ -178,15 +197,17 @@ const CreateOrderPage: React.FC = () => {
         unitPrice: parseFloat(selectedItemUnitPrice),
         quantity: selectedItemQuantity,
         discount: selectedItemDiscount,
-        total: calculateItemTotal()
-      }
-
+        total: calculateItemTotal(),
+      };
 
       //const newItem = { ...currentItem, total: calculateItemTotal() };
       const updatedOrderItems = [...orderItems, newItem];
       setOrderItems(updatedOrderItems);
 
-      const newOrderTotal = updatedOrderItems.reduce((acc, item) => acc + item.total, 0);
+      const newOrderTotal = updatedOrderItems.reduce(
+        (acc, item) => acc + item.total,
+        0
+      );
       setOrderTotal(newOrderTotal);
 
       // Update order totals
@@ -200,9 +221,7 @@ const CreateOrderPage: React.FC = () => {
       setSelectedItemUnitPrice("");
       setSelectedItemQuantity(0);
       setSelectedItemDiscount(0);
-
     }
-
   };
 
   const generatePDF = () => {
@@ -251,12 +270,9 @@ const CreateOrderPage: React.FC = () => {
 
     const finalY = pdf.lastAutoTable?.finalY || 60;
     pdf.setFontSize(12);
-    pdf.text(
-      `Total Outstanding: ${totalDue.toFixed(2)}`,
-      195,
-      finalY + 10,
-      { align: "right" }
-    );
+    pdf.text(`Total Outstanding: ${totalDue.toFixed(2)}`, 195, finalY + 10, {
+      align: "right",
+    });
 
     const blob = pdf.output("blob");
     const url = URL.createObjectURL(blob);
@@ -284,10 +300,7 @@ const CreateOrderPage: React.FC = () => {
   };
 
   // Update current item field
-  const updateCurrentItem = (
-    field: keyof OrderItem,
-    value: string
-  ) => {
+  const updateCurrentItem = (field: keyof OrderItem, value: string) => {
     setSelectedItem(value);
     const selected = itemsList.find((item) => item.itemCode === value);
     if (selected) {
@@ -319,25 +332,26 @@ const CreateOrderPage: React.FC = () => {
       //   items: orderItems
       // }
 
-      const response = await fetch('/api/orders/create', {
-        method: 'POST',
+      const response = await fetch("/api/orders/create", {
+        method: "POST",
         body: JSON.stringify({
           customerCode: selectedCustomer?.customerCode,
           locationCode: location,
           paymentMethodCode: paymentType,
           totalAmount: orderTotal,
-          items: orderItems
-        }), headers: {
-          'Content-Type': 'application/json',
+          items: orderItems,
+        }),
+        headers: {
+          "Content-Type": "application/json",
         },
-      })
+      });
       console.log(response);
       const data = await response.json();
 
       if (response.status === 200) {
         // Success case
         //handleShowAlert('success', 'Login successful! Redirecting to dashboard...');
-        console.log('Order successful:', data);
+        console.log("Order successful:", data);
         setSelectedCustomer(null);
         setLocation("");
         setPaymentType("");
@@ -347,18 +361,15 @@ const CreateOrderPage: React.FC = () => {
         // }, 2000);
       } else {
         // Error case - error message from the API response
-        const errorMessage = data.error || 'Order failed. Please try again.';
-        // handleShowAlert('error', errorMessage);
-        console.error('Order failed:', data);
+        const errorMessage = data.error || "Order failed. Please try again.";
+        handleShowAlert("error", errorMessage);
+        console.error("Order failed:", data);
       }
-
     } catch (error) {
-      console.error('Network or unexpected error:', error);
+      console.error("Network or unexpected error:", error);
+      handleShowAlert("error", error);
     }
-  }
-
-
-
+  };
 
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
@@ -366,12 +377,16 @@ const CreateOrderPage: React.FC = () => {
       <AppBar toggleSideNav={toggleSideNav} />
 
       {/* Main Content Area */}
+     
       <div className="flex flex-1 overflow-hidden">
         {/* Side Navigation */}
         <SideNav isOpen={sideNavOpen} />
-
+        
         {/* Order Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
+           {showAlert && (
+          <Alert message={alertMessage} type={alertType} duration={5000} />
+        )}
           <div className="flex-1 p-4 overflow-auto">
             {/* Order Form */}
             <div className="bg-white p-6 rounded-md shadow-sm mb-4">
@@ -387,7 +402,9 @@ const CreateOrderPage: React.FC = () => {
                     value={location}
                     onChange={(e) => setLocation(e.target.value)}
                   >
-                    <option value="" disabled>Select a Location</option>
+                    <option value="" disabled>
+                      Select a Location
+                    </option>
                     {locations.map((loc: any, index) => (
                       <option key={index} value={loc.locationCode}>
                         {loc.locationName}
@@ -459,7 +476,10 @@ const CreateOrderPage: React.FC = () => {
                     readOnly
                   />
                   <div className="flex justify-start mt-2">
-                    <button onClick={handleViewDetails} className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-950 focus:outline-none cursor-pointer">
+                    <button
+                      onClick={handleViewDetails}
+                      className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-950 focus:outline-none cursor-pointer"
+                    >
                       View Details
                     </button>
                   </div>
@@ -579,11 +599,14 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                    // value={currentItem.itemName}
-                    // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
+                      // value={currentItem.itemName}
+                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
-                      {substitutedItemsList && substitutedItemsList.length === 0 ? (
-                        <option value="" disabled>No substitute items available</option>
+                      {substitutedItemsList &&
+                      substitutedItemsList.length === 0 ? (
+                        <option value="" disabled>
+                          No substitute items available
+                        </option>
                       ) : (
                         substitutedItemsList.map((item: any, index: number) => (
                           <option key={index} value={item.itemName}>
@@ -640,7 +663,9 @@ const CreateOrderPage: React.FC = () => {
                     type="number"
                     className="block w-full p-2 border border-gray-300 rounded"
                     value={selectedItemQuantity}
-                    onChange={(e) => setSelectedItemQuantity(parseInt(e.target.value))}
+                    onChange={(e) =>
+                      setSelectedItemQuantity(parseInt(e.target.value))
+                    }
                   />
                 </div>
 
@@ -652,7 +677,9 @@ const CreateOrderPage: React.FC = () => {
                     type="number"
                     className="block w-full p-2 border border-gray-300 rounded"
                     value={selectedItemDiscount}
-                    onChange={(e) => setSelectedItemDiscount(parseInt(e.target.value))}
+                    onChange={(e) =>
+                      setSelectedItemDiscount(parseInt(e.target.value))
+                    }
                   />
                 </div>
 
@@ -663,7 +690,9 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
-                    value={calculateItemTotal() ? calculateItemTotal().toFixed(2) : 0}
+                    value={
+                      calculateItemTotal() ? calculateItemTotal().toFixed(2) : 0
+                    }
                     readOnly
                   />
                 </div>
@@ -767,9 +796,19 @@ const CreateOrderPage: React.FC = () => {
                           </tr>
                         ))}
                         <tr>
-                          <td colSpan={3} className="py-2 px-4 border-b text-center">Total</td>
+                          <td
+                            colSpan={3}
+                            className="py-2 px-4 border-b text-center"
+                          >
+                            Total
+                          </td>
                           <td className="py-2 px-4 border-b text-right"></td>
-                          <td colSpan={2} className="py-2 px-4 border-b text-right">{orderTotal.toFixed(2)}</td>
+                          <td
+                            colSpan={2}
+                            className="py-2 px-4 border-b text-right"
+                          >
+                            {orderTotal.toFixed(2)}
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -780,7 +819,10 @@ const CreateOrderPage: React.FC = () => {
               {/* Submit Order Button */}
               {orderItems.length > 0 && (
                 <div className="mt-6 flex justify-end">
-                  <button onClick={handleSave} className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 focus:outline-none cursor-pointer">
+                  <button
+                    onClick={handleSave}
+                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 focus:outline-none cursor-pointer"
+                  >
                     Save
                   </button>
                 </div>
