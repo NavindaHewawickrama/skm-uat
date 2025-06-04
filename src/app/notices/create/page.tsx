@@ -54,7 +54,7 @@ const CreateNoticePage: React.FC = () => {
         size: file.size,
         type: file.type
       }));
-      
+
       setUploadedFiles(prev => [...prev, ...newFiles]);
     } else {
       setNoticeData(prev => ({
@@ -66,7 +66,7 @@ const CreateNoticePage: React.FC = () => {
     // Clear notice error if it exists
     if (errors.notice) {
       setErrors(prev => {
-        const newErrors = {...prev};
+        const newErrors = { ...prev };
         delete newErrors.notice;
         return newErrors;
       });
@@ -76,21 +76,21 @@ const CreateNoticePage: React.FC = () => {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
       const files = Array.from(e.target.files);
-      
+
       // Filter for only PDF and Word documents
-      const validFiles = files.filter(file => 
-        file.type === "application/pdf" || 
-        file.type === "application/msword" || 
+      const validFiles = files.filter(file =>
+        file.type === "application/pdf" ||
+        file.type === "application/msword" ||
         file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
       );
-      
+
       if (validFiles.length !== files.length) {
         setErrors(prev => ({
           ...prev,
           notice: "Only PDF and Word documents are allowed"
         }));
       }
-      
+
       if (validFiles.length > 0) {
         handleNoticeInputChange("documents", validFiles);
       }
@@ -123,7 +123,7 @@ const CreateNoticePage: React.FC = () => {
     // Here you would handle the notice creation logic
     // For now, we'll just reset the form
     alert(`Notice "${noticeData.title}" created with ${noticeData.documents.length} document(s)`);
-    
+
     // Reset notice form
     setNoticeData({
       title: "",
@@ -133,19 +133,19 @@ const CreateNoticePage: React.FC = () => {
     setUploadedFiles([]);
   };
 
-  const handleNoticeReset = () => {
-    setNoticeData({
-      title: "",
-      description: "",
-      documents: [],
-    });
-    setUploadedFiles([]);
-    setErrors(prev => {
-      const newErrors = {...prev};
-      delete newErrors.notice;
-      return newErrors;
-    });
-  };
+  // const handleNoticeReset = () => {
+  //   setNoticeData({
+  //     title: "",
+  //     description: "",
+  //     documents: [],
+  //   });
+  //   setUploadedFiles([]);
+  //   setErrors(prev => {
+  //     const newErrors = {...prev};
+  //     delete newErrors.notice;
+  //     return newErrors;
+  //   });
+  // };
 
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col">

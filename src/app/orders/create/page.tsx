@@ -66,6 +66,8 @@ const CreateOrderPage: React.FC = () => {
   const [itemsList, setItemsList] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState("");
   const [selectedItemUnitPrice, setSelectedItemUnitPrice] = useState("");
+  const [selectedItemQuantity, setSelectedItemQuantity] = useState(0);
+  const [selectedItemDiscount, setSelectedItemDiscount] = useState(0);
   const [substitutedItemsList, setSubstitutedItemsList] = useState<SubstituteItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -146,9 +148,10 @@ const CreateOrderPage: React.FC = () => {
 
   // Calculate item total
   const calculateItemTotal = () => {
-    const totalBeforeDiscount = currentItem.unitPrice * currentItem.quantity;
-    const discountAmount = totalBeforeDiscount * (currentItem.discount / 100);
-    return totalBeforeDiscount - discountAmount;
+    let totalFull = (parseFloat(selectedItemUnitPrice) * selectedItemQuantity);
+    let discount = totalFull * (selectedItemDiscount / 100);
+    let total = totalFull - discount;
+    return total;
   };
 
 
@@ -156,9 +159,9 @@ const CreateOrderPage: React.FC = () => {
   // Add item to order list
   const addToList = () => {
     if (
-      !currentItem.itemCode ||
-      !currentItem.itemName ||
-      currentItem.quantity <= 0
+      !selectedItem ||
+      !selectedItemQuantity || 
+      !selectedCustomer || !paymentType
     ) {
       alert("Please fill in all required fields");
       return;
@@ -267,9 +270,7 @@ const CreateOrderPage: React.FC = () => {
     value: string
   ) => {
     setSelectedItem(value);
-    
     const selected = itemsList.find((item) => item.itemCode === value);
-    console.log(selected);
     if (selected) {
       setSelectedItemUnitPrice(selected.unitprice);
       setSubstitutedItemsList(
@@ -510,8 +511,8 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                      // value={currentItem.itemName}
-                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
+                    // value={currentItem.itemName}
+                    // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
                       {substitutedItemsList && substitutedItemsList.length === 0 ? (
                         <option value="" disabled>No substitute items available</option>
@@ -570,13 +571,8 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="number"
                     className="block w-full p-2 border border-gray-300 rounded"
-                    value={currentItem.quantity || ""}
-                    onChange={(e) =>
-                      updateCurrentItem(
-                        "quantity",
-                        parseInt(e.target.value) || 0
-                      )
-                    }
+                    value={selectedItemQuantity}
+                    onChange={(e) => setSelectedItemQuantity(parseInt(e.target.value))}
                   />
                 </div>
 
@@ -587,13 +583,8 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="number"
                     className="block w-full p-2 border border-gray-300 rounded"
-                    value={currentItem.discount || ""}
-                    onChange={(e) =>
-                      updateCurrentItem(
-                        "discount",
-                        parseFloat(e.target.value) || 0
-                      )
-                    }
+                    value={selectedItemDiscount}
+                    onChange={(e) => setSelectedItemDiscount(parseInt(e.target.value))}
                   />
                 </div>
 

@@ -6,7 +6,7 @@ export async function POST(request: Request) {
         const { username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCode, email, phoneNumber, isActive, isMfaEnabled, mfaType } = body;
         const response = await fetch('http://173.212.233.90:8090/api/User/AddUser', {
             method: 'POST',
-            body: JSON.stringify({ username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCode, email, phoneNumber, mfaType }),
+            body: JSON.stringify({ username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCode, email, phoneNumber, isActive,isMfaEnabled, mfaType }),
             headers: {
                 'Content-Type': 'application/json',
             },
