@@ -70,7 +70,7 @@ const Dashboard = () => {
                       // href={`/view-pdf?file=${encodeURIComponent(doc.file)}`}
                       href={doc.file}
                       target="_blank"
-                      className="text-blue-600 underline hover:text-blue-800"
+                      className="text-blue-600 hover:text-blue-800"
                     >
                       📄 {doc.name}
                     </a>
