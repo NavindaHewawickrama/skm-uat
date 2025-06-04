@@ -3,6 +3,9 @@
 import React, { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
+
 interface ModalProps {
   open: boolean;
   onClose: () => void;
@@ -15,6 +18,76 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDe
   console.log(orderDetails);
 
   if (!open) return null;
+
+   const generatePDF = () => {
+  const pdf = new jsPDF();
+
+  pdf.setFontSize(18);
+  pdf.text("Order Items Details Report", 105, 15, { align: "center" });
+
+  const currentDate = new Date().toLocaleDateString("en-US");
+  pdf.setFontSize(10);
+  pdf.text(currentDate, 195, 15, { align: "right" });
+
+  const tableColumn = [
+    "Item Code",
+    "Unit Price", 
+    "Quantity",
+    "Discount(%)",
+    "Total",
+  ];
+
+  // Fix 1: Use correct variable names and calculate total
+  const tableRows = orderDetails.map((item) => {
+    // Calculate total = (unitPrice * quantity) - discount
+    const subtotal = item.unitPrice * item.quantity;
+    const discountAmount = subtotal * (item.discountPercent / 100);
+    const total = subtotal - discountAmount;
+    
+    return [
+      item.description,           // Item Code/Description
+      item.unitPrice.toFixed(2),  // Unit Price
+      item.quantity,              // Quantity  
+      `${item.discountPercent}%`, // Discount Percent
+      total.toFixed(2)            // Total
+    ];
+  });
+
+  autoTable(pdf, {
+    head: [tableColumn],
+    body: tableRows,
+    startY: 25,
+    theme: "grid",
+    styles: { fontSize: 10, cellPadding: 3 },
+    headStyles: {
+      fillColor: [200, 200, 200],
+      textColor: [0, 0, 0],
+      fontStyle: "bold",
+    },
+    alternateRowStyles: { fillColor: [245, 245, 245] },
+  });
+
+  // Fix 2: Calculate grand total from orderDetails
+  const grandTotal = orderDetails.reduce((sum, item) => {
+    const subtotal = item.unitPrice * item.quantity;
+    const discountAmount = subtotal * (item.discountPercent / 100);
+    const total = subtotal - discountAmount;
+    return sum + total;
+  }, 0);
+
+  const finalY = pdf.lastAutoTable?.finalY || 60;
+  pdf.setFontSize(12);
+  pdf.text(
+    `Grand Total: ${grandTotal.toFixed(2)}`,
+    195,
+    finalY + 10,
+    { align: "right" }
+  );
+
+  const blob = pdf.output("blob");
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+};
 
   return (
     <>
@@ -96,7 +169,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDe
           <div className="flex gap-2 mt-4 sm:mt-6">
             {/* Generate Report Button */}
             <button
-              onClick={() => router.push(`/report/${orderDetails.orderNo}`)}
+              onClick={generatePDF}
               className="bg-blue-900 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded hover:bg-blue-950 text-xs sm:text-sm cursor-pointer"
             >
               Report
