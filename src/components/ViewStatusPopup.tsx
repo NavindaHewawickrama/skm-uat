@@ -6,11 +6,11 @@ import Alert from "../components/Alert";
 interface ModalProps {
   open: boolean;
   onClose: () => void;
-  selectedOrder: any; // Fixed: changed from 'status' to 'selectedOrder'
+  selectedOrder: any; 
 }
 
 const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
-  const [selectedStatus, setSelectedStatus] = useState("1"); // Fixed: initialize with default value
+  const [selectedStatus, setSelectedStatus] = useState("1"); 
   const [trackingNumber, setTrackingNumber] = useState("");
   const [deliveryPerson, setDeliveryPerson] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
@@ -46,14 +46,13 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
   }, [open, selectedOrder]);
 
   const handleShowAlert = (
-    type: string, // Fixed: simplified type annotation
-    message: string // Fixed: simplified type annotation
+    type: string, 
+    message: string
   ) => {
     setAlertType(type);
     setAlertMessage(message);
     setShowAlert(true);
     
-    // Auto-hide alert after 5 seconds
     setTimeout(() => {
       setShowAlert(false);
     }, 5000);
@@ -95,7 +94,6 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
       // Delay closing modal to show success message
       setTimeout(() => {
         onClose();
-        // Optionally trigger a page refresh or data refetch
         window.location.reload();
       }, 1500);
 
@@ -112,7 +110,6 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
 
   return (
     <>
-      {/* Fixed: Move alert outside modal and increase z-index */}
       {showAlert && (
         <div className="fixed top-4 right-4 z-[60]">
           <Alert message={alertMessage} type={alertType} duration={5000} />
