@@ -133,7 +133,7 @@ const RejectedOrdersPage: React.FC = () => {
 
   const handleItemDetailsView = (order: any) => {
     console.log(order);
-    setSelectedOrder(order);
+    setSelectedOrder(order.items);
     setListViewOpen(true)
   }
 

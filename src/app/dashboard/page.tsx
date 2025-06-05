@@ -22,11 +22,8 @@ const Dashboard = () => {
           const data = await response.json();
           console.log(data);
         }
-
-
       } catch (err) {
         console.error("Error fetching pending order data:", err);
-
       }
     }
 

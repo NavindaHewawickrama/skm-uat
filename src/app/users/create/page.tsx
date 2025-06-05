@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 import AppBar from "../../../components/Appbar";
 import SideNav from "../../../components/Sidenav";
 import Footer from "../../../components/Footer";
+import Alert from '../../../components/Alert';
 import MultiSelectDropdown from "@/components/MultiSelectDropdown";
 
 interface UserData {
@@ -76,6 +77,30 @@ const CreateUserPage: React.FC = () => {
   const [errors, setErrors] = useState<FormErrors>({});
   const [usersList, setUsersList] = useState<UserData[]>([]);
   const [showUsersList, setShowUsersList] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [password, setPassword] = useState("");
+  const [reTypePassword, setReTypePassword] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [selectedSalesPerson, setSelectedSalesPerson] = useState("");
+  const [email, setEmail] = useState("");
+  const [telephone, setTelephone] = useState("");
+  const [role, setRole] = useState(0);
+  const [location, setLocation] = useState([]);
+  const [isActive, setIsActive] = useState(false);
+  const [isMfaEnabled, setIsMfaEnabled] = useState(true);
+  const [mfaType, setMfaType] = useState("phone");
+
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const [alertType, setAlertType] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleShowAlert = (type: React.SetStateAction<string>, message: React.SetStateAction<string>) => {
+    setAlertType(type);
+    setAlertMessage(message);
+    setShowAlert(true);
+  };
 
   // API data states
   const [userCreationDetails, setUserCreationDetails] = useState<UserCreationDetails>({
@@ -98,7 +123,11 @@ const CreateUserPage: React.FC = () => {
         }
 
         const data = await response.json();
-        setUserCreationDetails(data);
+        console.log(data);
+        setUserCreationDetails(data.creationDetails);
+        if (data.userDetails.userRoleId === 1) {
+          setUsersList(data.creationDetails.salesPersons);
+        }
         setApiError(null);
       } catch (error) {
         console.error('Error fetching user creation details:', error);
@@ -122,7 +151,7 @@ const CreateUserPage: React.FC = () => {
     // Clear error when field is modified
     if (field in errors) {
       setErrors(prev => {
-        const newErrors = {...prev};
+        const newErrors = { ...prev };
         delete newErrors[field as keyof FormErrors];
         return newErrors;
       });
@@ -142,7 +171,7 @@ const CreateUserPage: React.FC = () => {
     if (selectedSalesPerson) {
       // Clear errors related to posName, email, and telephone as they are now being auto-filled
       setErrors(prev => {
-        const newErrors = {...prev};
+        const newErrors = { ...prev };
         delete newErrors.posName;
         delete newErrors.email;
         delete newErrors.telephone;
@@ -170,64 +199,64 @@ const CreateUserPage: React.FC = () => {
     const newErrors: FormErrors = {};
     let isValid = true;
 
-    if (!userData.username) {
+    if (!userName) {
       newErrors.username = "Username is required";
       isValid = false;
     }
 
-    if (!userData.password) {
+    if (!password) {
       newErrors.password = "Password is required";
       isValid = false;
     }
 
-    if (!userData.confirmPassword) {
+    if (!reTypePassword) {
       newErrors.confirmPassword = "Re Type Password is required";
       isValid = false;
     }
 
-    if (!userData.firstName) {
+    if (!firstName) {
       newErrors.firstName = "First Name is required";
       isValid = false;
     }
 
-    if (!userData.lastName) {
+    if (!lastName) {
       newErrors.lastName = "Last Name is required";
       isValid = false;
     }
 
-    if (userData.password !== userData.confirmPassword) {
+    if (password !== reTypePassword) {
       newErrors.confirmPassword = "Passwords do not match";
       isValid = false;
     }
 
-    if (!userData.posName) {
+    if (!selectedSalesPerson) {
       newErrors.posName = "Sales Person is required";
       isValid = false;
     }
 
     // Basic email validation regex
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!userData.email) {
+    if (!email) {
       newErrors.email = "Email is required";
       isValid = false;
-    } else if (!emailRegex.test(userData.email)) {
+    } else if (!emailRegex.test(email)) {
       newErrors.email = "Enter a valid email address";
       isValid = false;
     }
 
     // Basic telephone validation (e.g., just check if it's not empty)
     // You might want to add more robust regex for phone numbers
-    if (!userData.telephone) {
+    if (!telephone) {
       newErrors.telephone = "Telephone Number is required";
       isValid = false;
     }
 
-    if (!userData.role) {
+    if (!role) {
       newErrors.role = "Role is required";
       isValid = false;
     }
 
-    if (!userData.location || userData.location.length === 0) {
+    if (!location) {
       newErrors.location = "At least one location is required";
       isValid = false;
     }
@@ -236,49 +265,97 @@ const CreateUserPage: React.FC = () => {
     return isValid;
   };
 
-  const handleCreateUser = () => {
+  const handleCreateUser = async () => {
     // Validate form
     if (!validateForm()) {
       // Scroll to the first error if needed
       return;
     }
 
-    // Add user to list
-    setUsersList([...usersList, userData]);
+    setIsLoading(true);
 
-    // Reset form and errors
-    setUserData({
-      username: "",
-      password: "",
-      confirmPassword: "",
-      firstName: "",
-      lastName: "",
-      posName: "",
-      email: "",
-      telephone: "",
-      role: "",
-      location: [],
-      isActive: false,
-    });
-    setErrors({ notice: "User created successfully!" }); // Optional: Add a success notice
-    setTimeout(() => setErrors({}), 3000); // Clear notice after 3 seconds
+    try {
+      // const apiBody = {
+      //   username: userName,
+      //   password: password,
+      //   reEnteredPassword: reTypePassword,
+      //   firstName: firstName,
+      //   lastName: lastName,
+      //   userRoleId: role,
+      //   salesPersonCode: selectedSalesPerson,
+      //   locationCode: location,
+      //   email: email,
+      //   phoneNumber: telephone,
+      //   isActive: isActive,
+      //   isMfaEnabled: true,
+      //   mfaType: "phone"
+      // }
+      const response = await fetch('/api/user/addNewUser', {
+        method: 'POST',
+        body: JSON.stringify({
+          username: userName,
+          password: password,
+          reEnteredPassword: reTypePassword,
+          firstName: firstName,
+          lastName: lastName,
+          userRoleId: role,
+          salesPersonCode: selectedSalesPerson,
+          locationCode: location,
+          email: email,
+          phoneNumber: telephone,
+          isActive: isActive,
+          isMfaEnabled: true,
+          mfaType: "phone"
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        handleShowAlert('success', 'User Created successfully!');
+        handleReset();
+      } else {
+        handleShowAlert('error', data.error || 'User Creating failed');
+      }
+
+    } catch (error) {
+      console.error('User Createing error:', error);
+      handleShowAlert('error', 'Network error. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleReset = () => {
-    setUserData({
-      username: "",
-      password: "",
-      confirmPassword: "",
-      firstName: "",
-      lastName: "",
-      posName: "",
-      email: "",
-      telephone: "",
-      role: "",
-      location: [],
-      isActive: false,
-    });
+    // setUserData({
+    //   username: "",
+    //   password: "",
+    //   confirmPassword: "",
+    //   firstName: "",
+    //   lastName: "",
+    //   posName: "",
+    //   email: "",
+    //   telephone: "",
+    //   role: "",
+    //   location: [],
+    //   isActive: false,
+    // });
     setErrors({}); // Clear all errors on reset
+
+    setUserName("");
+    setPassword("");
+    setReTypePassword("");
+    setFirstName("");
+    setLastName("");
+    setRole(0);
+    setSelectedSalesPerson("");
+    setLocation("");
+    setEmail("");
+    setTelephone("");
+    setIsActive(false);
   };
 
   const toggleUsersList = () => {
@@ -322,8 +399,8 @@ const CreateUserPage: React.FC = () => {
                 type="text"
                 className={`w-full p-2 border ${errors.username ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="Username"
-                value={userData.username}
-                onChange={(e) => handleInputChange("username", e.target.value)}
+                value={userName}
+                onChange={(e) => setUserName(e.target.value)}
               />
               {errors.username && (
                 <p className="text-red-500 text-sm mt-1">{errors.username}</p>
@@ -337,8 +414,8 @@ const CreateUserPage: React.FC = () => {
                 type="password"
                 className={`w-full p-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="Password"
-                value={userData.password}
-                onChange={(e) => handleInputChange("password", e.target.value)}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
               />
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
@@ -354,9 +431,9 @@ const CreateUserPage: React.FC = () => {
                 type="password"
                 className={`w-full p-2 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="Re-Type Password"
-                value={userData.confirmPassword}
+                value={reTypePassword}
                 onChange={(e) =>
-                  handleInputChange("confirmPassword", e.target.value)
+                  setReTypePassword(e.target.value)
                 }
               />
               {errors.confirmPassword && (
@@ -371,8 +448,8 @@ const CreateUserPage: React.FC = () => {
                 type="text"
                 className={`w-full p-2 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="First Name"
-                value={userData.firstName}
-                onChange={(e) => handleInputChange("firstName", e.target.value)}
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
               />
               {errors.firstName && (
                 <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
@@ -386,8 +463,8 @@ const CreateUserPage: React.FC = () => {
                 type="text"
                 className={`w-full p-2 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="Last Name"
-                value={userData.lastName}
-                onChange={(e) => handleInputChange("lastName", e.target.value)}
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
               />
               {errors.lastName && (
                 <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>
@@ -401,9 +478,10 @@ const CreateUserPage: React.FC = () => {
                 <select
                   className={`w-full p-2 border ${errors.posName ? 'border-red-500' : 'border-gray-300'} rounded appearance-none`}
                   // The value here needs to be the salesPersonCode that matches userData.posName (salesPersonName)
-                  value={userCreationDetails.salesPersons.find(sp => sp.salesPersonName === userData.posName)?.salesPersonCode || ""}
+                  // value={userCreationDetails.salesPersons.find(sp => sp.salesPersonName === userData.posName)?.salesPersonCode || ""}
+                  value={selectedSalesPerson}
                   onChange={(e) => {
-                    handleSalesPersonChange(e.target.value);
+                    setSelectedSalesPerson(e.target.value);
                   }}
                 >
                   <option value="">Select Sales Person</option>
@@ -441,8 +519,8 @@ const CreateUserPage: React.FC = () => {
                 type="email"
                 className={`w-full p-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="Enter a valid e-mail"
-                value={userData.email}
-                onChange={(e) => handleInputChange("email", e.target.value)}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               {errors.email && (
                 <p className="text-red-500 text-sm mt-1">{errors.email}</p>
@@ -456,8 +534,8 @@ const CreateUserPage: React.FC = () => {
                 type="text"
                 className={`w-full p-2 border ${errors.telephone ? 'border-red-500' : 'border-gray-300'} rounded`}
                 placeholder="Enter a valid Number"
-                value={userData.telephone}
-                onChange={(e) => handleInputChange("telephone", e.target.value)}
+                value={telephone}
+                onChange={(e) => setTelephone(e.target.value)}
               />
               {errors.telephone && (
                 <p className="text-red-500 text-sm mt-1">{errors.telephone}</p>
@@ -470,12 +548,12 @@ const CreateUserPage: React.FC = () => {
               <div className="relative">
                 <select
                   className={`w-full p-2 border ${errors.role ? 'border-red-500' : 'border-gray-300'} rounded appearance-none`}
-                  value={userData.role}
-                  onChange={(e) => handleInputChange("role", e.target.value)}
+                  value={role}
+                  onChange={(e) => setRole(parseInt(e.target.value))}
                 >
                   <option value="">Select Role</option>
                   {userCreationDetails.roles.map((role) => (
-                    <option key={role.roleId} value={role.roleName}>
+                    <option key={role.roleId} value={role.roleId}>
                       {role.roleName}
                     </option>
                   ))}
@@ -503,21 +581,23 @@ const CreateUserPage: React.FC = () => {
 
             {/* Location Select */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">Location :</label>
-              <div className="relative">
-                <select
+              {/* <label className="block text-gray-700 font-semibold mb-2">Location :</label> */}
+              {/* <div className="relative"> */}
+              {/* <select
                   className={`w-full p-2 border ${errors.role ? 'border-red-500' : 'border-gray-300'} rounded appearance-none`}
-                  value={userData.location}
-                  onChange={(e) => handleInputChange("location", e.target.value)}
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
                 >
                   <option value="">Select Location</option>
                   {userCreationDetails.locations.map((location) => (
-                    <option key={location.locationCode} value={location.locationName}>
+                    <option key={location.locationCode} value={location.locationCode}>
                       {location.locationName}
                     </option>
                   ))}
-                </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                </select> */}
+
+
+              {/* <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                   <svg
                     className="h-4 w-4"
                     fill="none"
@@ -531,8 +611,13 @@ const CreateUserPage: React.FC = () => {
                       d="M19 9l-7 7-7-7"
                     />
                   </svg>
-                </div>
-              </div>
+                </div> */}
+              {/* </div> */}
+              <MultiSelectDropdown
+                locationOptions={userCreationDetails.locations}
+                selectedLocations={location}
+                setSelectedLocations={setLocation}
+              />
               {errors.role && (
                 <p className="text-red-500 text-sm mt-1">{errors.role}</p>
               )}
@@ -546,13 +631,42 @@ const CreateUserPage: React.FC = () => {
                 <input
                   type="checkbox"
                   className="form-checkbox h-5 w-5 text-blue-600"
-                  checked={userData.isActive}
+                  checked={isActive}
                   onChange={(e) =>
-                    handleInputChange("isActive", e.target.checked)
+                    setIsActive(e.target.checked)
                   }
                 />
               </label>
             </div>
+
+            {/* MFA Type Checkboxes */}
+            <div className="mb-6">
+              <label className="block text-gray-700 font-semibold mb-2">MFA Type:</label>
+              <div className="flex gap-4">
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    value="sms"
+                    checked={mfaType.includes('sms')}
+                    onChange={() => setMfaType('sms')}
+                    className="form-checkbox h-5 w-5 text-blue-600"
+                  />
+                  <span className="ml-2 text-gray-700">SMS</span>
+                </label>
+
+                <label className="flex items-center">
+                  <input
+                    type="checkbox"
+                    value="email"
+                    checked={mfaType.includes('email')}
+                    onChange={() => setMfaType('email')}
+                    className="form-checkbox h-5 w-5 text-blue-600"
+                  />
+                  <span className="ml-2 text-gray-700">Email</span>
+                </label>
+              </div>
+            </div>
+
 
             {/* Buttons */}
             <div className="flex flex-wrap gap-2">
@@ -681,6 +795,13 @@ const CreateUserPage: React.FC = () => {
           )}
         </div>
       </div>
+      {showAlert && (
+        <Alert
+          message={alertMessage}
+          type={alertType}
+          duration={5000}
+        />
+      )}
 
       {/* Footer Component */}
       <Footer />

@@ -48,7 +48,6 @@ export async function GET() {
       );
     }
 
-    console.log("id", userId);
 
     // ✅ Make request with userId
     const response = await fetch(`http://173.212.233.90:8090/api/Business/GetOrderCreationDetailsByUser?userId=${userId}`, {

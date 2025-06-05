@@ -3,13 +3,13 @@ import { NextResponse } from 'next/server';
 
 interface JwtPayload {
   nameid: string;
-  // add more fields if needed
+  exp: number;
 }
 
-// Helper to decode base64url to JSON
+// Decode JWT payload safely
 function decodeJWT(token: string): JwtPayload | null {
   try {
-    const payload = token.split('.')[1]; // JWT is [header].[payload].[signature]
+    const payload = token.split('.')[1];
     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(
       atob(base64)
@@ -36,46 +36,83 @@ export async function GET() {
       );
     }
 
-    // ✅ Decode token to get userId
+    // Decode JWT
     const decoded = decodeJWT(acctoken);
     const userId = decoded?.nameid;
+    const exp = decoded?.exp;
+    const now = Math.floor(Date.now() / 1000); // current Unix time
 
-    if (!userId) {
+    if (!userId || !exp) {
       return NextResponse.json(
-        { error: 'Invalid token: userId missing' },
+        { error: 'Invalid token: userId or expiration missing' },
         { status: 400 }
       );
     }
 
-    console.log("id", userId);
-
-    // ✅ Make request with userId
-    const response = await fetch(`http://173.212.233.90:8090/api/User/GetUserDetailsById?userId=${userId}`, {
-      method: 'GET',
-      headers: {
-        'Authorization': `Bearer ${acctoken}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    // Token expired check
+    if (exp < now) {
+      return NextResponse.json(
+        { error: 'Token has expired' },
+        { status: 401 }
+      );
     }
 
-    const data = await response.json();
+    const maxAge = exp - now;
 
-    return NextResponse.json(data, {
+    // Fetch user details from your API
+    const response = await fetch(
+      `http://173.212.233.90:8090/api/User/GetUserDetailsById?userId=${userId}`,
+      {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${acctoken}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch user details: ${response.status}`);
+    }
+
+    const userData = await response.json();
+
+    // Filter only non-sensitive fields to store in cookie
+    const safeUserData = {
+      email: userData.email,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      locationCode: userData.locationCode,
+      salesPersonCode: userData.salesPersonCode,
+      userRoleId: userData.userRoleId,
+      username: userData.username,
+    };
+
+    // Set cookie
+    const responseWithCookie = NextResponse.json(safeUserData, {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
       },
     });
 
+    responseWithCookie.cookies.set('userDetails', JSON.stringify(safeUserData), {
+      httpOnly: true,
+      secure: true,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: maxAge > 0 ? maxAge : 0,
+    });
+
+    return responseWithCookie;
+
   } catch (error) {
-    console.error('Error fetching pending orders:', error);
+    console.error('Error fetching user details:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch pending orders' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
 }
+
+//created by Navinda Hewawickrama & Praveen Bimsara

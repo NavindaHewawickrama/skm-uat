@@ -1,13 +1,27 @@
+import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
+
 
 export async function POST(request: Request) {
     try {
+
+        const cookieStore = await cookies();
+        const acctoken = cookieStore.get('acctoken')?.value;
+
+        if (!acctoken) {
+            return NextResponse.json(
+                { error: 'Unauthorized: Token missing' },
+                { status: 401 }
+            );
+        }
+
         const body = await request.json();
         const { username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCode, email, phoneNumber, isActive, isMfaEnabled, mfaType } = body;
         const response = await fetch('http://173.212.233.90:8090/api/User/AddUser', {
             method: 'POST',
-            body: JSON.stringify({ username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCode, email, phoneNumber, isActive,isMfaEnabled, mfaType }),
+            body: JSON.stringify({ username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCode, email, phoneNumber, isActive, isMfaEnabled, mfaType }),
             headers: {
+                'Authorization': `Bearer ${acctoken}`,
                 'Content-Type': 'application/json',
             },
         });
