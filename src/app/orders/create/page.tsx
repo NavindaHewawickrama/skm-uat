@@ -352,6 +352,7 @@ const CreateOrderPage: React.FC = () => {
         // Success case
         //handleShowAlert('success', 'Login successful! Redirecting to dashboard...');
         console.log("Order successful:", data);
+        handleShowAlert('success', 'Order created successfully');
         setSelectedCustomer(null);
         setLocation("");
         setPaymentType("");
@@ -367,7 +368,7 @@ const CreateOrderPage: React.FC = () => {
       }
     } catch (error) {
       console.error("Network or unexpected error:", error);
-      handleShowAlert("error", error);
+      handleShowAlert("error", "Unexpected error occured");
     }
   };
 

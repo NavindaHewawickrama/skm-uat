@@ -1,17 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import Alert from '../components/Alert';
-
+import Alert from "../components/Alert";
 
 interface ModalProps {
   open: boolean;
   onClose: () => void;
-  status: any;
+  selectedOrder: any; // Fixed: changed from 'status' to 'selectedOrder'
 }
 
 const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
-  const [selectedStatus, setSelectedStatus] = useState(status);
+  const [selectedStatus, setSelectedStatus] = useState("1"); // Fixed: initialize with default value
   const [trackingNumber, setTrackingNumber] = useState("");
   const [deliveryPerson, setDeliveryPerson] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
@@ -19,10 +18,10 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
 
   const [rejectReason, setRejectReason] = useState("");
   const [loading, setLoading] = useState(false);
-  
-    const [showAlert, setShowAlert] = useState(false);
-    const [alertMessage, setAlertMessage] = useState('');
-    const [alertType, setAlertType] = useState('');
+
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
 
   useEffect(() => {
     if (open && selectedOrder) {
@@ -39,14 +38,26 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
       setDeliveryDate("");
       setSpecialNote("");
       setRejectReason("");
+      // Reset alert state when modal opens
+      setShowAlert(false);
+      setAlertMessage("");
+      setAlertType("");
     }
   }, [open, selectedOrder]);
 
-  const handleShowAlert = (type: React.SetStateAction<string>, message: React.SetStateAction<string>) => {
-      setAlertType(type);
-      setAlertMessage(message);
-      setShowAlert(true);
-    };
+  const handleShowAlert = (
+    type: string, // Fixed: simplified type annotation
+    message: string // Fixed: simplified type annotation
+  ) => {
+    setAlertType(type);
+    setAlertMessage(message);
+    setShowAlert(true);
+    
+    // Auto-hide alert after 5 seconds
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 5000);
+  };
 
   if (!open) return null;
 
@@ -55,6 +66,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
 
     try {
       setLoading(true);
+      setShowAlert(false); // Hide any existing alerts
 
       const requestBody = {
         orderNumber: selectedOrder.orderNumber,
@@ -77,17 +89,22 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
       const result = await response.json();
       console.log("Status updated successfully:", result);
 
-      // Show success message or refresh data
-      handleShowAlert("success","Order status updated successfully!");
-      console.log("Status updated successfully")
+      // Show success message
+      handleShowAlert("success", "Order status updated successfully!");
+      
+      // Delay closing modal to show success message
+      setTimeout(() => {
+        onClose();
+        // Optionally trigger a page refresh or data refetch
+        window.location.reload();
+      }, 1500);
 
-      onClose();
-
-      // Optionally trigger a page refresh or data refetch
-      window.location.reload();
     } catch (error) {
       console.error("Error updating status:", error);
-      handleShowAlert("error","Failed to update order status. Please try again.");
+      handleShowAlert(
+        "error",
+        "Failed to update order status. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -95,6 +112,12 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
 
   return (
     <>
+      {/* Fixed: Move alert outside modal and increase z-index */}
+      {showAlert && (
+        <div className="fixed top-4 right-4 z-[60]">
+          <Alert message={alertMessage} type={alertType} duration={5000} />
+        </div>
+      )}
       <div
         className="fixed inset-0 z-50 flex items-center justify-center backdrop-brightness-50 overflow-auto p-4"
         onClick={onClose}
