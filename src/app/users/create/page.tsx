@@ -86,7 +86,7 @@ const CreateUserPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
   const [role, setRole] = useState(0);
-  const [location, setLocation] = useState([]);
+const [location, setLocation] = useState<string[]>([]);
   const [isActive, setIsActive] = useState(false);
   const [isMfaEnabled, setIsMfaEnabled] = useState(true);
   const [mfaType, setMfaType] = useState("phone");
@@ -256,10 +256,10 @@ const CreateUserPage: React.FC = () => {
       isValid = false;
     }
 
-    if (!location) {
-      newErrors.location = "At least one location is required";
-      isValid = false;
-    }
+    if (!location || location.length === 0) {
+  newErrors.location = "At least one location is required";
+  isValid = false;
+}
 
     setErrors(newErrors);
     return isValid;
@@ -352,7 +352,7 @@ const CreateUserPage: React.FC = () => {
     setLastName("");
     setRole(0);
     setSelectedSalesPerson("");
-    setLocation("");
+    setLocation([]);
     setEmail("");
     setTelephone("");
     setIsActive(false);
@@ -581,45 +581,13 @@ const CreateUserPage: React.FC = () => {
 
             {/* Location Select */}
             <div className="mb-4">
-              {/* <label className="block text-gray-700 font-semibold mb-2">Location :</label> */}
-              {/* <div className="relative"> */}
-              {/* <select
-                  className={`w-full p-2 border ${errors.role ? 'border-red-500' : 'border-gray-300'} rounded appearance-none`}
-                  value={location}
-                  onChange={(e) => setLocation(e.target.value)}
-                >
-                  <option value="">Select Location</option>
-                  {userCreationDetails.locations.map((location) => (
-                    <option key={location.locationCode} value={location.locationCode}>
-                      {location.locationName}
-                    </option>
-                  ))}
-                </select> */}
-
-
-              {/* <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                  <svg
-                    className="h-4 w-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
-                </div> */}
-              {/* </div> */}
               <MultiSelectDropdown
                 locationOptions={userCreationDetails.locations}
                 selectedLocations={location}
                 setSelectedLocations={setLocation}
               />
-              {errors.role && (
-                <p className="text-red-500 text-sm mt-1">{errors.role}</p>
+              {errors.location && (
+                <p className="text-red-500 text-sm mt-1">{errors.location}</p>
               )}
             </div>
 

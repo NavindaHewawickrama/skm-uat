@@ -40,7 +40,9 @@ const PendingOrdersPage: React.FC = () => {
       } catch (err) {
         console.error("Error fetching pending order data:", err);
         setError(
-          err instanceof Error ? err.message : "Failed to fetch pending order data"
+          err instanceof Error
+            ? err.message
+            : "Failed to fetch pending order data"
         );
       } finally {
         setLoading(false);
@@ -49,7 +51,6 @@ const PendingOrdersPage: React.FC = () => {
 
     fetchStockData();
   }, []);
-
 
   // Filter orders based on search query
   const filteredOrders = useMemo(() => {
@@ -134,8 +135,8 @@ const PendingOrdersPage: React.FC = () => {
   const handleItemDetailsView = (order: any) => {
     console.log(order);
     setSelectedOrder(order.items);
-    setListViewOpen(true)
-  }
+    setListViewOpen(true);
+  };
   // Handle entries per page change
   const handleEntriesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setEntriesPerPage(e.target.value);
@@ -143,10 +144,10 @@ const PendingOrdersPage: React.FC = () => {
   };
 
   const handleStatus = (order: any) => {
-    // setStatus(status);
+    setSelectedOrder(order);
     setStatusViewOpen(true);
     console.log(order);
-  }
+  };
 
   if (loading) {
     return (
@@ -285,7 +286,7 @@ const PendingOrdersPage: React.FC = () => {
                           {order.salesPersonName}
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.orderDate.split('T')[0]}
+                          {order.orderDate.split("T")[0]}
                         </td>
                         <td className="px-4 py-3 border text-sm">
                           {order.paymentMethodType}
@@ -294,7 +295,10 @@ const PendingOrdersPage: React.FC = () => {
                           {order.totalAmount.toFixed(2)}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer" onClick={() => handleItemDetailsView(order)}>
+                          <button
+                            className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer"
+                            onClick={() => handleItemDetailsView(order)}
+                          >
                             View
                           </button>
                         </td>
@@ -307,7 +311,10 @@ const PendingOrdersPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded focus:outline-none cursor-pointer" onClick={() => handleStatus(order)} >
+                          <button
+                            className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded focus:outline-none cursor-pointer"
+                            onClick={() => handleStatus(order)}
+                          >
                             Edit
                           </button>
                         </td>
@@ -335,8 +342,9 @@ const PendingOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
-                      }`}
+                    className={`px-3 py-1 border rounded cursor-pointer ${
+                      currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
+                    }`}
                   >
                     Previous
                   </button>
@@ -345,12 +353,13 @@ const PendingOrdersPage: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => typeof page === "number" && goToPage(page)}
-                      className={`px-3 py-1 border rounded ${page === currentPage
-                        ? "bg-blue-500 text-white"
-                        : page === "..."
+                      className={`px-3 py-1 border rounded ${
+                        page === currentPage
+                          ? "bg-blue-500 text-white"
+                          : page === "..."
                           ? ""
                           : "hover:bg-gray-100"
-                        }`}
+                      }`}
                       disabled={page === "..."}
                     >
                       {page}
@@ -360,20 +369,28 @@ const PendingOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages || totalPages === 0}
-                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === totalPages || totalPages === 0
-                      ? "text-gray-400"
-                      : "hover:bg-gray-100"
-                      }`}
+                    className={`px-3 py-1 border rounded cursor-pointer ${
+                      currentPage === totalPages || totalPages === 0
+                        ? "text-gray-400"
+                        : "hover:bg-gray-100"
+                    }`}
                   >
                     Next
                   </button>
                 </div>
               </div>
             </div>
-
           </div>
-          <ViewOrderEditPopupButton open={listViewOpen} onClose={() => setListViewOpen(false)} orderDetails={selectedOrder} />
-          <ViewStatusPopup open={statusViewOpen} onClose={() => setStatusViewOpen(false)} status={status} />
+          <ViewOrderEditPopupButton
+            open={listViewOpen}
+            onClose={() => setListViewOpen(false)}
+            orderDetails={selectedOrder}
+          />
+          <ViewStatusPopup
+            open={statusViewOpen}
+            onClose={() => setStatusViewOpen(false)}
+            selectedOrder={selectedOrder}
+          />{" "}
           {/* Footer Component */}
           <Footer />
         </div>

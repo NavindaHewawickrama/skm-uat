@@ -1,6 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import Alert from '../components/Alert';
+
 
 interface ModalProps {
   open: boolean;
@@ -8,18 +10,87 @@ interface ModalProps {
   status: any;
 }
 
-const ViewStatus: React.FC<ModalProps> = ({ open, onClose, status }) => {
+const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
   const [selectedStatus, setSelectedStatus] = useState(status);
   const [trackingNumber, setTrackingNumber] = useState("");
   const [deliveryPerson, setDeliveryPerson] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
   const [specialNote, setSpecialNote] = useState("");
 
+  const [rejectReason, setRejectReason] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+    const [showAlert, setShowAlert] = useState(false);
+    const [alertMessage, setAlertMessage] = useState('');
+    const [alertType, setAlertType] = useState('');
+
+  useEffect(() => {
+    if (open && selectedOrder) {
+      // Map current status to dropdown value
+      const statusMap: { [key: string]: string } = {
+        Pending: "1",
+        Processing: "2",
+        Delivered: "3",
+        Rejected: "4",
+      };
+      setSelectedStatus(statusMap[selectedOrder.status] || "1");
+      setTrackingNumber("");
+      setDeliveryPerson("");
+      setDeliveryDate("");
+      setSpecialNote("");
+      setRejectReason("");
+    }
+  }, [open, selectedOrder]);
+
+  const handleShowAlert = (type: React.SetStateAction<string>, message: React.SetStateAction<string>) => {
+      setAlertType(type);
+      setAlertMessage(message);
+      setShowAlert(true);
+    };
+
   if (!open) return null;
 
-  const handleUpdate = () => {
-    console.log("Updated status:", selectedStatus);
-    onClose();
+  const handleUpdate = async () => {
+    if (!selectedOrder) return;
+
+    try {
+      setLoading(true);
+
+      const requestBody = {
+        orderNumber: selectedOrder.orderNumber,
+        status: parseInt(selectedStatus),
+        rejectReason: selectedStatus === "4" ? rejectReason : "",
+      };
+
+      const response = await fetch("/api/orders/changeStatus", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(requestBody),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update order status");
+      }
+
+      const result = await response.json();
+      console.log("Status updated successfully:", result);
+
+      // Show success message or refresh data
+      handleShowAlert("success","Order status updated successfully!");
+      console.log("Status updated successfully")
+
+      onClose();
+
+      // Optionally trigger a page refresh or data refetch
+      window.location.reload();
+    } catch (error) {
+      console.error("Error updating status:", error);
+      handleShowAlert("error","Failed to update order status. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -36,7 +107,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, status }) => {
         >
           <div className="flex flex-row justify-between mb-3 sm:mb-5">
             <h4 className="capitalize font-medium text-xl sm:text-2xl">
-              Order Status
+              Order Status - {selectedOrder?.orderNumber}
             </h4>
 
             <p
@@ -80,6 +151,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, status }) => {
               value={selectedStatus}
               onChange={(e) => setSelectedStatus(e.target.value)}
               className="block w-full border border-gray-300 rounded-md p-2"
+              disabled={loading}
             >
               <option value="1">Pending</option>
               <option value="2">Processing</option>
@@ -88,8 +160,29 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, status }) => {
             </select>
           </div>
 
+          {/* Conditional Input for Rejected Status */}
+          {selectedStatus === "4" && (
+            <div className="mb-3 sm:mb-4">
+              <label
+                htmlFor="rejectReason"
+                className="block text-sm font-medium text-gray-700 mb-1 sm:mb-2"
+              >
+                Reject Reason <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                id="rejectReason"
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                className="block w-full border border-gray-300 rounded-md p-2"
+                rows={3}
+                placeholder="Please provide reason for rejection..."
+                required
+              />
+            </div>
+          )}
+
           {/* Conditional Inputs for Delivered Status */}
-          {selectedStatus === "delivered" && (
+          {selectedStatus === "3" && (
             <div className="space-y-3 sm:space-y-4 mb-2">
               <div>
                 <label
@@ -158,9 +251,16 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, status }) => {
           <div className="flex justify-end mt-4 sm:mt-6">
             <button
               onClick={handleUpdate}
-              className="bg-green-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded hover:bg-green-700 text-sm sm:text-base cursor-pointer"
+              disabled={
+                loading || (selectedStatus === "4" && !rejectReason.trim())
+              }
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded text-sm sm:text-base cursor-pointer ${
+                loading || (selectedStatus === "4" && !rejectReason.trim())
+                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                  : "bg-green-600 text-white hover:bg-green-700"
+              }`}
             >
-              Update
+              {loading ? "Updating..." : "Update"}
             </button>
           </div>
         </div>
