@@ -33,6 +33,16 @@ export async function POST(request: Request) {
       maxAge: rememberme ? 60 * 60 * 24 * 7 : 60 * 60, // 7 days if rememberMe is true
     });
 
+    (await cookieStore).set({
+      name: 'refreshtoken',
+      value: data.refreshtoken, // adjust according to actual token field in API response
+      httpOnly: true,
+      secure: true,
+      sameSite: 'strict',
+      path: '/',
+      maxAge: rememberme ? 60 * 60 * 24 * 7 : 60 * 60, // 7 days if rememberMe is true
+    });
+
     return NextResponse.json({ message: 'Login successful' }, { status: 200 });
 
   } catch (error) {

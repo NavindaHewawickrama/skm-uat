@@ -3,13 +3,12 @@ import { NextResponse } from 'next/server';
 
 interface JwtPayload {
   nameid: string;
-  // add more fields if needed
+  exp: number; // expiry time in seconds
 }
 
-// Helper to decode base64url to JSON
 function decodeJWT(token: string): JwtPayload | null {
   try {
-    const payload = token.split('.')[1]; // JWT is [header].[payload].[signature]
+    const payload = token.split('.')[1]; // JWT = header.payload.signature
     const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
     const jsonPayload = decodeURIComponent(
       atob(base64)
@@ -39,6 +38,16 @@ export async function GET() {
 
     // ✅ Decode token to get userId
     const decoded = decodeJWT(acctoken);
+
+
+    if (!decoded || !decoded.exp || !decoded.nameid) {
+      return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
+    }
+    const now = Math.floor(Date.now() / 1000);
+    if (decoded.exp < now) {
+      // Token is expired -> Refresh it
+    }
+
     const userId = decoded?.nameid;
 
     if (!userId) {
