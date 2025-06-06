@@ -127,7 +127,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
         >
           <div className="flex flex-row justify-between mb-3 sm:mb-5">
             <h4 className="capitalize font-medium text-xl sm:text-2xl">
-              Order Status - {selectedOrder?.orderNumber}
+              Order No - {selectedOrder?.orderNumber}
             </h4>
 
             <p
