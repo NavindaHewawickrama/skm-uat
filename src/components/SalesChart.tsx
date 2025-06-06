@@ -27,7 +27,7 @@ const SalesChart = ({ deliveredCount = 18898 }) => {
           boxWidth: 12,
           padding: 15,
           font: {
-            size: (context: { chart: { width: any } }) => {
+            size: (context: { chart: { width: number } }) => {
               const width = context.chart.width;
               return width < 300 ? 10 : 12;
             },

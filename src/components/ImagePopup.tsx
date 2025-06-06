@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Image from 'next/image';
 
 
 interface ModalProps {
@@ -60,7 +61,7 @@ const ImagePopup: React.FC<ModalProps> = ({ open, onClose, image }) => {
                     <hr className="border-t-2 border-gray-300 my-3 sm:my-4" />
                     {/* Display the image */}
                     <div className="flex justify-center">
-                        <img
+                        <Image
                             src={image.src}
                             alt="Product"
                             width={image.width}

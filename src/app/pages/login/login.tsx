@@ -9,7 +9,7 @@ const LoginPage = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [rememberMe, setRememberMe] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // const [error, setError] = useState<string | null>(null);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('');
@@ -40,8 +40,8 @@ const LoginPage = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    setShowAlert(false); 
-    
+    setShowAlert(false);
+
     try {
       const response = await fetch('/api/login/userlogin', {
         method: 'POST',
@@ -61,7 +61,7 @@ const LoginPage = () => {
         // Success case
         handleShowAlert('success', 'Login successful! Redirecting to dashboard...');
         console.log('Login successful:', data);
-        
+
         setTimeout(() => {
           router.push("/dashboard");
         }, 2000);
@@ -147,11 +147,10 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${
-                isLoading 
-                  ? 'bg-gray-400 cursor-not-allowed' 
+              className={`w-full font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${isLoading
+                  ? 'bg-gray-400 cursor-not-allowed'
                   : 'bg-red-500 hover:bg-red-600 cursor-pointer'
-              } text-white`}
+                } text-white`}
             >
               {isLoading ? 'Logging in...' : 'Log In'}
             </button>
@@ -161,9 +160,11 @@ const LoginPage = () => {
 
       {/* Footer image at bottom */}
       <div className="w-full">
-        <img
+        <Image
           src="/images/bg-account.png"
           alt="Decorative footer"
+          width={800}  // Add actual width
+          height={150} // Add actual height
           className="w-full object-cover"
           style={{ height: "150px" }}
         />

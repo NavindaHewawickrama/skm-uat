@@ -5,6 +5,22 @@ import SideNav from "@/components/Sidenav";
 import Footer from "@/components/Footer";
 import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 
+type OrderType = {
+  orderNumber: string;
+  customerName: string;
+  salesPersonName: string;
+  orderDate: string;
+  paymentMethodType: string;
+  totalAmount: number;
+  items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  specialNote: string;
+  rejectedReason: string;
+  status: string;
+  description?: string;
+};
+
+type ItemsType = { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }
+
 
 
 const RejectedOrdersPage: React.FC = () => {
@@ -13,10 +29,10 @@ const RejectedOrdersPage: React.FC = () => {
   const [entriesPerPage, setEntriesPerPage] = useState("50");
   const [currentPage, setCurrentPage] = useState(1);
   const [listViewOpen, setListViewOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState<ItemsType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [rejectedOrders, setRejectedOrders] = useState([]);
+  const [rejectedOrders, setRejectedOrders] = useState<OrderType[]>([]);
 
   // Fetch rejected order data from API
   useEffect(() => {
@@ -50,11 +66,11 @@ const RejectedOrdersPage: React.FC = () => {
     }
   };
 
- 
+
   // Filter orders based on search query
   const filteredOrders = useMemo(() => {
     return rejectedOrders.filter(
-      (order: any) =>
+      (order) =>
         order.orderNumber ||
         order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         order.salesPersonName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -131,9 +147,13 @@ const RejectedOrdersPage: React.FC = () => {
     setSideNavOpen(!sideNavOpen);
   };
 
-  const handleItemDetailsView = (order: any) => {
+  const handleItemDetailsView = (order: OrderType) => {
     console.log(order);
-    setSelectedOrder(order.items);
+    if (Array.isArray(order.items)) {
+      setSelectedOrder(order.items);
+    } else {
+      setSelectedOrder([]);
+    }
     setListViewOpen(true)
   }
 
@@ -262,7 +282,7 @@ const RejectedOrdersPage: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {currentOrders.map((order: any, index) => (
+                    {currentOrders.map((order: OrderType, index) => (
                       <tr key={index} className="hover:bg-gray-50">
                         <td className="px-4 py-3 border text-sm">
                           {order.orderNumber}
@@ -292,7 +312,7 @@ const RejectedOrdersPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.rejectReason}
+                          {order.rejectedReason}
                         </td>
                       </tr>
                     ))}

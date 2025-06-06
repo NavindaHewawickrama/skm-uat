@@ -13,7 +13,7 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [passwordsMatch, setPasswordsMatch] = useState(true);
+  const [passwordsMatch, setPasswordsMatch] = useState(false);
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -45,7 +45,7 @@ const ResetPassword = () => {
         setErrors(prev => ({ ...prev, confirmPassword: "" }));
       }
     } else {
-      setPasswordsMatch(true);
+      setPasswordsMatch(false);
     }
   }, [newPassword, confirmPassword]);
 
@@ -84,12 +84,12 @@ const ResetPassword = () => {
     if (!newPassword) {
       newErrors.newPassword = "Password is required";
       isValid = false;
-    } 
+    }
 
     if (!confirmPassword) {
       newErrors.confirmPassword = "Confirm password is required";
       isValid = false;
-    } else if (newPassword !== confirmPassword) {
+    } else if (passwordsMatch) {
       newErrors.confirmPassword = "Passwords do not match";
       isValid = false;
     }
@@ -126,9 +126,9 @@ const ResetPassword = () => {
       if (response.ok) {
         handleShowAlert('success', 'Password reset successfully!');
         setFormSubmitted(true);
-        
+
         setTimeout(() => {
-          router.push("/"); 
+          router.push("/");
         }, 2000);
       } else {
         handleShowAlert('error', data.error || 'Password reset failed');
@@ -144,7 +144,7 @@ const ResetPassword = () => {
   const handleReset = () => {
     setNewPassword("");
     setConfirmPassword("");
-    setPasswordsMatch(true);
+    setPasswordsMatch(false);
     setFormSubmitted(false);
     setErrors({
       newPassword: "",
@@ -184,9 +184,8 @@ const ResetPassword = () => {
                         type={showNewPassword ? "text" : "password"}
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 ${
-                          errors.newPassword ? "border-red-500" : "border-gray-300"
-                        }`}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.newPassword ? "border-red-500" : "border-gray-300"
+                          }`}
                         placeholder="Enter new password"
                         disabled={isLoading}
                       />
@@ -215,9 +214,8 @@ const ResetPassword = () => {
                         type={showConfirmPassword ? "text" : "password"}
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 ${
-                          errors.confirmPassword ? "border-red-500" : "border-gray-300"
-                        }`}
+                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-1 ${errors.confirmPassword ? "border-red-500" : "border-gray-300"
+                          }`}
                         placeholder="Confirm new password"
                         disabled={isLoading}
                       />
@@ -239,11 +237,10 @@ const ResetPassword = () => {
                     <button
                       type="submit"
                       disabled={isLoading}
-                      className={`px-4 py-2 rounded-md focus:outline-none text-white ${
-                        isLoading 
-                          ? 'bg-gray-400 cursor-not-allowed' 
+                      className={`px-4 py-2 rounded-md focus:outline-none text-white ${isLoading
+                          ? 'bg-gray-400 cursor-not-allowed'
                           : 'bg-blue-900 hover:bg-blue-950 focus:ring-blue-500 cursor-pointer'
-                      }`}
+                        }`}
                     >
                       {isLoading ? 'Resetting...' : 'Submit'}
                     </button>
@@ -251,11 +248,10 @@ const ResetPassword = () => {
                       type="button"
                       onClick={handleReset}
                       disabled={isLoading}
-                      className={`px-4 py-2 rounded-md focus:outline-none text-white ${
-                        isLoading 
-                          ? 'bg-gray-400 cursor-not-allowed' 
+                      className={`px-4 py-2 rounded-md focus:outline-none text-white ${isLoading
+                          ? 'bg-gray-400 cursor-not-allowed'
                           : 'bg-red-500 hover:bg-red-600 focus:ring-red-500 cursor-pointer'
-                      }`}
+                        }`}
                     >
                       Reset
                     </button>

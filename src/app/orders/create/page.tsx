@@ -7,6 +7,14 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import Alert from "../../../components/Alert";
 
+declare module 'jspdf' {
+  interface jsPDF {
+    lastAutoTable?: {
+      finalY: number;
+    };
+  }
+}
+
 interface OrderItem {
   itemCode: string;
   description: string;
@@ -47,16 +55,30 @@ interface Item {
   unitprice: string;
 }
 
+interface Location {
+  locationCode: string;
+  locationName: string;
+}
+
+interface Customer {
+  customerCode: string;
+  customerName: string;
+}
+
+interface Payment {
+  code: string,
+  name: string,
+}
+
 const CreateOrderPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [location, setLocation] = useState("");
   const [paymentType, setPaymentType] = useState("");
   const [notes, setNotes] = useState("");
-  const [totalDueAmount, setTotalDueAmount] = useState(0);
   const [total, setTotal] = useState(0);
   const [orderTotal, setOrderTotal] = useState(0);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
-  const [locations, setLocations] = useState([]);
+  const [locations, setLocations] = useState<Location[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
@@ -65,32 +87,18 @@ const CreateOrderPage: React.FC = () => {
     useState<number>(0);
   const [selectedCustomerTotal, setSelectedCustomerTotal] = useState<number>(0);
   const [customer, setCustomer] = useState<string>("");
-  const [paymentTypes, setPaymentTypes] = useState([]);
+  const [paymentTypes, setPaymentTypes] = useState<Payment[]>([]);
   const [itemsList, setItemsList] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState("");
   const [selectedItemName, setSelectedItemName] = useState("");
   const [selectedItemUnitPrice, setSelectedItemUnitPrice] = useState("");
   const [selectedItemQuantity, setSelectedItemQuantity] = useState(0);
   const [selectedItemDiscount, setSelectedItemDiscount] = useState(0);
-  const [substitutedItemsList, setSubstitutedItemsList] = useState<
-    SubstituteItem[]
-  >([]);
-  const [loading, setLoading] = useState(true);
+  const [substitutedItemsList, setSubstitutedItemsList] = useState<SubstituteItem[]>([]);
 
-  const [error, setError] = useState<string | null>(null);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
-
-  // Current item being added
-  const [currentItem, setCurrentItem] = useState<OrderItem>({
-    itemCode: "",
-    itemName: "",
-    unitPrice: 0,
-    quantity: 0,
-    discount: 0,
-    total: 0,
-  });
 
   const outstandingData: CustomerOutstandingData[] = [
     {
@@ -155,11 +163,6 @@ const CreateOrderPage: React.FC = () => {
       }
     } catch (err) {
       console.error("Error fetching pending order data:", err);
-      setError(
-        err instanceof Error
-          ? err.message
-          : "Failed to fetch pending order data"
-      );
     }
   };
 
@@ -169,9 +172,9 @@ const CreateOrderPage: React.FC = () => {
 
   // Calculate item total
   const calculateItemTotal = () => {
-    let totalFull = parseFloat(selectedItemUnitPrice) * selectedItemQuantity;
-    let discount = totalFull * (selectedItemDiscount / 100);
-    let total = totalFull - discount;
+    const totalFull = parseFloat(selectedItemUnitPrice) * selectedItemQuantity;
+    const discount = totalFull * (selectedItemDiscount / 100);
+    const total = totalFull - discount;
     return total;
   };
 
@@ -213,7 +216,6 @@ const CreateOrderPage: React.FC = () => {
       // Update order totals
       const newTotal = total + newItem.total;
       setTotal(newTotal);
-      setTotalDueAmount(newTotal);
 
       // Reset current item
       setSelectedItem("");
@@ -378,16 +380,16 @@ const CreateOrderPage: React.FC = () => {
       <AppBar toggleSideNav={toggleSideNav} />
 
       {/* Main Content Area */}
-     
+
       <div className="flex flex-1 overflow-hidden">
         {/* Side Navigation */}
         <SideNav isOpen={sideNavOpen} />
-        
+
         {/* Order Content */}
         <div className="flex-1 flex flex-col overflow-hidden">
-           {showAlert && (
-          <Alert message={alertMessage} type={alertType} duration={5000} />
-        )}
+          {showAlert && (
+            <Alert message={alertMessage} type={alertType} duration={5000} />
+          )}
           <div className="flex-1 p-4 overflow-auto">
             {/* Order Form */}
             <div className="bg-white p-6 rounded-md shadow-sm mb-4">
@@ -406,7 +408,7 @@ const CreateOrderPage: React.FC = () => {
                     <option value="" disabled>
                       Select a Location
                     </option>
-                    {locations.map((loc: any, index) => (
+                    {locations.map((loc, index) => (
                       <option key={index} value={loc.locationCode}>
                         {loc.locationName}
                       </option>
@@ -443,7 +445,7 @@ const CreateOrderPage: React.FC = () => {
                       onChange={(e) => handleCustomerChange(e.target.value)} // pass the code
                     >
                       <option value="">Select a customer</option>
-                      {customers.map((customer: any, index) => (
+                      {customers.map((customer, index) => (
                         <option value={customer.customerCode} key={index}>
                           {customer.customerName}
                         </option>
@@ -512,7 +514,7 @@ const CreateOrderPage: React.FC = () => {
                       onChange={(e) => setPaymentType(e.target.value)}
                     >
                       <option value="">Select payment type</option>
-                      {paymentTypes.map((type: any, index) => (
+                      {paymentTypes.map((type, index) => (
                         <option key={index} value={type.code}>
                           {type.name}
                         </option>
@@ -569,7 +571,7 @@ const CreateOrderPage: React.FC = () => {
                       }
                     >
                       <option value="">Select item code</option>
-                      {itemsList.map((item: any, index) => (
+                      {itemsList.map((item, index) => (
                         <option key={index} value={item.itemCode}>
                           {item.itemCode}
                         </option>
@@ -600,16 +602,16 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                      // value={currentItem.itemName}
-                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
+                    // value={currentItem.itemName}
+                    // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
                       {substitutedItemsList &&
-                      substitutedItemsList.length === 0 ? (
+                        substitutedItemsList.length === 0 ? (
                         <option value="" disabled>
                           No substitute items available
                         </option>
                       ) : (
-                        substitutedItemsList.map((item: any, index: number) => (
+                        substitutedItemsList.map((item, index) => (
                           <option key={index} value={item.itemName}>
                             {item.itemName}
                           </option>
@@ -773,9 +775,6 @@ const CreateOrderPage: React.FC = () => {
 
                                   // Update totals
                                   setTotal((prev) => prev - removedItem.total);
-                                  setTotalDueAmount(
-                                    (prev) => prev - removedItem.total
-                                  );
                                 }}
                               >
                                 <svg

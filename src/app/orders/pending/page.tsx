@@ -6,15 +6,33 @@ import Footer from "@/components/Footer";
 import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 import ViewStatusPopup from "@/components/ViewStatusPopup";
 
+type OrderType = {
+  orderNumber: string;
+  customerName: string;
+  salesPersonName: string;
+  orderDate: string;
+  paymentMethodType: string;
+  totalAmount: number;
+  items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  specialNote: string;
+  rejectedReason: string;
+  status: string;
+  description?: string;
+};
+
+type ItemsType = { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }
+
+
 const PendingOrdersPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [entriesPerPage, setEntriesPerPage] = useState("50");
-  const [pendingOrders, setPendingOrders] = useState([]);
+  const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [listViewOpen, setListViewOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState([]);
-  const [status, setStatus] = useState("");
+  const [selectedOrderItems, setSelectedOrderItems] = useState<ItemsType[]>([]);
+  const [selectedOrderForStatus, setSelectedOrderForStatus] = useState<OrderType | null>(null);
+  // const [status, setStatus] = useState("");
   const [statusViewOpen, setStatusViewOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -55,7 +73,7 @@ const PendingOrdersPage: React.FC = () => {
   // Filter orders based on search query
   const filteredOrders = useMemo(() => {
     return pendingOrders.filter(
-      (order: any) =>
+      (order) =>
         // order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
         order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         order.salesPersonName.toLowerCase().includes(searchQuery.toLowerCase())
@@ -132,19 +150,25 @@ const PendingOrdersPage: React.FC = () => {
     setSideNavOpen(!sideNavOpen);
   };
 
-  const handleItemDetailsView = (order: any) => {
+  const handleItemDetailsView = (order: OrderType) => {
     console.log(order);
-    setSelectedOrder(order.items);
+
+    if (Array.isArray(order.items)) {
+      setSelectedOrderItems(order.items);
+    } else {
+      setSelectedOrderItems([]);
+    }
     setListViewOpen(true);
   };
+
   // Handle entries per page change
   const handleEntriesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setEntriesPerPage(e.target.value);
     setCurrentPage(1); // Reset to first page when changing entries per page
   };
 
-  const handleStatus = (order: any) => {
-    setSelectedOrder(order);
+  const handleStatus = (order: OrderType) => {
+    setSelectedOrderForStatus(order);
     setStatusViewOpen(true);
     console.log(order);
   };
@@ -274,7 +298,7 @@ const PendingOrdersPage: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {currentOrders.map((order: any, index) => (
+                    {currentOrders.map((order, index) => (
                       <tr key={index} className="hover:bg-gray-50">
                         <td className="px-4 py-3 border text-sm">
                           {order.orderNumber}
@@ -342,9 +366,8 @@ const PendingOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`px-3 py-1 border rounded cursor-pointer ${
-                      currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
-                    }`}
+                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
+                      }`}
                   >
                     Previous
                   </button>
@@ -353,13 +376,12 @@ const PendingOrdersPage: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => typeof page === "number" && goToPage(page)}
-                      className={`px-3 py-1 border rounded ${
-                        page === currentPage
-                          ? "bg-blue-500 text-white"
-                          : page === "..."
+                      className={`px-3 py-1 border rounded ${page === currentPage
+                        ? "bg-blue-500 text-white"
+                        : page === "..."
                           ? ""
                           : "hover:bg-gray-100"
-                      }`}
+                        }`}
                       disabled={page === "..."}
                     >
                       {page}
@@ -369,11 +391,10 @@ const PendingOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages || totalPages === 0}
-                    className={`px-3 py-1 border rounded cursor-pointer ${
-                      currentPage === totalPages || totalPages === 0
-                        ? "text-gray-400"
-                        : "hover:bg-gray-100"
-                    }`}
+                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === totalPages || totalPages === 0
+                      ? "text-gray-400"
+                      : "hover:bg-gray-100"
+                      }`}
                   >
                     Next
                   </button>
@@ -384,12 +405,12 @@ const PendingOrdersPage: React.FC = () => {
           <ViewOrderEditPopupButton
             open={listViewOpen}
             onClose={() => setListViewOpen(false)}
-            orderDetails={selectedOrder}
+            orderDetails={selectedOrderItems}
           />
           <ViewStatusPopup
             open={statusViewOpen}
             onClose={() => setStatusViewOpen(false)}
-            selectedOrder={selectedOrder}
+            selectedOrder={selectedOrderForStatus}
           />{" "}
           {/* Footer Component */}
           <Footer />

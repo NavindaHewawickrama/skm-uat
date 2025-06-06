@@ -60,19 +60,19 @@ interface FormErrors {
 
 const CreateUserPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
-  const [userData, setUserData] = useState<UserData>({
-    username: "",
-    password: "",
-    confirmPassword: "",
-    firstName: "",
-    lastName: "",
-    posName: "",
-    email: "",
-    telephone: "",
-    role: "",
-    location: [],
-    isActive: false,
-  });
+  // const [userData, setUserData] = useState<UserData>({
+  //   username: "",
+  //   password: "",
+  //   confirmPassword: "",
+  //   firstName: "",
+  //   lastName: "",
+  //   posName: "",
+  //   email: "",
+  //   telephone: "",
+  //   role: "",
+  //   location: [],
+  //   isActive: false,
+  // });
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [usersList, setUsersList] = useState<UserData[]>([]);
@@ -86,7 +86,7 @@ const CreateUserPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
   const [role, setRole] = useState(0);
-const [location, setLocation] = useState<string[]>([]);
+  const [location, setLocation] = useState<string[]>([]);
   const [isActive, setIsActive] = useState(false);
   const [isMfaEnabled, setIsMfaEnabled] = useState(true);
   const [mfaType, setMfaType] = useState("phone");
@@ -94,7 +94,7 @@ const [location, setLocation] = useState<string[]>([]);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  // const [isLoading, setIsLoading] = useState(false);
 
   const handleShowAlert = (type: React.SetStateAction<string>, message: React.SetStateAction<string>) => {
     setAlertType(type);
@@ -108,14 +108,14 @@ const [location, setLocation] = useState<string[]>([]);
     roles: [],
     locations: []
   });
-  const [loading, setLoading] = useState(true);
+  //const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
 
   // Fetch user creation details on component mount
   useEffect(() => {
     const fetchUserCreationDetails = async () => {
       try {
-        setLoading(true);
+        //setLoading(true);
         const response = await fetch('/api/user-creation-details'); // Using relative path to your API route
 
         if (!response.ok) {
@@ -132,8 +132,9 @@ const [location, setLocation] = useState<string[]>([]);
       } catch (error) {
         console.error('Error fetching user creation details:', error);
         setApiError('Failed to load user creation details. Please try again.');
-      } finally {
-        setLoading(false);
+        // } finally {
+        //   setLoading(false);
+        // }
       }
     };
 
@@ -143,57 +144,85 @@ const [location, setLocation] = useState<string[]>([]);
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
   };
+  const handleReset = () => {
+    // setUserData({
+    //   username: "",
+    //   password: "",
+    //   confirmPassword: "",
+    //   firstName: "",
+    //   lastName: "",
+    //   posName: "",
+    //   email: "",
+    //   telephone: "",
+    //   role: "",
+    //   location: [],
+    //   isActive: false,
+    // });
+    setErrors({}); // Clear all errors on reset
 
-  const handleInputChange = (
-    field: keyof UserData,
-    value: string | boolean | string[]
-  ) => {
-    // Clear error when field is modified
-    if (field in errors) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors[field as keyof FormErrors];
-        return newErrors;
-      });
-    }
-
-    setUserData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
+    setUserName("");
+    setPassword("");
+    setReTypePassword("");
+    setFirstName("");
+    setLastName("");
+    setRole(0);
+    setSelectedSalesPerson("");
+    setLocation([]);
+    setEmail("");
+    setTelephone("");
+    setIsActive(false);
   };
 
-  const handleSalesPersonChange = (salesPersonCode: string) => {
-    const selectedSalesPerson = userCreationDetails.salesPersons.find(
-      sp => sp.salesPersonCode === salesPersonCode
-    );
+  // const handleInputChange = (
+  //   field: keyof UserData,
+  //   value: string | boolean | string[]
+  // ) => {
+  //   // Clear error when field is modified
+  //   if (field in errors) {
+  //     setErrors(prev => {
+  //       const newErrors = { ...prev };
+  //       delete newErrors[field as keyof FormErrors];
+  //       return newErrors;
+  //     });
+  //   }
 
-    if (selectedSalesPerson) {
-      // Clear errors related to posName, email, and telephone as they are now being auto-filled
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors.posName;
-        delete newErrors.email;
-        delete newErrors.telephone;
-        return newErrors;
-      });
+  //   // setUserData((prev) => ({
+  //   //   ...prev,
+  //   //   [field]: value,
+  //   // }));
+  // };
 
-      setUserData(prev => ({
-        ...prev,
-        posName: selectedSalesPerson.salesPersonName,
-        email: selectedSalesPerson.email || prev.email,
-        telephone: selectedSalesPerson.phone || prev.telephone
-      }));
-    } else {
-      // If no sales person is selected (e.g., "Select Sales Person" is chosen)
-      setUserData(prev => ({
-        ...prev,
-        posName: "",
-        email: "",
-        telephone: ""
-      }));
-    }
-  };
+  // const handleSalesPersonChange = (salesPersonCode: string) => {
+  //   const selectedSalesPerson = userCreationDetails.salesPersons.find(
+  //     sp => sp.salesPersonCode === salesPersonCode
+  //   );
+
+  //   if (selectedSalesPerson) {
+  //     // Clear errors related to posName, email, and telephone as they are now being auto-filled
+  //     setErrors(prev => {
+  //       const newErrors = { ...prev };
+  //       delete newErrors.posName;
+  //       delete newErrors.email;
+  //       delete newErrors.telephone;
+  //       return newErrors;
+  //     });
+
+  //     // setUserData(prev => ({
+  //     //   ...prev,
+  //     //   posName: selectedSalesPerson.salesPersonName,
+  //     //   email: selectedSalesPerson.email || prev.email,
+  //     //   telephone: selectedSalesPerson.phone || prev.telephone
+  //     // }));
+  //   } else {
+  //     // If no sales person is selected (e.g., "Select Sales Person" is chosen)
+  //     // setUserData(prev => ({
+  //     //   ...prev,
+  //     //   posName: "",
+  //     //   email: "",
+  //     //   telephone: ""
+  //     // }));
+  //   }
+  // };
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -257,9 +286,9 @@ const [location, setLocation] = useState<string[]>([]);
     }
 
     if (!location || location.length === 0) {
-  newErrors.location = "At least one location is required";
-  isValid = false;
-}
+      newErrors.location = "At least one location is required";
+      isValid = false;
+    }
 
     setErrors(newErrors);
     return isValid;
@@ -272,7 +301,7 @@ const [location, setLocation] = useState<string[]>([]);
       return;
     }
 
-    setIsLoading(true);
+    // setIsLoading(true);
 
     try {
       // const apiBody = {
@@ -304,8 +333,8 @@ const [location, setLocation] = useState<string[]>([]);
           email: email,
           phoneNumber: telephone,
           isActive: isActive,
-          isMfaEnabled: true,
-          mfaType: "phone"
+          isMfaEnabled: isMfaEnabled,
+          mfaType: mfaType
         }),
         headers: {
           'Content-Type': 'application/json',
@@ -324,39 +353,13 @@ const [location, setLocation] = useState<string[]>([]);
     } catch (error) {
       console.error('User Createing error:', error);
       handleShowAlert('error', 'Network error. Please try again.');
-    } finally {
-      setIsLoading(false);
+      // } finally {
+      //   setIsLoading(false);
+      // }
     }
   };
 
-  const handleReset = () => {
-    // setUserData({
-    //   username: "",
-    //   password: "",
-    //   confirmPassword: "",
-    //   firstName: "",
-    //   lastName: "",
-    //   posName: "",
-    //   email: "",
-    //   telephone: "",
-    //   role: "",
-    //   location: [],
-    //   isActive: false,
-    // });
-    setErrors({}); // Clear all errors on reset
 
-    setUserName("");
-    setPassword("");
-    setReTypePassword("");
-    setFirstName("");
-    setLastName("");
-    setRole(0);
-    setSelectedSalesPerson("");
-    setLocation([]);
-    setEmail("");
-    setTelephone("");
-    setIsActive(false);
-  };
 
   const toggleUsersList = () => {
     setShowUsersList(!showUsersList);
@@ -616,7 +619,10 @@ const [location, setLocation] = useState<string[]>([]);
                     type="checkbox"
                     value="sms"
                     checked={mfaType.includes('sms')}
-                    onChange={() => setMfaType('sms')}
+                    onChange={() => {
+                      setMfaType('sms');
+                      setIsMfaEnabled(true);
+                    }}
                     className="form-checkbox h-5 w-5 text-blue-600"
                   />
                   <span className="ml-2 text-gray-700">SMS</span>
@@ -627,7 +633,10 @@ const [location, setLocation] = useState<string[]>([]);
                     type="checkbox"
                     value="email"
                     checked={mfaType.includes('email')}
-                    onChange={() => setMfaType('email')}
+                    onChange={() => {
+                      setMfaType('email');
+                      setIsMfaEnabled(true);
+                    }}
                     className="form-checkbox h-5 w-5 text-blue-600"
                   />
                   <span className="ml-2 text-gray-700">Email</span>

@@ -16,10 +16,10 @@ const ReportsOutstandings = () => {
     setSelectedCustomer(e.target.value);
   };
 
-  const handleSubmit = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    e.preventDefault();
-    // Add submission logic here
-  };
+  // const handleSubmit = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  //   e.preventDefault();
+  //   // Add submission logic here
+  // };
 
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">

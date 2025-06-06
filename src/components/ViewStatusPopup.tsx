@@ -3,14 +3,21 @@
 import React, { useState, useEffect } from "react";
 import Alert from "../components/Alert";
 
+interface Order {
+  orderNumber: string;
+  status: string;
+}
+
 interface ModalProps {
   open: boolean;
   onClose: () => void;
-  selectedOrder: any; 
+  selectedOrder: Order | null;
 }
 
+
+
 const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
-  const [selectedStatus, setSelectedStatus] = useState("1"); 
+  const [selectedStatus, setSelectedStatus] = useState("1");
   const [trackingNumber, setTrackingNumber] = useState("");
   const [deliveryPerson, setDeliveryPerson] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
@@ -46,13 +53,13 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
   }, [open, selectedOrder]);
 
   const handleShowAlert = (
-    type: string, 
+    type: string,
     message: string
   ) => {
     setAlertType(type);
     setAlertMessage(message);
     setShowAlert(true);
-    
+
     setTimeout(() => {
       setShowAlert(false);
     }, 5000);
@@ -90,7 +97,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
 
       // Show success message
       handleShowAlert("success", "Order status updated successfully!");
-      
+
       // Delay closing modal to show success message
       setTimeout(() => {
         onClose();
@@ -274,11 +281,10 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
               disabled={
                 loading || (selectedStatus === "4" && !rejectReason.trim())
               }
-              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded text-sm sm:text-base cursor-pointer ${
-                loading || (selectedStatus === "4" && !rejectReason.trim())
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded text-sm sm:text-base cursor-pointer ${loading || (selectedStatus === "4" && !rejectReason.trim())
                   ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                   : "bg-green-600 text-white hover:bg-green-700"
-              }`}
+                }`}
             >
               {loading ? "Updating..." : "Update"}
             </button>

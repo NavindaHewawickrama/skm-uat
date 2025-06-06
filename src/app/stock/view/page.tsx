@@ -6,6 +6,7 @@ import Footer from "../../../components/Footer";
 import productImage from "../../../../public/images/products/pro1.png";
 import ImagePopup from "@/components/ImagePopup";
 import producctImage2 from "../../../../public/images/products/pro2.png";
+import { StaticImageData } from 'next/image';
 
 interface Image {
   src: string;
@@ -17,7 +18,7 @@ interface Image {
 }
 
 interface StockItem {
-  img?: any;
+  img?: string | StaticImageData;
   description: string;
   description2: string;
   unitOfMeasure: string;
@@ -202,7 +203,7 @@ const StockView = () => {
     setEntriesPerPage(e.target.value);
   };
 
-  function handleViewImage(img: any): void {
+  function handleViewImage(img: string | StaticImageData | undefined): void {
     setOpenImagePopup(true);
 
     if (typeof img === "string") {
@@ -212,8 +213,13 @@ const StockView = () => {
         width: 400,
         height: 300,
       });
-    } else {
-      setSelectedProductImage(img);
+    } else if (img && typeof img === "object") {
+      // Handle StaticImageData - convert to Image format
+      setSelectedProductImage({
+        src: img.src,
+        width: img.width || 400,
+        height: img.height || 300,
+      });
     }
     //console.log(img);
   }
@@ -437,10 +443,10 @@ const StockView = () => {
                     key={index}
                     onClick={() => typeof page === "number" && goToPage(page)}
                     className={`px-3 py-1 border rounded ${page === currentPage
-                        ? "bg-blue-500 text-white"
-                        : page === "..."
-                          ? ""
-                          : "hover:bg-gray-100"
+                      ? "bg-blue-500 text-white"
+                      : page === "..."
+                        ? ""
+                        : "hover:bg-gray-100"
                       }`}
                     disabled={page === "..."}
                   >
@@ -452,8 +458,8 @@ const StockView = () => {
                   onClick={() => goToPage(currentPage + 1)}
                   disabled={currentPage === totalPages || totalPages === 0}
                   className={`px-3 py-1 border rounded cursor-pointer ${currentPage === totalPages || totalPages === 0
-                      ? "text-gray-400"
-                      : "hover:bg-gray-100"
+                    ? "text-gray-400"
+                    : "hover:bg-gray-100"
                     }`}
                 >
                   Next

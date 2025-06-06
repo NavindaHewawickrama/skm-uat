@@ -49,7 +49,7 @@ const Dashboard = () => {
           <div className="flex-1 p-4 lg:p-6 md:flex gap-4">
             {/* Sales Order Card */}
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 w-full md:w-1/2 sm:w-full">
-              <h2 className="text-xl font-semibold mb-2">Total Sales Order's</h2>
+              <h2 className="text-xl font-semibold mb-2">Total Sales Order &apos; s</h2>
               <SalesChart deliveredCount={18898} />
             </div>
 
