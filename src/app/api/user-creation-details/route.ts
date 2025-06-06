@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
 
+
 // Get roles, locations, sales persons details
 export async function GET() {
   try {

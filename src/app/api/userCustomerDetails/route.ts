@@ -1,60 +1,15 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-
-interface JwtPayload {
-  nameid: string;
-  exp: number; // expiry time in seconds
-}
-
-function decodeJWT(token: string): JwtPayload | null {
-  try {
-    const payload = token.split('.')[1]; // JWT = header.payload.signature
-    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch (err) {
-    console.error("Invalid token:", err);
-    return null;
-  }
-}
+import { getValidAccessToken } from '@/lib/auth';
 
 //get customer details based on the user
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const acctoken = cookieStore.get('acctoken')?.value;
+    const result = await getValidAccessToken();
 
-    if (!acctoken) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Token missing' },
-        { status: 401 }
-      );
-    }
+    const { userId, token, status, message } = result;
 
-    // ✅ Decode token to get userId
-    const decoded = decodeJWT(acctoken);
-
-
-    if (!decoded || !decoded.exp || !decoded.nameid) {
-      return NextResponse.json({ error: 'Invalid token' }, { status: 400 });
-    }
-    const now = Math.floor(Date.now() / 1000);
-    if (decoded.exp < now) {
-      // Token is expired -> Refresh it
-    }
-
-    const userId = decoded?.nameid;
-
-    if (!userId) {
-      return NextResponse.json(
-        { error: 'Invalid token: userId missing' },
-        { status: 400 }
-      );
+    if (status !== 200 || !token || !userId) {
+      return NextResponse.json({ error: message }, { status });
     }
 
 
@@ -62,7 +17,7 @@ export async function GET() {
     const response = await fetch(`http://173.212.233.90:8090/api/Business/GetOrderCreationDetailsByUser?userId=${userId}`, {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${acctoken}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     });

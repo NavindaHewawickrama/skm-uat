@@ -1,18 +1,14 @@
-import { cookies } from 'next/headers';
 import { NextResponse } from 'next/server';
-
+import { getValidAccessToken } from '@/lib/auth';
 
 export async function POST(request: Request) {
     try {
+        const result = await getValidAccessToken();
 
-        const cookieStore = await cookies();
-        const acctoken = cookieStore.get('acctoken')?.value;
+        const { userId, token, status, message } = result;
 
-        if (!acctoken) {
-            return NextResponse.json(
-                { error: 'Unauthorized: Token missing' },
-                { status: 401 }
-            );
+        if (status !== 200 || !token || !userId) {
+            return NextResponse.json({ error: message }, { status });
         }
 
         const body = await request.json();
@@ -21,7 +17,7 @@ export async function POST(request: Request) {
             method: 'POST',
             body: JSON.stringify({ username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCode, email, phoneNumber, isActive, isMfaEnabled, mfaType }),
             headers: {
-                'Authorization': `Bearer ${acctoken}`,
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });

@@ -1,35 +1,22 @@
-import { cookies } from 'next/headers';
-import { NextRequest, NextResponse } from 'next/server';
+import { getValidAccessToken } from '@/lib/auth';
+import { NextResponse } from 'next/server';
 
 // get delivered order details
-export async function GET(request: NextRequest) {
+export async function GET() {
     try {
-        const cookieStore = await cookies();
-        const acctoken = cookieStore.get('acctoken')?.value;
+        const result = await getValidAccessToken();
 
-        if (!acctoken) {
-            return NextResponse.json(
-                { error: 'Unauthorized: Token missing' },
-                { status: 401 }
-            );
-        }
+        const { userId, token, status, message } = result;
 
-        // ✅ Get userId from query string
-        const { searchParams } = new URL(request.url);
-        const userId = searchParams.get('userId');
-
-        if (!userId) {
-            return NextResponse.json(
-                { error: 'Bad Request: userId is required' },
-                { status: 400 }
-            );
+        if (status !== 200 || !token || !userId) {
+            return NextResponse.json({ error: message }, { status });
         }
 
         // ✅ Include userId as query param in API URL
         const response = await fetch(`http://173.212.233.90:8090/api/Business/GetDeliveredOrders?userId=${userId}`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${acctoken}`,
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });

@@ -1,24 +1,21 @@
-import { cookies } from 'next/headers';
+import { getValidAccessToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
 // get stock details
 export async function GET() {
   try {
-    const cookieStore = await cookies(); 
-    const acctoken = cookieStore.get('acctoken')?.value;
+    const result = await getValidAccessToken();
 
+    const { userId, token, status, message } = result;
 
-    if (!acctoken) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Token missing' },
-        { status: 401 }
-      );
+    if (status !== 200 || !token || !userId) {
+      return NextResponse.json({ error: message }, { status });
     }
 
     const response = await fetch('http://173.212.233.90:8090/api/Business/GetStockDetails', {
       method: 'GET',
       headers: {
-        'Authorization': `Bearer ${acctoken}`,
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     });

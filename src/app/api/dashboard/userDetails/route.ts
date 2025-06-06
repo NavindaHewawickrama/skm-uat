@@ -1,63 +1,16 @@
-import { cookies } from 'next/headers';
+import { getValidAccessToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
-interface JwtPayload {
-  nameid: string;
-  exp: number;
-}
-
-// Decode JWT payload safely
-function decodeJWT(token: string): JwtPayload | null {
-  try {
-    const payload = token.split('.')[1];
-    const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-    const jsonPayload = decodeURIComponent(
-      atob(base64)
-        .split('')
-        .map((c) => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
-        .join('')
-    );
-    return JSON.parse(jsonPayload);
-  } catch (err) {
-    console.error("Invalid token:", err);
-    return null;
-  }
-}
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const acctoken = cookieStore.get('acctoken')?.value;
+    const result = await getValidAccessToken();
 
-    if (!acctoken) {
-      return NextResponse.json(
-        { error: 'Unauthorized: Token missing' },
-        { status: 401 }
-      );
+    const { userId, token, status, message } = result;
+
+    if (status !== 200 || !token || !userId) {
+      return NextResponse.json({ error: message }, { status });
     }
-
-    // Decode JWT
-    const decoded = decodeJWT(acctoken);
-    const userId = decoded?.nameid;
-    const exp = decoded?.exp;
-    const now = Math.floor(Date.now() / 1000); // current Unix time
-
-    if (!userId || !exp) {
-      return NextResponse.json(
-        { error: 'Invalid token: userId or expiration missing' },
-        { status: 400 }
-      );
-    }
-
-    // Token expired check
-    if (exp < now) {
-      return NextResponse.json(
-        { error: 'Token has expired' },
-        { status: 401 }
-      );
-    }
-
-    const maxAge = exp - now;
 
     // Fetch user details from your API
     const response = await fetch(
@@ -65,7 +18,7 @@ export async function GET() {
       {
         method: 'GET',
         headers: {
-          'Authorization': `Bearer ${acctoken}`,
+          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       }
@@ -101,7 +54,7 @@ export async function GET() {
       secure: true,
       sameSite: 'lax',
       path: '/',
-      maxAge: maxAge > 0 ? maxAge : 0,
+      maxAge: 60*60,
     });
 
     return responseWithCookie;

@@ -1,25 +1,23 @@
 import { NextResponse } from 'next/server';
-import { cookies } from 'next/headers';
+import { getValidAccessToken } from '@/lib/auth';
 
 export async function POST(request: Request) {
     try {
-        const cookieStore = await cookies();
-        const acctoken = cookieStore.get('acctoken')?.value;
+        const result = await getValidAccessToken();
 
-        if (!acctoken) {
-            return NextResponse.json(
-                { error: 'Unauthorized: Token missing' },
-                { status: 401 }
-            );
+        const { userId, token, status, message } = result;
+
+        if (status !== 200 || !token || !userId) {
+            return NextResponse.json({ error: message }, { status });
         }
         const body = await request.json();
-        const { orderNumber, status, rejectReason } = body;
+        const { orderNumber, statusC, rejectReason } = body;
 
         const response = await fetch(' http://173.212.233.90:8090/api/Business/ChangeStatus', {
             method: 'POST',
-            body: JSON.stringify({ orderNumber, status, rejectReason }),
+            body: JSON.stringify({ orderNumber, statusC, rejectReason }),
             headers: {
-                'Authorization': `Bearer ${acctoken}`,
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });

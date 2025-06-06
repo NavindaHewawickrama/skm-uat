@@ -1,69 +1,23 @@
-import { cookies } from 'next/headers';
+import { getValidAccessToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
-interface JwtPayload {
-    nameid: string;
-    // add more fields if needed
-}
-
-// Helper to decode base64url to JSON
-function decodeJWT(token: string): JwtPayload | null {
-    try {
-        const payload = token.split('.')[1]; // JWT is [header].[payload].[signature]
-        const base64 = payload.replace(/-/g, '+').replace(/_/g, '/');
-        const jsonPayload = decodeURIComponent(
-            atob(base64)
-                .split('')
-                .map((c) => `%${('00' + c.charCodeAt(0).toString(16)).slice(-2)}`)
-                .join('')
-        );
-        return JSON.parse(jsonPayload);
-    } catch (err) {
-        console.error("Invalid token:", err);
-        return null;
-    }
-}
 
 // get pending order details
 export async function GET() {
     try {
-        const cookieStore = await cookies();
-        const acctoken = cookieStore.get('acctoken')?.value;
+        const result = await getValidAccessToken();
 
-        if (!acctoken) {
-            return NextResponse.json(
-                { error: 'Unauthorized: Token missing' },
-                { status: 401 }
-            );
-        }
+        const { userId, token, status, message } = result;
 
-        // // ✅ Get userId from query string
-        // const { searchParams } = new URL(request.url);
-        // const userId = searchParams.get('userId');
-
-        // if (!userId) {
-        //     return NextResponse.json(
-        //         { error: 'Bad Request: userId is required' },
-        //         { status: 400 }
-        //     );
-        // }
-
-        // ✅ Decode token to get userId
-        const decoded = decodeJWT(acctoken);
-        const userId = decoded?.nameid;
-
-        if (!userId) {
-            return NextResponse.json(
-                { error: 'Invalid token: userId missing' },
-                { status: 400 }
-            );
+        if (status !== 200 || !token || !userId) {
+            return NextResponse.json({ error: message }, { status });
         }
 
         // ✅ Include userId as query param in API URL
         const response = await fetch(`http://173.212.233.90:8090/api/Business/GetPendingOrders?userId=${userId}`, {
             method: 'GET',
             headers: {
-                'Authorization': `Bearer ${acctoken}`,
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
