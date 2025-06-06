@@ -751,10 +751,10 @@ const CreateOrderPage: React.FC = () => {
                                 className="text-red-500 hover:text-red-700 cursor-pointer"
                                 onClick={() => {
                                   const newItems = [...orderItems];
-                                  const removedItem = newItems.splice(
-                                    index,
-                                    1
-                                  )[0];
+                                  // const removedItem = newItems.splice(
+                                  //   index,
+                                  //   1
+                                  // )[0];
                                   setOrderItems(newItems);
 
                                   // Update totals
