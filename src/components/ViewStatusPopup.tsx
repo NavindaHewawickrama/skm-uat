@@ -34,10 +34,10 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
     if (open && selectedOrder) {
       // Map current status to dropdown value
       const statusMap: { [key: string]: string } = {
-        Pending: "1",
-        Processing: "2",
-        Delivered: "3",
-        Rejected: "4",
+        Pending: "0",
+        Processing: "1",
+        Delivered: "2",
+        Rejected: "3",
       };
       setSelectedStatus(statusMap[selectedOrder.status] || "1");
       setTrackingNumber("");
@@ -134,7 +134,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
         >
           <div className="flex flex-row justify-between mb-3 sm:mb-5">
             <h4 className="capitalize font-medium text-xl sm:text-2xl">
-              Order Status - {selectedOrder?.orderNumber}
+              Order No - {selectedOrder?.orderNumber}
             </h4>
 
             <p

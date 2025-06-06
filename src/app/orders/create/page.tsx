@@ -135,13 +135,15 @@ const CreateOrderPage: React.FC = () => {
     fetchUserCustomerDetails();
   }, []);
 
-  const handleShowAlert = (
-    type: React.SetStateAction<string>,
-    message: React.SetStateAction<string>
-  ) => {
+  const handleShowAlert = (type: string, message: string) => {
     setAlertType(type);
     setAlertMessage(message);
     setShowAlert(true);
+
+    // Auto hide alert after 5 seconds
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 5000);
   };
 
   const fetchUserCustomerDetails = async () => {
@@ -181,7 +183,6 @@ const CreateOrderPage: React.FC = () => {
   // Add item to order list
   const addToList = () => {
     if (orderItems.length >= 14) {
-      // alert("You can only add 14 items to your order");
     } else {
       if (
         !selectedItem ||
@@ -312,28 +313,13 @@ const CreateOrderPage: React.FC = () => {
         Array.isArray(selected.substituteItems) ? selected.substituteItems : []
       );
     } else {
-      setSubstitutedItemsList([]); // ensure fallback
+      setSubstitutedItemsList([]);
     }
-    // setCurrentItem((prev) => {
-    //   const updated = { ...prev, [field]: value };
-    //   // Recalculate total
-    //   updated.total =
-    //     updated.unitPrice * updated.quantity * (1 - updated.discount / 100);
-    //   return updated;
-    // });
     console.log(value);
   };
 
   const handleSave = async () => {
     try {
-      // const dataBody = {
-      //   customerCode: selectedCustomer,
-      //   locationCode: location,
-      //   paymentMethodCode: paymentType,
-      //   totalAmount: orderTotal,
-      //   items: orderItems
-      // }
-
       const response = await fetch("/api/orders/create", {
         method: "POST",
         body: JSON.stringify({
@@ -347,30 +333,35 @@ const CreateOrderPage: React.FC = () => {
           "Content-Type": "application/json",
         },
       });
+
       console.log(response);
       const data = await response.json();
 
       if (response.status === 200) {
         // Success case
-        //handleShowAlert('success', 'Login successful! Redirecting to dashboard...');
         console.log("Order successful:", data);
-        handleShowAlert('success', 'Order created successfully');
+        handleShowAlert("success", "Order created successfully");
+
+        // Reset form after successful save
         setSelectedCustomer(null);
+        setCustomer("");
         setLocation("");
         setPaymentType("");
         setOrderItems([]);
-        // setTimeout(() => {
-        //   router.push("/dashboard");
-        // }, 2000);
+        setOrderTotal(0);
+        setTotal(0);
+        setSelectedCustomerDueAmount(0);
+        setSelectedCustomerTotal(0);
       } else {
         // Error case - error message from the API response
-        const errorMessage = data.error || "Order failed. Please try again.";
+        const errorMessage =
+          data.error || "Order creation failed. Please try again.";
         handleShowAlert("error", errorMessage);
-        console.error("Order failed:", data);
+        console.error("Order creation failed:", data);
       }
     } catch (error) {
       console.error("Network or unexpected error:", error);
-      handleShowAlert("error", "Unexpected error occured");
+      handleShowAlert("error", "Unexpected error occurred");
     }
   };
 
@@ -380,7 +371,6 @@ const CreateOrderPage: React.FC = () => {
       <AppBar toggleSideNav={toggleSideNav} />
 
       {/* Main Content Area */}
-
       <div className="flex flex-1 overflow-hidden">
         {/* Side Navigation */}
         <SideNav isOpen={sideNavOpen} />
@@ -645,12 +635,6 @@ const CreateOrderPage: React.FC = () => {
                     type="number"
                     className="block w-full p-2 border border-gray-300 rounded"
                     value={selectedItemUnitPrice}
-                    // onChange={(e) =>
-                    //   updateCurrentItem(
-                    //     "unitPrice",
-                    //     parseFloat(e.target.value) || 0
-                    //   )
-                    // }
                     disabled
                   />
                 </div>
@@ -774,7 +758,12 @@ const CreateOrderPage: React.FC = () => {
                                   setOrderItems(newItems);
 
                                   // Update totals
-                                  setTotal((prev) => prev - removedItem.total);
+                                  const newOrderTotal = newItems.reduce(
+                                    (acc, item) => acc + item.total,
+                                    0
+                                  );
+                                  setOrderTotal(newOrderTotal);
+                                  setTotal(newOrderTotal);
                                 }}
                               >
                                 <svg
@@ -828,41 +817,6 @@ const CreateOrderPage: React.FC = () => {
                 </div>
               )}
             </div>
-
-            {/* Order Form */}
-            {/* <div className="bg-white p-6 rounded-md shadow-sm mb-4">
-              <h2 className="text-lg font-bold mb-4">Listed Order Items</h2> */}
-            {/* Customer and Totals Row */}
-            {/* <div className="bg-white overflow-x-auto overflow-y-auto shadow-sm">
-                <table className="min-w-full divide-y divide-gray-200">
-                  <thead className="bg-gray-200">
-                    <tr>
-                      <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
-                        #
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
-                        Item Name
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
-                        Unit Price
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
-                        Quantity
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
-                        Discount (%)
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
-                        Total
-                      </th>
-                      <th className="px-6 py-3 text-left text-sm font-bold text-black tracking-wider">
-                        Action
-                      </th>
-                    </tr>
-                  </thead>
-                </table>
-              </div> */}
-            {/* </div> */}
           </div>
 
           {/* Footer Component */}

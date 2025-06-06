@@ -247,7 +247,7 @@ const OutstandingsPage: React.FC = () => {
             {/* Outstandings Card */}
             <div className="bg-white p-6 rounded-md shadow-sm mb-4">
               <div className="bg-gray-100 rounded-lg shadow-sm p-6 mb-6 w-full md:w-1/2 sm:w-full h-[50%]">
-                <h2 className="text-xl font-bold mb-6">Get Customer &apos s</h2>
+                <h2 className="text-xl font-bold mb-6">Get Customer's</h2>
                 <div className="flex justify-start mb-6">
                   <button
                     className="bg-green-500 w-[50%] md:w-[50%] sm:w-full text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none cursor-pointer"
