@@ -27,10 +27,10 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
     if (open && selectedOrder) {
       // Map current status to dropdown value
       const statusMap: { [key: string]: string } = {
-        Pending: "1",
-        Processing: "2",
-        Delivered: "3",
-        Rejected: "4",
+        Pending: "0",
+        Processing: "1",
+        Delivered: "2",
+        Rejected: "3",
       };
       setSelectedStatus(statusMap[selectedOrder.status] || "1");
       setTrackingNumber("");
