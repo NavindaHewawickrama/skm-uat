@@ -401,12 +401,21 @@ const CreateUserPage: React.FC = () => {
     }
   };
 
-
-
   const toggleUsersList = () => {
     setShowUsersList(!showUsersList);
   };
 
+  const handleEditUser = async (user: UserData) => {
+    console.log(user);
+    setUserName(user.username);
+    setFirstName(user.firstName);
+    setLastName(user.lastName);
+    setSelectedSalesPerson(user.salesPersonCode);
+    setIsActive(user.isActive);
+    setRole(parseInt(user.userRoleId));
+
+    setUsersList(usersList.filter((item) => item.username !== user.username));
+  }
 
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col">
@@ -754,7 +763,8 @@ const CreateUserPage: React.FC = () => {
                             className="text-blue-500 hover:text-blue-700 mr-2 cursor-pointer"
                             onClick={() => {
                               // Edit functionality would go here
-                              alert(`Edit user: ${user.username}`);
+                              // alert(`Edit user: ${user.username}`);
+                              handleEditUser(user)
                             }}
                           >
                             <svg
