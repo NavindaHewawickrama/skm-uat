@@ -12,10 +12,11 @@ interface UserData {
   confirmPassword: string;
   firstName: string;
   lastName: string;
-  posName: string;
+  //posName: string;
+  salesPersonCode: string;
   email: string;
   telephone: string;
-  role: string;
+  userRoleId: string;
   location: string[];
   isActive: boolean;
 }
@@ -113,33 +114,52 @@ const CreateUserPage: React.FC = () => {
 
   // Fetch user creation details on component mount
   useEffect(() => {
-    const fetchUserCreationDetails = async () => {
-      try {
-        //setLoading(true);
-        const response = await fetch('/api/user-creation-details'); // Using relative path to your API route
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch user creation details');
-        }
-
-        const data = await response.json();
-        //console.log(data);
-        setUserCreationDetails(data.creationDetails);
-        if (data.userDetails.userRoleId === 1) {
-          setUsersList(data.creationDetails.salesPersons);
-        }
-        setApiError(null);
-      } catch (error) {
-        console.error('Error fetching user creation details:', error);
-        setApiError('Failed to load user creation details. Please try again.');
-        // } finally {
-        //   setLoading(false);
-        // }
-      }
-    };
-
     fetchUserCreationDetails();
   }, []);
+
+  const fetchUsers = async () => {
+    try {
+      //setLoading(true);
+      const response = await fetch('/api/user/fetchUserList'); // Using relative path to your API route
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user list');
+      }
+
+      const data = await response.json();
+      console.log(data);
+      setShowUsersList(true);
+      setUsersList(data);
+    } catch (error) {
+      console.error('Error fetching user creation details:', error);
+      setApiError('Failed to fetch user list details. Please try again.');
+    }
+  }
+
+
+  const fetchUserCreationDetails = async () => {
+    try {
+      //setLoading(true);
+      const response = await fetch('/api/user-creation-details'); // Using relative path to your API route
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch user creation details');
+      }
+
+      const data = await response.json();
+      //console.log(data);
+
+      setUserCreationDetails(data.creationDetails);
+      if (data.userDetails.userRoleId === 1) {
+        //setUsersList(data.creationDetails.salesPersons);
+        fetchUsers();
+      }
+      setApiError(null);
+    } catch (error) {
+      console.error('Error fetching user creation details:', error);
+      setApiError('Failed to load user creation details. Please try again.');
+    }
+  };
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -701,11 +721,11 @@ const CreateUserPage: React.FC = () => {
                       <th className="py-2 px-4 border-b text-left">Username</th>
                       <th className="py-2 px-4 border-b text-left">First Name</th>
                       <th className="py-2 px-4 border-b text-left">Last Name</th>
-                      <th className="py-2 px-4 border-b text-left">Sales Person</th>
-                      <th className="py-2 px-4 border-b text-left">Email</th>
-                      <th className="py-2 px-4 border-b text-left">Telephone</th>
-                      <th className="py-2 px-4 border-b text-left">Role</th>
-                      <th className="py-2 px-4 border-b text-left">Locations</th>
+                      <th className="py-2 px-4 border-b text-left">Sales Person Code</th> {/* Map the salespersons name to here*/}
+                      {/* <th className="py-2 px-4 border-b text-left">Email</th> */}
+                      {/* <th className="py-2 px-4 border-b text-left">Telephone</th> */}
+                      <th className="py-2 px-4 border-b text-left">Role</th> {/* Map the user role Id to the user role name */}
+                      {/* <th className="py-2 px-4 border-b text-left">Locations</th> */}
                       <th className="py-2 px-4 border-b text-left">Status</th>
                       <th className="py-2 px-4 border-b text-center">Actions</th>
                     </tr>
@@ -716,16 +736,16 @@ const CreateUserPage: React.FC = () => {
                         <td className="py-2 px-4 border-b">{user.username}</td>
                         <td className="py-2 px-4 border-b">{user.firstName}</td>
                         <td className="py-2 px-4 border-b">{user.lastName}</td>
-                        <td className="py-2 px-4 border-b">{user.posName}</td>
-                        <td className="py-2 px-4 border-b">{user.email}</td>
-                        <td className="py-2 px-4 border-b">{user.telephone}</td>
-                        <td className="py-2 px-4 border-b">{user.role}</td>
-                        <td className="py-2 px-4 border-b">
+                        <td className="py-2 px-4 border-b">{user.salesPersonCode}</td>
+                        {/* <td className="py-2 px-4 border-b">{user.email}</td>
+                          <td className="py-2 px-4 border-b">{user.telephone}</td> */}
+                        <td className="py-2 px-4 border-b">{user.userRoleId}</td>
+                        {/* <td className="py-2 px-4 border-b">
                           {user.location.map(loc => {
                             const location = userCreationDetails.locations.find(l => l.locationCode === loc);
                             return location ? location.locationName : loc;
                           }).join(', ')}
-                        </td>
+                        </td> */}
                         <td className="py-2 px-4 border-b">
                           {user.isActive ? "Active" : "Inactive"}
                         </td>
