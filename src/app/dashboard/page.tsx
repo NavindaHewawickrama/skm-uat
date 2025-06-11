@@ -20,7 +20,7 @@ const Dashboard = () => {
           throw Error("Failed to fetch data");
         }else{
           const data = await response.json();
-          console.log(data);
+          console.log("Welcome to SKM Sales App...",data.firstName);
         }
       } catch (err) {
         console.error("Error fetching pending order data:", err);

@@ -12,18 +12,26 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCode, email, phoneNumber, isActive, isMfaEnabled, mfaType } = body;
+        const { username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCodes, email, phoneNumber, isActive, isMfaEnabled, mfaType } = body;
         const response = await fetch('http://173.212.233.90:8090/api/User/AddUser', {
             method: 'POST',
-            body: JSON.stringify({ username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCode, email, phoneNumber, isActive, isMfaEnabled, mfaType }),
+            body: JSON.stringify({ username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCodes, email, phoneNumber, isActive, isMfaEnabled, mfaType }),
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
 
+        // if (!response.ok) {
+        //     return NextResponse.json({ error: 'Creating User Unsuccefull' }, { status: 401 });
+        // }
+
         if (!response.ok) {
-            return NextResponse.json({ error: 'Creating User Unsuccefull' }, { status: 401 });
+            const errorText = await response.text();
+            return NextResponse.json(
+                { error: 'Creating User Unsuccessful', details: errorText },
+                { status: response.status }
+            );
         }
 
         return NextResponse.json({ message: 'Creating User Succefull' }, { status: 200 });

@@ -72,12 +72,14 @@ export async function getValidAccessToken(): Promise<{
   let acctoken = cookieStore.get('acctoken')?.value ?? null;
 
   if (!acctoken) {
+    console.log('❌ No access token in cookies');
     return { userId: null, token: null, status: 401, message: 'Unauthorized: Token missing' };
   }
 
   let decoded = decodeJWT(acctoken);
 
   if (!decoded || !decoded.exp || !decoded.nameid) {
+    console.log('❌ Invalid token in cookies');
     return { userId: null, token: null, status: 400, message: 'Invalid token' };
   }
 
@@ -85,11 +87,13 @@ export async function getValidAccessToken(): Promise<{
   if (decoded.exp < now) {
     acctoken = await refreshAccessToken();
     if (!acctoken) {
+      console.log('❌ Failed to refresh cookies');
       return { userId: null, token: null, status: 401, message: 'Failed to refresh token' };
     }
 
     decoded = decodeJWT(acctoken);
     if (!decoded || !decoded.nameid) {
+      console.log('❌ Invalid token in cookies after refresh');
       return { userId: null, token: null, status: 400, message: 'Invalid refreshed token' };
     }
   }

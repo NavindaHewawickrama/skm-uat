@@ -88,8 +88,8 @@ const CreateUserPage: React.FC = () => {
   const [role, setRole] = useState(0);
   const [location, setLocation] = useState<string[]>([]);
   const [isActive, setIsActive] = useState(false);
-  const [isMfaEnabled, setIsMfaEnabled] = useState(true);
-  const [mfaType, setMfaType] = useState("phone");
+  const [isMfaEnabled, setIsMfaEnabled] = useState(false);
+  const [mfaType, setMfaType] = useState("");
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
@@ -123,7 +123,7 @@ const CreateUserPage: React.FC = () => {
         }
 
         const data = await response.json();
-        console.log(data);
+        //console.log(data);
         setUserCreationDetails(data.creationDetails);
         if (data.userDetails.userRoleId === 1) {
           setUsersList(data.creationDetails.salesPersons);
@@ -316,9 +316,10 @@ const CreateUserPage: React.FC = () => {
       //   email: email,
       //   phoneNumber: telephone,
       //   isActive: isActive,
-      //   isMfaEnabled: true,
-      //   mfaType: "phone"
+      //   isMfaEnabled: isMfaEnabled,
+      //   mfaType: mfaType
       // }
+      // console.log(apiBody);
       const response = await fetch('/api/user/addNewUser', {
         method: 'POST',
         body: JSON.stringify({
@@ -329,7 +330,7 @@ const CreateUserPage: React.FC = () => {
           lastName: lastName,
           userRoleId: role,
           salesPersonCode: selectedSalesPerson,
-          locationCode: location,
+          locationCodes: location,
           email: email,
           phoneNumber: telephone,
           isActive: isActive,
@@ -347,15 +348,36 @@ const CreateUserPage: React.FC = () => {
         handleShowAlert('success', 'User Created successfully!');
         handleReset();
       } else {
-        handleShowAlert('error', data.error || 'User Creating failed');
+        //handleShowAlert('error', data.error || 'User Creating failed');
+        let errorMessage = "User Creating  failed. Please try again.";
+
+        if (data.error) {
+          errorMessage = data.error;
+
+          // Try to parse details if it exists and show the inner message
+          if (data.details) {
+            try {
+              const parsedDetails = JSON.parse(data.details);
+              if (parsedDetails.message) {
+                errorMessage = `${data.error}: ${parsedDetails.message}`;
+              }
+            } catch (e) {
+              // If parsing fails, just use the error field
+              console.warn("Could not parse error details:", e);
+            }
+          }
+        }
+
+        handleShowAlert("error", errorMessage);
+        console.error("User Creating  failed:", data);
+        setTimeout(() => {
+          setShowAlert(false);
+        }, 3000);
       }
 
     } catch (error) {
       console.error('User Createing error:', error);
       handleShowAlert('error', 'Network error. Please try again.');
-      // } finally {
-      //   setIsLoading(false);
-      // }
     }
   };
 

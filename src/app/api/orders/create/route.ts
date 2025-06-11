@@ -8,13 +8,14 @@ export async function POST(request: Request) {
         const result = await getValidAccessToken();
 
         const { userId, token, status, message } = result;
-
+        // console.log(token);
         if (status !== 200 || !token || !userId) {
             return NextResponse.json({ error: message }, { status });
         }
-
+        console.log(userId);
         const body = await request.json();
         const { customerCode, locationCode, paymentMethodCode, totalAmount, items } = body;
+        console.log(customerCode);
         const response = await fetch(`http://173.212.233.90:8090/api/Business/CreateOrder?userId=${userId}`, {
             method: 'POST',
             body: JSON.stringify({ customerCode, locationCode, paymentMethodCode, totalAmount, items }),

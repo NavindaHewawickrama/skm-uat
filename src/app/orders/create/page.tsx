@@ -157,7 +157,7 @@ const CreateOrderPage: React.FC = () => {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
-        console.log(data);
+        //console.log(data);
         setLocations(data.locations);
         setCustomers(data.customers);
         setPaymentTypes(data.paymentTypes);
@@ -287,6 +287,7 @@ const CreateOrderPage: React.FC = () => {
   };
 
   const handleCustomerChange = (customerCode: string) => {
+    console.log(customerCode);
     setCustomer(customerCode);
 
     const selected = customers.find((c) => c.customerCode === customerCode);
@@ -354,8 +355,29 @@ const CreateOrderPage: React.FC = () => {
         setSelectedCustomerTotal(0);
       } else {
         // Error case - error message from the API response
-        const errorMessage =
-          data.error || "Order creation failed. Please try again.";
+        // const errorMessage =
+        //   data.error  || "Order creation failed. Please try again.";
+        // handleShowAlert("error", errorMessage);
+        // console.error("Order creation failed:", data);
+        let errorMessage = "Order creation failed. Please try again.";
+
+        if (data.error) {
+          errorMessage = data.error;
+
+          // Try to parse details if it exists and show the inner message
+          if (data.details) {
+            try {
+              const parsedDetails = JSON.parse(data.details);
+              if (parsedDetails.message) {
+                errorMessage = `${data.error}: ${parsedDetails.message}`;
+              }
+            } catch (e) {
+              // If parsing fails, just use the error field
+              console.warn("Could not parse error details:", e);
+            }
+          }
+        }
+
         handleShowAlert("error", errorMessage);
         console.error("Order creation failed:", data);
       }
@@ -751,10 +773,11 @@ const CreateOrderPage: React.FC = () => {
                                 className="text-red-500 hover:text-red-700 cursor-pointer"
                                 onClick={() => {
                                   const newItems = [...orderItems];
-                                  // const removedItem = newItems.splice(
-                                  //   index,
-                                  //   1
-                                  // )[0];
+                                  const removedItem = newItems.splice(
+                                    index,
+                                    1
+                                  )[0];
+                                  console.log(removedItem);
                                   setOrderItems(newItems);
 
                                   // Update totals

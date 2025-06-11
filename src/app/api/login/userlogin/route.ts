@@ -27,7 +27,7 @@ export async function POST(request: Request) {
       name: 'acctoken',
       value: data.acctoken, // adjust according to actual token field in API response
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: 'lax',
       path: '/',
       maxAge: rememberme ? 60 * 60 * 24 * 7 : 60 * 60, // 7 days if rememberMe is true
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
       name: 'refreshtoken',
       value: data.refreshtoken, // adjust according to actual token field in API response
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: 'lax',
       path: '/',
       maxAge: rememberme ? 60 * 60 * 24 * 7 : 60 * 60, // 7 days if rememberMe is true
