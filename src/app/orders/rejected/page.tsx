@@ -14,7 +14,7 @@ type OrderType = {
   totalAmount: number;
   items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
   specialNote: string;
-  rejectedReason: string;
+  rejectReason: string;
   status: string;
   description?: string;
 };
@@ -312,7 +312,7 @@ const RejectedOrdersPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.rejectedReason}
+                          {order.rejectReason}
                         </td>
                       </tr>
                     ))}

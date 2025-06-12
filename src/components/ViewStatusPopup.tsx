@@ -77,8 +77,10 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
       const requestBody = {
         orderNumber: selectedOrder.orderNumber,
         status: parseInt(selectedStatus),
-        rejectReason: selectedStatus === "4" ? rejectReason : "",
+        rejectReason: selectedStatus === "3" ? rejectReason : "",
       };
+
+      console.log(requestBody);
 
       const response = await fetch("/api/orders/changeStatus", {
         method: "POST",
@@ -180,15 +182,15 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
               className="block w-full border border-gray-300 rounded-md p-2"
               disabled={loading}
             >
-              <option value="1">Pending</option>
-              <option value="2">Processing</option>
-              <option value="3">Delivered</option>
-              <option value="4">Rejected</option>
+              <option value="0">Pending</option>
+              <option value="1">Processing</option>
+              <option value="2">Delivered</option>
+              <option value="3">Rejected</option>
             </select>
           </div>
 
           {/* Conditional Input for Rejected Status */}
-          {selectedStatus === "4" && (
+          {selectedStatus === "3" && (
             <div className="mb-3 sm:mb-4">
               <label
                 htmlFor="rejectReason"
@@ -209,7 +211,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
           )}
 
           {/* Conditional Inputs for Delivered Status */}
-          {selectedStatus === "3" && (
+          {selectedStatus === "2" && (
             <div className="space-y-3 sm:space-y-4 mb-2">
               <div>
                 <label
@@ -279,11 +281,11 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
             <button
               onClick={handleUpdate}
               disabled={
-                loading || (selectedStatus === "4" && !rejectReason.trim())
+                loading || (selectedStatus === "3" && !rejectReason.trim())
               }
               className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded text-sm sm:text-base cursor-pointer ${loading || (selectedStatus === "4" && !rejectReason.trim())
-                  ? "bg-gray-400 text-gray-200 cursor-not-allowed"
-                  : "bg-green-600 text-white hover:bg-green-700"
+                ? "bg-gray-400 text-gray-200 cursor-not-allowed"
+                : "bg-green-600 text-white hover:bg-green-700"
                 }`}
             >
               {loading ? "Updating..." : "Update"}

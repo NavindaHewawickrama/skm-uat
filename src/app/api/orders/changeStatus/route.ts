@@ -5,17 +5,17 @@ export async function POST(request: Request) {
     try {
         const result = await getValidAccessToken();
 
-        const { userId, token, status, message } = result;
+        const { userId, token, status: authStatus, message } = result;
 
-        if (status !== 200 || !token || !userId) {
-            return NextResponse.json({ error: message }, { status });
+        if (authStatus !== 200 || !token || !userId) {
+            return NextResponse.json({ error: message }, { status: authStatus });
         }
         const body = await request.json();
-        const { orderNumber, statusC, rejectReason } = body;
+        const { orderNumber, status, rejectReason } = body;
 
         const response = await fetch(' http://173.212.233.90:8090/api/Business/ChangeStatus', {
             method: 'POST',
-            body: JSON.stringify({ orderNumber, statusC, rejectReason }),
+            body: JSON.stringify({ orderNumber, status, rejectReason }),
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
