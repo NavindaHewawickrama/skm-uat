@@ -9,10 +9,12 @@ interface FormErrors {
   notice?: string;
 }
 
+
+
 interface NoticeData {
   title: string;
   description: string;
-  documents: File[];
+  document: File | null;
 }
 
 interface UploadedFile {
@@ -26,10 +28,11 @@ const CreateNoticePage: React.FC = () => {
   const [noticeData, setNoticeData] = useState<NoticeData>({
     title: "",
     description: "",
-    documents: [],
+    document: null,
   });
 
-  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  //const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [errors, setErrors] = useState<FormErrors>({});
@@ -40,22 +43,20 @@ const CreateNoticePage: React.FC = () => {
 
   const handleNoticeInputChange = (
     field: keyof NoticeData,
-    value: string | File[]
+    value: string | File | null
   ) => {
-    if (field === "documents" && Array.isArray(value)) {
+    if (field === "document" && value instanceof File) {
       setNoticeData(prev => ({
         ...prev,
-        documents: [...prev.documents, ...value]
+        document: value
       }));
 
-      // Also update the uploadedFiles state for display
-      const newFiles = Array.from(value).map(file => ({
-        name: file.name,
-        size: file.size,
-        type: file.type
-      }));
-
-      setUploadedFiles(prev => [...prev, ...newFiles]);
+      // Also update the uploadedFile state for display
+      setUploadedFile({
+        name: value.name,
+        size: value.size,
+        type: value.type
+      });
     } else {
       setNoticeData(prev => ({
         ...prev,
@@ -74,26 +75,27 @@ const CreateNoticePage: React.FC = () => {
   };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const files = Array.from(e.target.files);
+    if (e.target.files) {
+      const file = e.target.files[0];
 
       // Filter for only PDF and Word documents
-      const validFiles = files.filter(file =>
-        file.type === "application/pdf" ||
+      const isValidFile = file.type === "application/pdf" ||
         file.type === "application/msword" ||
-        file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-      );
+        file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
-      if (validFiles.length !== files.length) {
+      if (!isValidFile) {
         setErrors(prev => ({
           ...prev,
           notice: "Only PDF and Word documents are allowed"
         }));
+        return;
       }
-
-      if (validFiles.length > 0) {
-        handleNoticeInputChange("documents", validFiles);
-      }
+      setUploadedFile(file);
+      // handleNoticeInputChange("document", file);
+      setNoticeData(prev => ({
+        ...prev,
+        document: file
+      }));
     }
   };
 
@@ -103,34 +105,64 @@ const CreateNoticePage: React.FC = () => {
     }
   };
 
-  const removeFile = (index: number) => {
-    setUploadedFiles(prev => prev.filter((_, i) => i !== index));
+  const removeFile = () => {
+    setUploadedFile(null);
     setNoticeData(prev => ({
       ...prev,
-      documents: prev.documents.filter((_, i) => i !== index)
+      document: null
     }));
   };
 
-  const handleCreateNotice = () => {
-    if (!noticeData.title) {
+  const handleCreateNotice = async () => {
+    if (!uploadedFile) {
       setErrors(prev => ({
         ...prev,
-        notice: "Notice title is required"
+        notice: "Document is required"
       }));
       return;
     }
 
-    // Here you would handle the notice creation logic
-    // For now, we'll just reset the form
-    alert(`Notice "${noticeData.title}" created with ${noticeData.documents.length} document(s)`);
+    try {
+      const formData = new FormData();
+      formData.append('Document', uploadedFile); // Use uploadedFile (the actual File object)
 
-    // Reset notice form
-    setNoticeData({
-      title: "",
-      description: "",
-      documents: [],
-    });
-    setUploadedFiles([]);
+      const response = await fetch('/api/notices/saveNotice', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (response.ok) {
+        alert('Document uploaded successfully!');
+
+        // Reset form
+        setNoticeData({
+          title: "",
+          description: "",
+          document: null,
+        });
+        setUploadedFile(null);
+        setErrors({});
+      } else {
+        setTimeout(() => {
+          setErrors(prev => ({
+            ...prev,
+            notice: result.error || 'Failed to upload document'
+          }));
+        }, 2000);
+
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      setTimeout(() => {
+        setErrors(prev => ({
+          ...prev,
+          notice: 'Failed to upload document. Please try again.'
+        }));
+      }, 2000);
+
+    }
   };
 
   // const handleNoticeReset = () => {
@@ -173,7 +205,7 @@ const CreateNoticePage: React.FC = () => {
                   ref={fileInputRef}
                   className="hidden"
                   accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-                  multiple
+                  // multiple
                   onChange={handleFileUpload}
                 />
                 <button
@@ -191,35 +223,40 @@ const CreateNoticePage: React.FC = () => {
             </div>
 
             {/* Uploaded Files List */}
-            {uploadedFiles.length > 0 && (
+            {uploadedFile && (
               <div className="mb-6">
-                <h3 className="text-md font-semibold mb-2">Uploaded Documents:</h3>
-                <ul className="bg-gray-50 rounded border border-gray-200 p-2">
-                  {uploadedFiles.map((file, index) => (
-                    <li key={index} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
-                      <div className="flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        <span className="text-sm">{file.name}</span>
-                        <span className="ml-2 text-xs text-gray-500">
-                          ({(file.size / 1024).toFixed(1)} KB)
-                        </span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => removeFile(index)}
-                        className="text-red-500 hover:text-red-700 cursor-pointer"
-                      >
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
-                      </button>
-                    </li>
-                  ))}
-                </ul>
+                <h3 className="text-md font-semibold mb-2">Uploaded Document:</h3>
+                <div className="bg-gray-50 rounded border border-gray-200 p-2">
+                  <div className="flex justify-between items-center py-2">
+                    <div className="flex items-center">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      <span className="text-sm">{uploadedFile.name}</span>
+                      <span className="ml-2 text-xs text-gray-500">
+                        ({(uploadedFile.size / 1024).toFixed(1)} KB)
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={removeFile}
+                      className="text-red-500 hover:text-red-700 cursor-pointer"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
+            <div>
+              {errors.notice && (
+                <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+                  {errors.notice}
+                </div>
+              )}
+            </div>
 
             {/* Notice Buttons */}
             <div className="flex flex-wrap gap-2">
