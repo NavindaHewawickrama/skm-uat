@@ -1,27 +1,45 @@
 import { NextResponse } from 'next/server';
+import { getValidAccessToken } from '@/lib/auth';
 
-export async function POST(request: Request) {
+export async function PUT(request: Request) {
     try {
+        const result = await getValidAccessToken();
+
+        const { userId, token, status, message } = result;
+
+        if (status !== 200 || !token || !userId) {
+            return NextResponse.json({ error: message }, { status });
+        }
+
         const body = await request.json();
-        const { username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCode, email, phoneNumber, isActive, isMfaEnabled, mfaType } = body;
-        const response = await fetch('http://173.212.233.90:8090/api/User/UpdateUser', {
-            method: 'POST',
-            body: JSON.stringify({ username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCode, email, phoneNumber, isActive, isMfaEnabled, mfaType }),
+        const { username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCodes, email, phoneNumber, isActive, isMfaEnabled, mfaType } = body;
+        const response = await fetch(`http://173.212.233.90:8090/api/User/UpdateUser?userId=${userId}`, {
+            method: 'PUT',
+            body: JSON.stringify({ username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCodes, email, phoneNumber, isActive, isMfaEnabled, mfaType }),
             headers: {
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
 
+        // if (!response.ok) {
+        //     return NextResponse.json({ error: 'Creating User Unsuccefull' }, { status: 401 });
+        // }
+
         if (!response.ok) {
-            return NextResponse.json({ error: 'Updating User Unsuccefull' }, { status: 401 });
+            const errorText = await response.text();
+            return NextResponse.json(
+                { error: 'Creating User Unsuccessful', details: errorText },
+                { status: response.status }
+            );
         }
 
-        return NextResponse.json({ message: 'Updating User Succefull' }, { status: 200 });
+        return NextResponse.json({ message: 'Creating User Succefull' }, { status: 200 });
 
     } catch (error) {
-        console.error('Updating User error:', error);
+        console.error('Creating User error:', error);
         return NextResponse.json(
-            { error: 'Failed to update User' },
+            { error: 'Failed to Create User' },
             { status: 500 }
         );
     }
