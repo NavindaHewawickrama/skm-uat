@@ -65,10 +65,10 @@ interface Customer {
   customerName: string;
 }
 
-interface Payment {
-  code: string,
-  name: string,
-}
+// interface Payment {
+//   code: string,
+//   name: string,
+// }
 
 const CreateOrderPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
@@ -87,7 +87,7 @@ const CreateOrderPage: React.FC = () => {
     useState<number>(0);
   const [selectedCustomerTotal, setSelectedCustomerTotal] = useState<number>(0);
   const [customer, setCustomer] = useState<string>("");
-  const [paymentTypes, setPaymentTypes] = useState<Payment[]>([]);
+  //const [paymentTypes, setPaymentTypes] = useState<Payment[]>([]);
   const [itemsList, setItemsList] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState("");
   const [selectedItemName, setSelectedItemName] = useState("");
@@ -160,7 +160,7 @@ const CreateOrderPage: React.FC = () => {
         //console.log(data);
         setLocations(data.locations);
         setCustomers(data.customers);
-        setPaymentTypes(data.paymentTypes);
+       // setPaymentTypes(data.paymentTypes);
         setItemsList(data.items);
       }
     } catch (err) {
@@ -188,7 +188,7 @@ const CreateOrderPage: React.FC = () => {
         !selectedItem ||
         !selectedItemQuantity ||
         !selectedCustomer ||
-        !paymentType ||
+        //!paymentType ||
         !location
       ) {
         handleShowAlert("error", "Please fill in all required fields");
@@ -523,14 +523,15 @@ const CreateOrderPage: React.FC = () => {
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
                       value={paymentType}
-                      onChange={(e) => setPaymentType(e.target.value)}
+                     // onChange={(e) => setPaymentType(e.target.value)}
                     >
-                      <option value="">Select payment type</option>
+                      {/* <option value="">Select payment type</option>
                       {paymentTypes.map((type, index) => (
                         <option key={index} value={type.code}>
                           {type.name}
                         </option>
-                      ))}
+                      ))} */}
+                      <option>Default payment type</option>
                     </select>
                     <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                       <svg
