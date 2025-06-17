@@ -5,30 +5,68 @@ import SideNav from "../../components/Sidenav";
 import Footer from "../../components/Footer";
 import SalesChart from "@/components/SalesChart";
 
+interface Notices {
+  originalName: string;
+  type: string;
+  url: string;
+}
+
 const Dashboard = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
+  const [notices, setNotices] = useState<Notices[]>([]);
 
   useEffect(() => {
-    const fetchUserDetails = async () => {
-      try {
-        const response = await fetch('/api/dashboard/userDetails', {
-          method: "GET",
-          credentials: "include",
-        });
-
-        if (!response.ok) {
-          throw Error("Failed to fetch data");
-        }else{
-          const data = await response.json();
-          console.log("Welcome to SKM Sales App...",data.firstName);
-        }
-      } catch (err) {
-        console.error("Error fetching pending order data:", err);
-      }
-    }
-
     fetchUserDetails();
+    fetchNotices();
   }, [])
+
+  const fetchUserDetails = async () => {
+    try {
+      const response = await fetch('/api/dashboard/userDetails', {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw Error("Failed to fetch data");
+      } else {
+        const data = await response.json();
+        console.log("Welcome to SKM Sales App...", data.firstName);
+      }
+    } catch (err) {
+      console.error("Error fetching pending order data:", err);
+    }
+  }
+
+  const fetchNotices = async () => {
+    try {
+      const response = await fetch('/api/notices/getNotice', {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw Error("Failed to fetch data");
+      } else {
+        const data = await response.json();
+        console.log("Welcome to SKM Sales App...", data);
+        setNotices(data || []);
+      }
+    } catch (err) {
+      console.error("Error fetching pending order data:", err);
+      setNotices([]);
+    }
+  }
+
+  const getTodaysDate = () => {
+    const today = new Date();
+    return today.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      weekday: 'long'
+    });
+  };
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -55,24 +93,24 @@ const Dashboard = () => {
 
             {/* Notices card */}
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 w-full md:w-1/2 sm:w-full">
-              <h2 className="text-xl font-semibold mb-2">Notices [March 14 2024 - April 14 2025]</h2>
+              <h2 className="text-xl font-semibold mb-2">Notices [{getTodaysDate()}]</h2>
               <ul className="space-y-2">
-                {/* Replace these URLs with your API response or static links */}
-                {[
-                  { name: "Notice 1 - Holiday Schedule", file: "/documents/nutrients-15-00155.pdf" },
-                  { name: "Notice 2 - Meeting Agenda", file: "/documents/s41598-025-88963-9 (1).pdf" },
-                ].map((doc, index) => (
-                  <li key={index}>
-                    <a
-                      // href={`/view-pdf?file=${encodeURIComponent(doc.file)}`}
-                      href={doc.file}
-                      target="_blank"
-                      className="text-blue-600 hover:text-blue-800"
-                    >
-                      📄 {doc.name}
-                    </a>
-                  </li>
-                ))}
+                {notices.length > 0 ? (
+                  notices.map((notice, index) => (
+                    <div key={index}>
+                      <a
+                        href={notice.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ textDecoration: 'none' }}
+                      >
+                        📄 <strong> Notice {index + 1}</strong> -  {notice.originalName}
+                      </a>
+                    </div>
+                  ))
+                ) : (
+                  <div>No notices available</div>
+                )}
               </ul>
             </div>
           </div>
