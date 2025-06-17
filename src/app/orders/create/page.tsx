@@ -39,6 +39,7 @@ interface Customer {
   creditAllowed: boolean;
   creditLimit: number;
   balanceCredit: number;
+  paymentTermCode: string;
   // add more fields if necessary
 }
 
@@ -160,7 +161,7 @@ const CreateOrderPage: React.FC = () => {
         //console.log(data);
         setLocations(data.locations);
         setCustomers(data.customers);
-       // setPaymentTypes(data.paymentTypes);
+        // setPaymentTypes(data.paymentTypes);
         setItemsList(data.items);
       }
     } catch (err) {
@@ -287,12 +288,13 @@ const CreateOrderPage: React.FC = () => {
   };
 
   const handleCustomerChange = (customerCode: string) => {
-    console.log(customerCode);
+    //console.log(customerCode);
     setCustomer(customerCode);
 
     const selected = customers.find((c) => c.customerCode === customerCode);
     if (selected) {
       setSelectedCustomer(selected);
+      console.log(selected)
       setSelectedCustomerDueAmount(selected.dueAmount);
 
       const creditLimit = Number(selected.creditLimit) || 0;
@@ -326,7 +328,7 @@ const CreateOrderPage: React.FC = () => {
         body: JSON.stringify({
           customerCode: selectedCustomer?.customerCode,
           locationCode: location,
-          paymentMethodCode: paymentType,
+          paymentMethodCode: selectedCustomer?.paymentTermCode,
           totalAmount: orderTotal,
           items: orderItems,
         }),
@@ -507,7 +509,8 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
-                    value={selectedCustomerTotal}
+                    //value={selectedCustomerTotal}
+                    value={orderTotal.toFixed(2)}
                     readOnly
                   />
                 </div>
@@ -523,7 +526,7 @@ const CreateOrderPage: React.FC = () => {
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
                       value={paymentType}
-                     // onChange={(e) => setPaymentType(e.target.value)}
+                    // onChange={(e) => setPaymentType(e.target.value)}
                     >
                       {/* <option value="">Select payment type</option>
                       {paymentTypes.map((type, index) => (
