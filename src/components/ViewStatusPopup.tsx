@@ -74,11 +74,35 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
       setLoading(true);
       setShowAlert(false); // Hide any existing alerts
 
+      const deliveryDateParts = deliveryDate
+        ? new Date(deliveryDate)
+        : null;
+
+      const formattedDeliveryDate = deliveryDateParts
+        ? {
+          year: deliveryDateParts.getFullYear(),
+          month: deliveryDateParts.getMonth() + 1, // Months are 0-based in JS
+          day: deliveryDateParts.getDate(),
+          dayOfWeek: deliveryDateParts.getDay(), // 0 = Sunday, 6 = Saturday
+        }
+        : null;
+
       const requestBody = {
         orderNumber: selectedOrder.orderNumber,
         status: parseInt(selectedStatus),
         rejectReason: selectedStatus === "3" ? rejectReason : "",
+        trackingNumber: trackingNumber,
+        delivertPersonName: deliveryPerson,
+        deliveryDate: formattedDeliveryDate,
+        note: specialNote,
       };
+
+      if (selectedStatus === "2" && !deliveryDate) {
+        handleShowAlert("error", "Delivery date is required for Delivered status.");
+        return;
+      }
+
+
 
       console.log(requestBody);
 
