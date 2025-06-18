@@ -422,7 +422,7 @@ const DeliveredOrdersPage: React.FC = () => {
                         Status
                       </th>
                       <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
-                        Action
+                        Delivery Details
                       </th>
                     </tr>
                   </thead>
