@@ -72,6 +72,10 @@ const Dashboard = () => {
     setSideNavOpen(!sideNavOpen);
   };
 
+  const handleDownload = async (url: string) => {
+    console.log(url);
+  }
+
   return (
     <div className="min-h-screen w-screen bg-gray-100 flex flex-col">
       {/* App Bar */}
@@ -97,15 +101,16 @@ const Dashboard = () => {
               <ul className="space-y-2">
                 {notices.length > 0 ? (
                   notices.map((notice, index) => (
-                    <div key={index}>
-                      <a
-                        href={notice.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        style={{ textDecoration: 'none' }}
+                    <div key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded hover:bg-gray-100">
+                      <div>
+                        📄 <strong>Notice {index + 1}</strong> - {notice.originalName}
+                      </div>
+                      <button
+                        onClick={() => handleDownload(notice.url)}
+                        className="text-blue-600 hover:text-blue-800 underline text-sm"
                       >
-                        📄 <strong> Notice {index + 1}</strong> -  {notice.originalName}
-                      </a>
+                        ⬇ Download
+                      </button>
                     </div>
                   ))
                 ) : (

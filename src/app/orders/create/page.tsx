@@ -86,7 +86,7 @@ const CreateOrderPage: React.FC = () => {
   );
   const [selectedCustomerDueAmount, setSelectedCustomerDueAmount] =
     useState<number>(0);
-  const [selectedCustomerTotal, setSelectedCustomerTotal] = useState<number>(0);
+  //const [selectedCustomerTotal, setSelectedCustomerTotal] = useState<number>(0);
   const [customer, setCustomer] = useState<string>("");
   //const [paymentTypes, setPaymentTypes] = useState<Payment[]>([]);
   const [itemsList, setItemsList] = useState<Item[]>([]);
@@ -301,7 +301,8 @@ const CreateOrderPage: React.FC = () => {
       const balanceCredit = Number(selected.balanceCredit ?? 0);
       const customerTotal = creditLimit - balanceCredit;
 
-      setSelectedCustomerTotal(customerTotal);
+      // setSelectedCustomerTotal(customerTotal);
+      console.log(customerTotal);
     }
   };
 
@@ -354,7 +355,7 @@ const CreateOrderPage: React.FC = () => {
         setOrderTotal(0);
         setTotal(0);
         setSelectedCustomerDueAmount(0);
-        setSelectedCustomerTotal(0);
+        // setSelectedCustomerTotal(0);
       } else {
         // Error case - error message from the API response
         // const errorMessage =

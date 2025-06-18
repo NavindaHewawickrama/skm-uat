@@ -17,11 +17,11 @@ interface NoticeData {
   document: File | null;
 }
 
-interface UploadedFile {
-  name: string;
-  size: number;
-  type: string;
-}
+// interface UploadedFile {
+//   name: string;
+//   size: number;
+//   type: string;
+// }
 
 const CreateNoticePage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
@@ -41,38 +41,38 @@ const CreateNoticePage: React.FC = () => {
     setSideNavOpen(!sideNavOpen);
   };
 
-  const handleNoticeInputChange = (
-    field: keyof NoticeData,
-    value: string | File | null
-  ) => {
-    if (field === "document" && value instanceof File) {
-      setNoticeData(prev => ({
-        ...prev,
-        document: value
-      }));
+  // const handleNoticeInputChange = (
+  //   field: keyof NoticeData,
+  //   value: string | File | null
+  // ) => {
+  //   if (field === "document" && value instanceof File) {
+  //     setNoticeData(prev => ({
+  //       ...prev,
+  //       document: value
+  //     }));
 
-      // Also update the uploadedFile state for display
-      setUploadedFile({
-        name: value.name,
-        size: value.size,
-        type: value.type
-      });
-    } else {
-      setNoticeData(prev => ({
-        ...prev,
-        [field]: value,
-      }));
-    }
+  //     // Also update the uploadedFile state for display
+  //     setUploadedFile({
+  //       name: value.name,
+  //       size: value.size,
+  //       type: value.type
+  //     });
+  //   } else {
+  //     setNoticeData(prev => ({
+  //       ...prev,
+  //       [field]: value,
+  //     }));
+  //   }
 
-    // Clear notice error if it exists
-    if (errors.notice) {
-      setErrors(prev => {
-        const newErrors = { ...prev };
-        delete newErrors.notice;
-        return newErrors;
-      });
-    }
-  };
+  //   // Clear notice error if it exists
+  //   if (errors.notice) {
+  //     setErrors(prev => {
+  //       const newErrors = { ...prev };
+  //       delete newErrors.notice;
+  //       return newErrors;
+  //     });
+  //   }
+  // };
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -92,6 +92,7 @@ const CreateNoticePage: React.FC = () => {
       }
       setUploadedFile(file);
       // handleNoticeInputChange("document", file);
+      console.log(noticeData);
       setNoticeData(prev => ({
         ...prev,
         document: file
