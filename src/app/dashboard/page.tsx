@@ -73,8 +73,35 @@ const Dashboard = () => {
   };
 
   const handleDownload = async (url: string) => {
-    console.log(url);
-  }
+    try {
+      const response = await fetch(`/api/notices/downloadNotice?documentUrl=${encodeURIComponent(url)}`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Download failed");
+      }
+
+      const blob = await response.blob();
+      const contentDisposition = response.headers.get("Content-Disposition") || "";
+      const fileNameMatch = contentDisposition.match(/filename="?(.+?)"?$/);
+      const fileName = fileNameMatch ? fileNameMatch[1] : "downloaded_file";
+
+      // Create a link and trigger download
+      const link = document.createElement("a");
+      link.href = URL.createObjectURL(blob);
+      link.download = fileName;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(link.href); // Clean up
+
+    } catch (err) {
+      console.error("Download error:", err);
+      alert("Download failed");
+    }
+  };
 
   return (
     <div className="min-h-screen w-screen bg-gray-100 flex flex-col">
@@ -107,9 +134,9 @@ const Dashboard = () => {
                       </div>
                       <button
                         onClick={() => handleDownload(notice.url)}
-                        className="text-blue-600 hover:text-blue-800 underline text-sm"
+                        className="text-blue-600 hover:text-white underline text-sm cursor-pointer bg-blue-400 p-2 rounded-xl"
                       >
-                        ⬇ Download
+                        Download
                       </button>
                     </div>
                   ))
