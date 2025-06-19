@@ -11,11 +11,11 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: message }, { status: authStatus });
         }
         const body = await request.json();
-        const { orderNumber, status, rejectReason } = body;
+        const { orderNumber, status, rejectReason, trackingNumber, deliveryPersonName,deliveryDate,note } = body;
 
         const response = await fetch(' http://173.212.233.90:8090/api/Business/ChangeStatus', {
             method: 'POST',
-            body: JSON.stringify({ orderNumber, status, rejectReason }),
+            body: JSON.stringify({ orderNumber, status, rejectReason, trackingNumber, deliveryPersonName,deliveryDate,note }),
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
@@ -25,7 +25,7 @@ export async function POST(request: Request) {
         console.log(response);
 
         if (!response.ok) {
-            return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
+            return NextResponse.json({ error: 'Invalid credentials: Not Authorized to do Changes...' }, { status: 401 });
         }
 
         //const data = await response.json();

@@ -74,18 +74,18 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
       setLoading(true);
       setShowAlert(false); // Hide any existing alerts
 
-      const deliveryDateParts = deliveryDate
-        ? new Date(deliveryDate)
-        : null;
+      // const deliveryDateParts = deliveryDate
+      //   ? new Date(deliveryDate)
+      //   : null;
 
-      const formattedDeliveryDate = deliveryDateParts
-        ? {
-          year: deliveryDateParts.getFullYear(),
-          month: deliveryDateParts.getMonth() + 1, // Months are 0-based in JS
-          day: deliveryDateParts.getDate(),
-          dayOfWeek: deliveryDateParts.getDay(), // 0 = Sunday, 6 = Saturday
-        }
-        : null;
+      // const formattedDeliveryDate = deliveryDateParts
+      //   ? {
+      //     year: deliveryDateParts.getFullYear(),
+      //     month: deliveryDateParts.getMonth() + 1, // Months are 0-based in JS
+      //     day: deliveryDateParts.getDate(),
+      //     dayOfWeek: deliveryDateParts.getDay(), // 0 = Sunday, 6 = Saturday
+      //   }
+      //   : null;
 
       const requestBody = {
         orderNumber: selectedOrder.orderNumber,
@@ -93,7 +93,8 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
         rejectReason: selectedStatus === "3" ? rejectReason : "",
         trackingNumber: trackingNumber,
         delivertPersonName: deliveryPerson,
-        deliveryDate: formattedDeliveryDate,
+        // deliveryDate: formattedDeliveryDate,
+        deliveryDate: deliveryDate,
         note: specialNote,
       };
 
@@ -115,7 +116,13 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update order status");
+        if (response.status === 401) {
+          const result = await response.json();
+          handleShowAlert("error", result.error || "Unauthorized access.");
+        } else {
+          handleShowAlert("error", "Failed to update order status. Please try again.");
+        }
+        return; // Exit early to prevent continuing
       }
 
       const result = await response.json();

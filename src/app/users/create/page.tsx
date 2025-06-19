@@ -156,6 +156,7 @@ const CreateUserPage: React.FC = () => {
       console.log(data);
 
       setUserCreationDetails(data.creationDetails);
+      //console.log(data.userDetails);
       if (data.userDetails.userRoleId === 1) {
         //setUsersList(data.creationDetails.salesPersons);
         setUserRoleId(data.userDetails.userRoleId);
