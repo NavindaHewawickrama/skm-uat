@@ -38,7 +38,6 @@ const CreateNoticePage: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);

@@ -4,6 +4,7 @@ import AppBar from "@/components/Appbar";
 import SideNav from "@/components/Sidenav";
 import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 import Footer from "@/components/Footer";
+import ViewOrderDeliveryStatus from "@/components/ViewOrderDeliveryStatus";
 // import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 // import DeliveryDetailsPopup from "@/components/DeliveryDetailsPopup";
 
@@ -18,7 +19,10 @@ type OrderType = {
   specialNote: string;
   rejectedReason: string;
   status: string;
-  description?: string;
+  description?: string
+  trackingNumber: string,
+  delivertPersonName: string,
+  deliveryDate: string,
 };
 
 type ItemsType = { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }
@@ -37,8 +41,11 @@ const DeliveredOrdersPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [deliveredOrders, setDeliveredOrders] = useState<OrderType[]>([]);
   const [listViewOpen, setListViewOpen] = useState(false);
+  const [deliverViewOpen, setDeliveryViewOpen] = useState(false);
   const [selectedOrderItems, setSelectedOrderItems] = useState<ItemsType[]>([]);
-
+  const [orderTrackingNumber, setOrderTrackingNumber] = useState("");
+  const [orderDeliveryPersonName, setOrderDeliverPersonName] = useState("");
+  const [orderDeliveryDate, setOrderDeliveryDate] = useState("");
   // Sample delivered orders data based on the screenshot
   // const deliveredOrders = [
   //   {
@@ -287,7 +294,12 @@ const DeliveredOrdersPage: React.FC = () => {
   const handleDeliveryDetailsView = (order: OrderType) => {
     // setSelectedDeliveryOrder(order);
     // setDeliveryDetailsOpen(true);
+
     console.log(order);
+    setOrderTrackingNumber(order.trackingNumber ? order.trackingNumber : "");
+    setOrderDeliverPersonName(order.delivertPersonName ? order.delivertPersonName : "");
+    setOrderDeliveryDate(order.deliveryDate ? order.deliveryDate : "");
+    setDeliveryViewOpen(true);
   };
 
   // Handle entries per page change
@@ -541,6 +553,17 @@ const DeliveredOrdersPage: React.FC = () => {
             onClose={() => setListViewOpen(false)}
             orderDetails={selectedOrderItems}
           />
+
+          <ViewOrderDeliveryStatus
+            open={deliverViewOpen}
+            onClose={() => setDeliveryViewOpen(false)}
+            orderDetails={selectedOrderItems}
+            trackingNumber={orderTrackingNumber}
+            deliveryPersonName={orderDeliveryPersonName}
+            deliveryDate={orderDeliveryDate}
+          />
+
+
           <Footer />
         </div>
       </div>
