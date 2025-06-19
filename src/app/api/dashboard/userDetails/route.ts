@@ -51,7 +51,7 @@ export async function GET() {
 
     responseWithCookie.cookies.set('userDetails', JSON.stringify(safeUserData), {
       httpOnly: true,
-      secure: true,
+      secure: false,
       sameSite: 'lax',
       path: '/',
       maxAge: 60*60,

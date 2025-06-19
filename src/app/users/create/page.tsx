@@ -101,6 +101,7 @@ const CreateUserPage: React.FC = () => {
   const [editingUser, setEditingUser] = useState(false);
   const [viewpw, setViewPw] = useState(false);
   const [viewpw1, setViewPw1] = useState(false);
+  const [userRoleId, setUserRoleId] = useState(0);
 
   const handleShowAlert = (type: React.SetStateAction<string>, message: React.SetStateAction<string>) => {
     setAlertType(type);
@@ -152,11 +153,12 @@ const CreateUserPage: React.FC = () => {
       }
 
       const data = await response.json();
-      //console.log(data);
+      console.log(data);
 
       setUserCreationDetails(data.creationDetails);
       if (data.userDetails.userRoleId === 1) {
         //setUsersList(data.creationDetails.salesPersons);
+        setUserRoleId(data.userDetails.userRoleId);
         fetchUsers();
       }
       setApiError(null);
@@ -309,170 +311,180 @@ const CreateUserPage: React.FC = () => {
   };
 
   const handleCreateUser = async () => {
-    // Validate form
-    if (!validateForm()) {
-      // Scroll to the first error if needed
-      return;
-    }
-
-    // setIsLoading(true);
-
-    try {
-      // const apiBody = {
-      //   username: userName,
-      //   password: password,
-      //   reEnteredPassword: reTypePassword,
-      //   firstName: firstName,
-      //   lastName: lastName,
-      //   userRoleId: role,
-      //   salesPersonCode: selectedSalesPerson,
-      //   locationCode: location,
-      //   email: email,
-      //   phoneNumber: telephone,
-      //   isActive: isActive,
-      //   isMfaEnabled: isMfaEnabled,
-      //   mfaType: mfaType
-      // }
-      // console.log(apiBody);
-      const response = await fetch('/api/user/addNewUser', {
-        method: 'POST',
-        body: JSON.stringify({
-          username: userName,
-          password: password,
-          reEnteredPassword: reTypePassword,
-          firstName: firstName,
-          lastName: lastName,
-          userRoleId: role,
-          salesPersonCode: selectedSalesPerson,
-          locationCodes: location,
-          email: email,
-          phoneNumber: telephone,
-          isActive: isActive,
-          isMfaEnabled: isMfaEnabled,
-          mfaType: mfaType
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        handleShowAlert('success', 'User Created successfully!');
-        fetchUsers();
-        handleReset();
-      } else {
-        //handleShowAlert('error', data.error || 'User Creating failed');
-        let errorMessage = "User Creating  failed. Please try again.";
-
-        if (data.error) {
-          errorMessage = data.error;
-
-          if (data.details) {
-            try {
-              const parsedDetails = JSON.parse(data.details);
-              if (parsedDetails.message) {
-                errorMessage = `${data.error}: ${parsedDetails.message}`;
-              }
-            } catch (e) {
-              // If parsing fails, just use the error field
-              console.warn("Could not parse error details:", e);
-            }
-          }
-        }
-
-        handleShowAlert("error", errorMessage);
-        console.error("User Creating  failed:", data);
-        setTimeout(() => {
-          setShowAlert(false);
-        }, 3000);
+    if (userRoleId === 1) {
+      // Validate form
+      if (!validateForm()) {
+        // Scroll to the first error if needed
+        return;
       }
 
-    } catch (error) {
-      console.error('User Createing error:', error);
-      handleShowAlert('error', 'Network error. Please try again.');
+      // setIsLoading(true);
+
+      try {
+        // const apiBody = {
+        //   username: userName,
+        //   password: password,
+        //   reEnteredPassword: reTypePassword,
+        //   firstName: firstName,
+        //   lastName: lastName,
+        //   userRoleId: role,
+        //   salesPersonCode: selectedSalesPerson,
+        //   locationCode: location,
+        //   email: email,
+        //   phoneNumber: telephone,
+        //   isActive: isActive,
+        //   isMfaEnabled: isMfaEnabled,
+        //   mfaType: mfaType
+        // }
+        // console.log(apiBody);
+        const response = await fetch('/api/user/addNewUser', {
+          method: 'POST',
+          body: JSON.stringify({
+            username: userName,
+            password: password,
+            reEnteredPassword: reTypePassword,
+            firstName: firstName,
+            lastName: lastName,
+            userRoleId: role,
+            salesPersonCode: selectedSalesPerson,
+            locationCodes: location,
+            email: email,
+            phoneNumber: telephone,
+            isActive: isActive,
+            isMfaEnabled: isMfaEnabled,
+            mfaType: mfaType
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          handleShowAlert('success', 'User Created successfully!');
+          fetchUsers();
+          handleReset();
+        } else {
+          //handleShowAlert('error', data.error || 'User Creating failed');
+          let errorMessage = "User Creating  failed. Please try again.";
+
+          if (data.error) {
+            errorMessage = data.error;
+
+            if (data.details) {
+              try {
+                const parsedDetails = JSON.parse(data.details);
+                if (parsedDetails.message) {
+                  errorMessage = `${data.error}: ${parsedDetails.message}`;
+                }
+              } catch (e) {
+                // If parsing fails, just use the error field
+                console.warn("Could not parse error details:", e);
+              }
+            }
+          }
+
+          handleShowAlert("error", errorMessage);
+          console.error("User Creating  failed:", data);
+          setTimeout(() => {
+            setShowAlert(false);
+          }, 3000);
+        }
+
+      } catch (error) {
+        console.error('User Createing error:', error);
+        handleShowAlert('error', 'Network error. Please try again.');
+      }
+    } else {
+      handleShowAlert('error', 'No permission to create a user');
     }
+
   };
 
   const handleUpdateUser = async () => {
-    try {
-      // const apiBody = {
-      //   username: userName,
-      //   password: password,
-      //   reEnteredPassword: reTypePassword,
-      //   firstName: firstName,
-      //   lastName: lastName,
-      //   userRoleId: role,
-      //   salesPersonCode: selectedSalesPerson,
-      //   locationCode: location,
-      //   email: email,
-      //   phoneNumber: telephone,
-      //   isActive: isActive,
-      //   isMfaEnabled: isMfaEnabled,
-      //   mfaType: mfaType
-      // }
-      // console.log(apiBody);
-      const response = await fetch('/api/user/updateUser', {
-        method: 'PUT',
-        body: JSON.stringify({
-          username: userName,
-          password: password,
-          reEnteredPassword: reTypePassword,
-          firstName: firstName,
-          lastName: lastName,
-          userRoleId: role,
-          salesPersonCode: selectedSalesPerson,
-          locationCodes: location,
-          email: email,
-          phoneNumber: telephone,
-          isActive: isActive,
-          isMfaEnabled: isMfaEnabled,
-          mfaType: mfaType
-        }),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+    if (userRoleId === 1) {
+      try {
+        // const apiBody = {
+        //   username: userName,
+        //   password: password,
+        //   reEnteredPassword: reTypePassword,
+        //   firstName: firstName,
+        //   lastName: lastName,
+        //   userRoleId: role,
+        //   salesPersonCode: selectedSalesPerson,
+        //   locationCode: location,
+        //   email: email,
+        //   phoneNumber: telephone,
+        //   isActive: isActive,
+        //   isMfaEnabled: isMfaEnabled,
+        //   mfaType: mfaType
+        // }
+        // console.log(apiBody);
+        const response = await fetch('/api/user/updateUser', {
+          method: 'PUT',
+          body: JSON.stringify({
+            username: userName,
+            password: password,
+            reEnteredPassword: reTypePassword,
+            firstName: firstName,
+            lastName: lastName,
+            userRoleId: role,
+            salesPersonCode: selectedSalesPerson,
+            locationCodes: location,
+            email: email,
+            phoneNumber: telephone,
+            isActive: isActive,
+            isMfaEnabled: isMfaEnabled,
+            mfaType: mfaType
+          }),
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (response.ok) {
-        handleShowAlert('success', 'User Updated successfully!');
-        handleReset();
-        fetchUsers();
-        setEditingUser(false);
-      } else {
-        //handleShowAlert('error', data.error || 'User Creating failed');
-        let errorMessage = "User Updating  failed. Please try again.";
+        if (response.ok) {
+          handleShowAlert('success', 'User Updated successfully!');
+          handleReset();
+          fetchUsers();
+          setEditingUser(false);
+        } else {
+          //handleShowAlert('error', data.error || 'User Creating failed');
+          let errorMessage = "User Updating  failed. Please try again.";
 
-        if (data.error) {
-          errorMessage = data.error;
+          if (data.error) {
+            errorMessage = data.error;
 
-          if (data.details) {
-            try {
-              const parsedDetails = JSON.parse(data.details);
-              if (parsedDetails.message) {
-                errorMessage = `${data.error}: ${parsedDetails.message}`;
+            if (data.details) {
+              try {
+                const parsedDetails = JSON.parse(data.details);
+                if (parsedDetails.message) {
+                  errorMessage = `${data.error}: ${parsedDetails.message}`;
+                }
+              } catch (e) {
+                // If parsing fails, just use the error field
+                console.warn("Could not parse error details:", e);
               }
-            } catch (e) {
-              // If parsing fails, just use the error field
-              console.warn("Could not parse error details:", e);
             }
           }
+
+          handleShowAlert("error", errorMessage);
+          console.error("User Updating  failed:", data);
+          setTimeout(() => {
+            setShowAlert(false);
+          }, 3000);
         }
 
-        handleShowAlert("error", errorMessage);
-        console.error("User Updating  failed:", data);
-        setTimeout(() => {
-          setShowAlert(false);
-        }, 3000);
+      } catch (error) {
+        console.error('User Updating error:', error);
+        handleShowAlert('error', 'Network error. Please try again.');
       }
-
-    } catch (error) {
-      console.error('User Updating error:', error);
-      handleShowAlert('error', 'Network error. Please try again.');
+    } else {
+      handleShowAlert('error', 'No Permisison to update users');
     }
+
   }
 
   const toggleUsersList = () => {
@@ -480,24 +492,28 @@ const CreateUserPage: React.FC = () => {
   };
 
   const handleEditUser = async (user: UserData) => {
-    console.log(user);
+    if (userRoleId === 1) {
+      setEditingUser(true);
 
-    setEditingUser(true);
+      setUserName(user.username);
+      setFirstName(user.firstName);
+      setLastName(user.lastName);
+      setSelectedSalesPerson(user.salesPersonCode);
+      setIsActive(user.isActive);
+      setRole(parseInt(user.userRoleId));
+      setPassword(user.password);
+      setReTypePassword(user.password);
+      setEmail(user.email);
+      setTelephone(user.phoneNumber);
+      setLocation(user.locationCodes);
 
-    setUserName(user.username);
-    setFirstName(user.firstName);
-    setLastName(user.lastName);
-    setSelectedSalesPerson(user.salesPersonCode);
-    setIsActive(user.isActive);
-    setRole(parseInt(user.userRoleId));
-    setPassword(user.password);
-    setReTypePassword(user.password);
-    setEmail(user.email);
-    setTelephone(user.phoneNumber);
-    setLocation(user.locationCodes);
+      // Remove the currently selected user from the list
+      setUsersList(usersList.filter((item) => item.username !== user.username));
+    } else {
+      handleShowAlert('error', 'You do not have permission to edit users.');
+    }
+    //console.log(user);
 
-    // Remove the currently selected user from the list
-    setUsersList(usersList.filter((item) => item.username !== user.username));
 
 
   }

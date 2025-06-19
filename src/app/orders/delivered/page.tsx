@@ -214,14 +214,16 @@ const DeliveredOrdersPage: React.FC = () => {
     return Math.ceil(filteredOrders.length / parseInt(entriesPerPage));
   }, [filteredOrders.length, entriesPerPage]);
 
-  const currentOrders = useMemo(() => {
-    const itemsPerPage = parseInt(entriesPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredOrders.slice(startIndex, endIndex);
-  }, [filteredOrders, currentPage, entriesPerPage]);
+  // const currentOrders = useMemo(() => {
+  //   const itemsPerPage = parseInt(entriesPerPage);
+  //   const startIndex = (currentPage - 1) * itemsPerPage;
+  //   const endIndex = startIndex + itemsPerPage;
+  //   return filteredOrders.slice(startIndex, endIndex);
+  // }, [filteredOrders, currentPage, entriesPerPage]);
 
-  // Generate page numbers for pagination - copied from StockView
+
+
+  // Generate page numbers for pagination 
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
