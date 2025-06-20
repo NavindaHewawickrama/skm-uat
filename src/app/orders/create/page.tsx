@@ -100,6 +100,7 @@ const CreateOrderPage: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
+  const [userRoleType, setUserRoleType] = useState<string | null>(null);
 
   const outstandingData: CustomerOutstandingData[] = [
     {
@@ -134,6 +135,7 @@ const CreateOrderPage: React.FC = () => {
 
   useEffect(() => {
     fetchUserCustomerDetails();
+    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
   }, []);
 
   const handleShowAlert = (type: string, message: string) => {
@@ -294,7 +296,7 @@ const CreateOrderPage: React.FC = () => {
     const selected = customers.find((c) => c.customerCode === customerCode);
     if (selected) {
       setSelectedCustomer(selected);
-      console.log(selected)
+ //     console.log(selected)
       setSelectedCustomerDueAmount(selected.dueAmount);
 
       const creditLimit = Number(selected.creditLimit) || 0;
@@ -319,7 +321,7 @@ const CreateOrderPage: React.FC = () => {
     } else {
       setSubstitutedItemsList([]);
     }
-    console.log(value);
+ //   console.log(value);
   };
 
   const handleSave = async () => {
@@ -338,12 +340,12 @@ const CreateOrderPage: React.FC = () => {
         },
       });
 
-      console.log(response);
+   //   console.log(response);
       const data = await response.json();
 
       if (response.status === 200) {
         // Success case
-        console.log("Order successful:", data);
+    //    console.log("Order successful:", data);
         handleShowAlert("success", "Order created successfully");
 
         // Reset form after successful save
@@ -393,7 +395,7 @@ const CreateOrderPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
@@ -675,6 +677,7 @@ const CreateOrderPage: React.FC = () => {
                   </label>
                   <input
                     type="number"
+                    min={0}
                     className="block w-full p-2 border border-gray-300 rounded"
                     value={selectedItemQuantity}
                     onChange={(e) =>
@@ -689,6 +692,7 @@ const CreateOrderPage: React.FC = () => {
                   </label>
                   <input
                     type="number"
+                    min={0}
                     className="block w-full p-2 border border-gray-300 rounded"
                     value={selectedItemDiscount}
                     onChange={(e) =>

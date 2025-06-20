@@ -33,6 +33,11 @@ const RejectedOrdersPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [rejectedOrders, setRejectedOrders] = useState<OrderType[]>([]);
+  const [userRoleType, setUserRoleType] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+  }, []);
 
   // Fetch rejected order data from API
   useEffect(() => {
@@ -53,7 +58,7 @@ const RejectedOrdersPage: React.FC = () => {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
-       // console.log(data);
+        // console.log(data);
         setRejectedOrders(data);
       }
     } catch (err) {
@@ -148,7 +153,7 @@ const RejectedOrdersPage: React.FC = () => {
   };
 
   const handleItemDetailsView = (order: OrderType) => {
-    console.log(order);
+  //  console.log(order);
     if (Array.isArray(order.items)) {
       setSelectedOrder(order.items);
     } else {
@@ -166,7 +171,7 @@ const RejectedOrdersPage: React.FC = () => {
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -186,7 +191,7 @@ const RejectedOrdersPage: React.FC = () => {
   if (error) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -207,7 +212,7 @@ const RejectedOrdersPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">

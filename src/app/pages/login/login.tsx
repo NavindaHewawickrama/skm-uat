@@ -61,7 +61,7 @@ const LoginPage = () => {
       if (response.ok) {
         // Success case
         handleShowAlert('success', 'Login successful! Redirecting to dashboard...');
-        console.log('Login successful:', data);
+      //  console.log('Login successful:', data);
 
         setTimeout(() => {
           router.push("/dashboard");

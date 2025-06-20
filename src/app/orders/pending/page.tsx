@@ -36,6 +36,11 @@ const PendingOrdersPage: React.FC = () => {
   const [statusViewOpen, setStatusViewOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userRoleType, setUserRoleType] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+  }, []);
 
   // Fetch pending order data from API
   useEffect(() => {
@@ -151,7 +156,7 @@ const PendingOrdersPage: React.FC = () => {
   };
 
   const handleItemDetailsView = (order: OrderType) => {
-    console.log(order);
+//    console.log(order);
 
     if (Array.isArray(order.items)) {
       setSelectedOrderItems(order.items);
@@ -170,13 +175,13 @@ const PendingOrdersPage: React.FC = () => {
   const handleStatus = (order: OrderType) => {
     setSelectedOrderForStatus(order);
     setStatusViewOpen(true);
-    console.log(order);
+   // console.log(order);
   };
 
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -196,7 +201,7 @@ const PendingOrdersPage: React.FC = () => {
   if (error) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -217,7 +222,7 @@ const PendingOrdersPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">

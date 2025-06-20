@@ -19,6 +19,11 @@ const ResetPassword = () => {
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [userRoleType, setUserRoleType] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+  }, []);
 
   const handleShowAlert = (type: React.SetStateAction<string>, message: React.SetStateAction<string>) => {
     setAlertType(type);
@@ -49,30 +54,6 @@ const ResetPassword = () => {
     }
   }, [newPassword, confirmPassword]);
 
-  // const validatePassword = (password: string) => {
-  //   const minLength = 8;
-  //   const hasUpperCase = /[A-Z]/.test(password);
-  //   const hasLowerCase = /[a-z]/.test(password);
-  //   const hasNumbers = /\d/.test(password);
-  //   const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-
-  //   if (password.length < minLength) {
-  //     return "Password must be at least 8 characters long";
-  //   }
-  //   if (!hasUpperCase) {
-  //     return "Password must contain at least one uppercase letter";
-  //   }
-  //   if (!hasLowerCase) {
-  //     return "Password must contain at least one lowercase letter";
-  //   }
-  //   if (!hasNumbers) {
-  //     return "Password must contain at least one number";
-  //   }
-  //   if (!hasSpecialChar) {
-  //     return "Password must contain at least one special character";
-  //   }
-  //   return "";
-  // };
 
   const validateForm = () => {
     const newErrors = {
@@ -155,7 +136,7 @@ const ResetPassword = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
@@ -238,8 +219,8 @@ const ResetPassword = () => {
                       type="submit"
                       disabled={isLoading}
                       className={`px-4 py-2 rounded-md focus:outline-none text-white ${isLoading
-                          ? 'bg-gray-400 cursor-not-allowed'
-                          : 'bg-blue-900 hover:bg-blue-950 focus:ring-blue-500 cursor-pointer'
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-blue-900 hover:bg-blue-950 focus:ring-blue-500 cursor-pointer'
                         }`}
                     >
                       {isLoading ? 'Resetting...' : 'Submit'}
@@ -249,8 +230,8 @@ const ResetPassword = () => {
                       onClick={handleReset}
                       disabled={isLoading}
                       className={`px-4 py-2 rounded-md focus:outline-none text-white ${isLoading
-                          ? 'bg-gray-400 cursor-not-allowed'
-                          : 'bg-red-500 hover:bg-red-600 focus:ring-red-500 cursor-pointer'
+                        ? 'bg-gray-400 cursor-not-allowed'
+                        : 'bg-red-500 hover:bg-red-600 focus:ring-red-500 cursor-pointer'
                         }`}
                     >
                       Reset

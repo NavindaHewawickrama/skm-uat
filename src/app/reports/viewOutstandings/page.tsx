@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import AppBar from "../../../components/Appbar";
 import SideNav from "../../../components/Sidenav";
 import Footer from "../../../components/Footer";
@@ -7,6 +7,11 @@ import Footer from "../../../components/Footer";
 const ReportsOutstandings = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState("");
+  const [userRoleType, setUserRoleType] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+  }, []);
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -16,15 +21,10 @@ const ReportsOutstandings = () => {
     setSelectedCustomer(e.target.value);
   };
 
-  // const handleSubmit = (e: React.ChangeEvent<HTMLSelectElement>) => {
-  //   e.preventDefault();
-  //   // Add submission logic here
-  // };
-
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">

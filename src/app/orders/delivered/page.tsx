@@ -33,10 +33,6 @@ const DeliveredOrdersPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [entriesPerPage, setEntriesPerPage] = useState("50");
   const [currentPage, setCurrentPage] = useState(1);
-  // const [listViewOpen, setListViewOpen] = useState(false);
-  // const [selectedOrder, setSelectedOrder] = useState<OrderType | null>(null);
-  // const [deliveryDetailsOpen, setDeliveryDetailsOpen] = useState(false);
-  // const [selectedDeliveryOrder, setSelectedDeliveryOrder] = useState<OrderType | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deliveredOrders, setDeliveredOrders] = useState<OrderType[]>([]);
@@ -46,6 +42,12 @@ const DeliveredOrdersPage: React.FC = () => {
   const [orderTrackingNumber, setOrderTrackingNumber] = useState("");
   const [orderDeliveryPersonName, setOrderDeliverPersonName] = useState("");
   const [orderDeliveryDate, setOrderDeliveryDate] = useState("");
+  const [userRoleType, setUserRoleType] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+  }, []);
+  
   // Sample delivered orders data based on the screenshot
   // const deliveredOrders = [
   //   {
@@ -192,7 +194,7 @@ const DeliveredOrdersPage: React.FC = () => {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
-        console.log(data);
+       // console.log(data);
         setDeliveredOrders(data);
       }
     } catch (err) {
@@ -281,7 +283,7 @@ const DeliveredOrdersPage: React.FC = () => {
   };
 
   const handleItemDetailsView = (order: OrderType) => {
-    console.log(order);
+  //  console.log(order);
 
     if (Array.isArray(order.items)) {
       setSelectedOrderItems(order.items);
@@ -295,7 +297,7 @@ const DeliveredOrdersPage: React.FC = () => {
     // setSelectedDeliveryOrder(order);
     // setDeliveryDetailsOpen(true);
 
-    console.log(order);
+  //  console.log(order);
     setOrderTrackingNumber(order.trackingNumber ? order.trackingNumber : "");
     setOrderDeliverPersonName(order.delivertPersonName ? order.delivertPersonName : "");
     setOrderDeliveryDate(order.deliveryDate ? order.deliveryDate : "");
@@ -310,7 +312,7 @@ const DeliveredOrdersPage: React.FC = () => {
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -330,7 +332,7 @@ const DeliveredOrdersPage: React.FC = () => {
   if (error) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -351,7 +353,7 @@ const DeliveredOrdersPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">

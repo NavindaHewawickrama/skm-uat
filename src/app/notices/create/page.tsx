@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import AppBar from "../../../components/Appbar";
 import SideNav from "../../../components/Sidenav";
 import Footer from "../../../components/Footer";
@@ -29,6 +29,8 @@ const CreateNoticePage: React.FC = () => {
     document: null,
   });
 
+  console.log(noticeData);
+
   //const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -38,6 +40,11 @@ const CreateNoticePage: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
+  const [userRoleType, setUserRoleType] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+  }, []);
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -61,7 +68,7 @@ const CreateNoticePage: React.FC = () => {
         file.type === "application/pdf" ||
         file.type === "application/msword" ||
         file.type ===
-          "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
       if (!isValidFile) {
         setErrors((prev) => ({
@@ -72,7 +79,7 @@ const CreateNoticePage: React.FC = () => {
       }
       setUploadedFile(file);
       // handleNoticeInputChange("document", file);
-      console.log(noticeData);
+      //   console.log(noticeData);
       setNoticeData((prev) => ({
         ...prev,
         document: file,
@@ -149,7 +156,7 @@ const CreateNoticePage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-auto">

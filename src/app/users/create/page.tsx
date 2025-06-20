@@ -21,6 +21,7 @@ interface UserData {
   locationCodes: [];
   isActive: boolean;
   phoneNumber: string;
+  userId: number;
 }
 
 interface SalesPerson {
@@ -93,15 +94,20 @@ const CreateUserPage: React.FC = () => {
   const [isActive, setIsActive] = useState(false);
   const [isMfaEnabled, setIsMfaEnabled] = useState(false);
   const [mfaType, setMfaType] = useState("");
-
+  const [selectedForUpdatingUser, setSelectedForUpdatingUser] = useState(0);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
   const [alertType, setAlertType] = useState('');
-  // const [isLoading, setIsLoading] = useState(false);
   const [editingUser, setEditingUser] = useState(false);
   const [viewpw, setViewPw] = useState(false);
   const [viewpw1, setViewPw1] = useState(false);
   const [userRoleId, setUserRoleId] = useState(0);
+
+  const [userRoleType, setUserRoleType] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+  }, []);
 
   const handleShowAlert = (type: React.SetStateAction<string>, message: React.SetStateAction<string>) => {
     setAlertType(type);
@@ -133,7 +139,7 @@ const CreateUserPage: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log(data);
+      //  console.log(data);
       setShowUsersList(true);
       setUsersList(data);
     } catch (error) {
@@ -153,7 +159,7 @@ const CreateUserPage: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log(data);
+      //  console.log(data);
 
       setUserCreationDetails(data.creationDetails);
       //console.log(data.userDetails);
@@ -407,6 +413,7 @@ const CreateUserPage: React.FC = () => {
     if (userRoleId === 1) {
       try {
         // const apiBody = {
+        //   updatingUserId: selectedForUpdatingUser,
         //   username: userName,
         //   password: password,
         //   reEnteredPassword: reTypePassword,
@@ -425,6 +432,7 @@ const CreateUserPage: React.FC = () => {
         const response = await fetch('/api/user/updateUser', {
           method: 'PUT',
           body: JSON.stringify({
+            updatingUserId: selectedForUpdatingUser,
             username: userName,
             password: password,
             reEnteredPassword: reTypePassword,
@@ -493,9 +501,10 @@ const CreateUserPage: React.FC = () => {
   };
 
   const handleEditUser = async (user: UserData) => {
+    //  console.log(user);
     if (userRoleId === 1) {
       setEditingUser(true);
-
+      setSelectedForUpdatingUser(user.userId);
       setUserName(user.username);
       setFirstName(user.firstName);
       setLastName(user.lastName);
@@ -522,7 +531,7 @@ const CreateUserPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-auto">
@@ -565,11 +574,41 @@ const CreateUserPage: React.FC = () => {
 
             {/* Password */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">Password :</label>
+              <div className="flex flex-row">
+                <label className="block text-gray-700 font-semibold mb-2">Password :</label>
+                <div className="p-1 mt-1">
+                  <div className="relative group">
+                    <svg
+                      className="w-4 h-4 text-gray-500 cursor-pointer hover:text-blue-700"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"
+                      />
+                    </svg>
+                    <div className="absolute z-20 w-64 p-2 text-sm text-gray-700 bg-white border border-gray-300 rounded shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 left-5 top-0">
+                      <ul className="list-disc list-inside">
+                        <li>At least 8 characters</li>
+                        <li>One uppercase letter</li>
+                        <li>One lowercase letter</li>
+                        <li>One number</li>
+                        {/* <li>One special character (!@#$...)</li> */}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
               <div className="relative">
                 <input
+                  disabled={editingUser ? true : false}
                   type={viewpw1 ? "text" : "password"}
-                  className={`w-full p-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className={`w-full p-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} ${editingUser ? 'bg-gray-300' : 'bg-white'} rounded`}
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -617,10 +656,12 @@ const CreateUserPage: React.FC = () => {
                     </svg>
                   )}
                 </button>
+
               </div>
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
               )}
+
             </div>
 
             {/* Re-Type Password */}
@@ -630,8 +671,9 @@ const CreateUserPage: React.FC = () => {
               </label>
               <div className="relative">
                 <input
+                  disabled={editingUser ? true : false}
                   type={viewpw ? "text" : "password"}
-                  className={`w-full p-2 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} rounded`}
+                  className={`w-full p-2 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} ${editingUser ? 'bg-gray-300' : 'bg-white'} rounded`}
                   placeholder="Re-Type Password"
                   value={reTypePassword}
                   onChange={(e) =>

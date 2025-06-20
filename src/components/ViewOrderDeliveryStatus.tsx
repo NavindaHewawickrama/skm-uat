@@ -24,8 +24,8 @@ const ViewOrderDeliveryStatus: React.FC<ModalProps> = ({ open, onClose, tracking
     // const DeliveryDate = "06 / 18 / 2025"
 
     //console.log(orderDetails);
-    console.log(trackingNumber);
-    console.log(deliveryDate);
+    // console.log(trackingNumber);
+    // console.log(deliveryDate);
 
     if (!open) return null;
 

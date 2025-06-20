@@ -12,7 +12,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: message }, { status });
         }
 
-        console.log('UserId:', userId);
+       // console.log('UserId:', userId);
 
         const formData = await request.formData();
 
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
         // Add the document to the API form data
         apiFormData.append('Document', document);
 
-        console.log('Uploading document:', document.name);
+   //     console.log('Uploading document:', document.name);
 
         const response = await fetch(`http://173.212.233.90:8090/api/Business/UploadUserDocument`, {
             method: 'POST',

@@ -105,7 +105,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
 
 
 
-      console.log(requestBody);
+      //console.log(requestBody);
 
       const response = await fetch("/api/orders/changeStatus", {
         method: "POST",

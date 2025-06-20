@@ -7,9 +7,10 @@ import { useRouter } from "next/navigation";
 
 interface AppBarProps {
   toggleSideNav: () => void;
+  userRole: string | null;
 }
 
-const AppBar: React.FC<AppBarProps> = ({ toggleSideNav }) => {
+const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole }) => {
   const router = useRouter();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [alertDropdownOpen, setAlertDropdownOpen] = useState(false);
@@ -163,7 +164,7 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav }) => {
         </div>
 
         {/* Admin label */}
-        <div className="font-bold">ADMIN</div>
+        <div className="font-bold">{userRole}</div>
 
         {/* User profile icon with dropdown */}
         <div className="relative" ref={profileDropdownRef}>
@@ -196,26 +197,26 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav }) => {
                 </div>
               </div>
               <div className="py-1">
-                  <button
-                    className="px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left flex items-center cursor-pointer"
-                    onClick={handleReserPasswordClicked}
+                <button
+                  className="px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left flex items-center cursor-pointer"
+                  onClick={handleReserPasswordClicked}
+                >
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-5 w-5 mr-3 text-gray-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
                   >
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      className="h-5 w-5 mr-3 text-gray-500"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
-                      />
-                    </svg>
-                    Reset Password
-                  </button>
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z"
+                    />
+                  </svg>
+                  Reset Password
+                </button>
                 <button
                   className="px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left flex items-center cursor-pointer"
                   // onClick={() => {

@@ -14,6 +14,8 @@ interface Notices {
 const Dashboard = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [notices, setNotices] = useState<Notices[]>([]);
+  const [user, setUser] = useState("");
+
 
   useEffect(() => {
     fetchUserDetails();
@@ -31,7 +33,26 @@ const Dashboard = () => {
         throw Error("Failed to fetch data");
       } else {
         const data = await response.json();
-        console.log("Welcome to SKM Sales App...", data.firstName);
+    //    console.log("Welcome to SKM Sales App...", data.firstName);
+      //  console.log(data);
+        switch (data.userRoleId) {
+          case 1:
+            setUser("ADMIN");
+            sessionStorage.setItem("userRoleName", "ADMIN");
+            break;
+          case 3:
+            setUser("SALES USER")
+            sessionStorage.setItem("userRoleName","SALES USER");
+            break;
+          case 4:
+            setUser("SALES CORDINATOR");
+            sessionStorage.setItem("userRoleName","SALES COORDINATOR");
+            break;
+          default:
+            setUser("USER");
+            sessionStorage.setItem("userRoleName","USER");
+            break;
+        }
       }
     } catch (err) {
       console.error("Error fetching pending order data:", err);
@@ -49,7 +70,7 @@ const Dashboard = () => {
         throw Error("Failed to fetch data");
       } else {
         const data = await response.json();
-        console.log("Welcome to SKM Sales App...", data);
+     //   console.log("Welcome to SKM Sales App...", data);
         setNotices(data || []);
       }
     } catch (err) {
@@ -117,7 +138,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen w-screen bg-gray-100 flex flex-col">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={user} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
@@ -157,8 +178,8 @@ const Dashboard = () => {
               <div className="space-y-3 max-h-96 overflow-y-auto">
                 {notices.length > 0 ? (
                   notices.map((notice, index) => (
-                    <div 
-                      key={index} 
+                    <div
+                      key={index}
                       className="group relative bg-gradient-to-r from-gray-50 to-gray-100 hover:from-blue-50 hover:to-indigo-50 border border-gray-200 hover:border-blue-300 rounded-lg p-4 transition-all duration-200 hover:shadow-md"
                     >
                       <div className="flex items-start justify-between">
@@ -167,7 +188,7 @@ const Dashboard = () => {
                           <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm border border-gray-200 group-hover:border-blue-300 transition-colors">
                             <span className="text-xl">{getFileIcon(notice.originalName)}</span>
                           </div>
-                          
+
                           {/* Notice Info */}
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center space-x-2 mb-1">

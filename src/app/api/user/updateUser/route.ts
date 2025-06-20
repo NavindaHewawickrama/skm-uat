@@ -12,8 +12,8 @@ export async function PUT(request: Request) {
         }
 
         const body = await request.json();
-        const { username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCodes, email, phoneNumber, isActive, isMfaEnabled, mfaType } = body;
-        const response = await fetch(`http://173.212.233.90:8090/api/User/UpdateUser?userId=${userId}`, {
+        const { updatingUserId, username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCodes, email, phoneNumber, isActive, isMfaEnabled, mfaType } = body;
+        const response = await fetch(`http://173.212.233.90:8090/api/User/UpdateUser?userId=${updatingUserId}`, {
             method: 'PUT',
             body: JSON.stringify({ username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCodes, email, phoneNumber, isActive, isMfaEnabled, mfaType }),
             headers: {
@@ -22,9 +22,6 @@ export async function PUT(request: Request) {
             },
         });
 
-        // if (!response.ok) {
-        //     return NextResponse.json({ error: 'Creating User Unsuccefull' }, { status: 401 });
-        // }
 
         if (!response.ok) {
             const errorText = await response.text();

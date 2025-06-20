@@ -19,7 +19,7 @@ interface ModalProps {
 
 const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDetails }) => {
 
-  console.log(orderDetails);
+//  console.log(orderDetails);
 
   if (!open) return null;
 

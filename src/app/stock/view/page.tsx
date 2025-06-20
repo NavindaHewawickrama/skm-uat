@@ -62,6 +62,11 @@ const StockView = () => {
   const [stockItems, setStockItems] = useState<StockItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [userRoleType, setUserRoleType] = useState<string | null>(null);
+
+  useEffect(() => {
+    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+  }, []);
 
   const defaultImage: Image = {
     ...producctImage2,
@@ -227,7 +232,7 @@ const StockView = () => {
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -247,7 +252,7 @@ const StockView = () => {
   if (error) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -267,7 +272,7 @@ const StockView = () => {
 
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-      <AppBar toggleSideNav={toggleSideNav} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
 
       <div className="flex flex-1 overflow-hidden">
         <SideNav isOpen={sideNavOpen} />

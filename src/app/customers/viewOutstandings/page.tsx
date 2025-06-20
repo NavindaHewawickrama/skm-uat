@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import AppBar from "@/components/Appbar";
 import SideNav from "@/components/Sidenav";
 import Footer from "@/components/Footer";
@@ -11,7 +11,11 @@ const OutstandingsPage: React.FC = () => {
   const [entriesPerPage, setEntriesPerPage] = useState(50);
   const [currentPage, setCurrentPage] = useState(1);
   const [isCustomerPopupOpen, setIsCustomerPopupOpen] = useState(false);
+  const [userRoleType, setUserRoleType] = useState<string | null>(null);
 
+  useEffect(() => {
+    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+  }, []);
   // Sample outstandings data
   const outstandingInvoices = [
     {
@@ -234,7 +238,7 @@ const OutstandingsPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
@@ -359,11 +363,10 @@ const OutstandingsPage: React.FC = () => {
                         setCurrentPage(Math.max(1, currentPage - 1))
                       }
                       disabled={currentPage === 1}
-                      className={`px-3 py-1 rounded ${
-                        currentPage === 1
-                          ? "bg-gray-200 cursor-not-allowed"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
+                      className={`px-3 py-1 rounded ${currentPage === 1
+                        ? "bg-gray-200 cursor-not-allowed"
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                        }`}
                     >
                       Previous
                     </button>
@@ -372,11 +375,10 @@ const OutstandingsPage: React.FC = () => {
                         <button
                           key={pageNumber}
                           onClick={() => setCurrentPage(pageNumber)}
-                          className={`px-3 py-1 rounded ${
-                            currentPage === pageNumber
-                              ? "bg-blue-700 text-white"
-                              : "bg-blue-600 text-white hover:bg-blue-700"
-                          }`}
+                          className={`px-3 py-1 rounded ${currentPage === pageNumber
+                            ? "bg-blue-700 text-white"
+                            : "bg-blue-600 text-white hover:bg-blue-700"
+                            }`}
                         >
                           {pageNumber}
                         </button>
@@ -387,11 +389,10 @@ const OutstandingsPage: React.FC = () => {
                         setCurrentPage(Math.min(totalPages, currentPage + 1))
                       }
                       disabled={currentPage === totalPages}
-                      className={`px-3 py-1 rounded ${
-                        currentPage === totalPages
-                          ? "bg-gray-200 cursor-not-allowed"
-                          : "bg-blue-600 text-white hover:bg-blue-700"
-                      }`}
+                      className={`px-3 py-1 rounded ${currentPage === totalPages
+                        ? "bg-gray-200 cursor-not-allowed"
+                        : "bg-blue-600 text-white hover:bg-blue-700"
+                        }`}
                     >
                       Next
                     </button>
