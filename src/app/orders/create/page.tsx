@@ -368,7 +368,7 @@ const CreateOrderPage: React.FC = () => {
 
         if (data.error) {
           errorMessage = data.error;
-
+          handleShowAlert("error", errorMessage);
           // Try to parse details if it exists and show the inner message
           if (data.details) {
             try {
