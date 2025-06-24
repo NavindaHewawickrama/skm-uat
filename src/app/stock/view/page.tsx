@@ -341,7 +341,7 @@ const StockView = () => {
                     <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Image
                     </th>
-                    <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
+                    {/* <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Description
                     </th>
                     <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
@@ -355,7 +355,7 @@ const StockView = () => {
                     </th>
                     <th className="px-6 py-3 text-center text-sm font-bold text-black tracking-wider">
                       Reorder Quantity
-                    </th>
+                    </th> */}
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
@@ -399,7 +399,7 @@ const StockView = () => {
                           View
                         </button>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
+                      {/* <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.description}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
@@ -413,7 +413,7 @@ const StockView = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.reorderQuantity}
-                      </td>
+                      </td> */}
                     </tr>
                   ))}
                 </tbody>

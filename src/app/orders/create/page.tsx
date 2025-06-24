@@ -29,6 +29,7 @@ interface CustomerOutstandingData {
   invoiceNumber: string;
   invoiceDate: string;
   invoicedAmount: number;
+  pdcAmount: number;
   dueAmount: number;
 }
 
@@ -108,6 +109,7 @@ const CreateOrderPage: React.FC = () => {
       invoiceNumber: "INV-001",
       invoiceDate: "2025-04-15",
       invoicedAmount: 5000,
+      pdcAmount: 3200,
       dueAmount: 5000,
     },
     {
@@ -115,6 +117,7 @@ const CreateOrderPage: React.FC = () => {
       invoiceNumber: "INV-002",
       invoiceDate: "2025-04-25",
       invoicedAmount: 3500,
+      pdcAmount: 1800,
       dueAmount: 3500,
     },
     {
@@ -122,6 +125,7 @@ const CreateOrderPage: React.FC = () => {
       invoiceNumber: "INV-003",
       invoiceDate: "2025-05-01",
       invoicedAmount: 7500,
+      pdcAmount: 5200,
       dueAmount: 7500,
     },
     {
@@ -129,6 +133,7 @@ const CreateOrderPage: React.FC = () => {
       invoiceNumber: "INV-004",
       invoiceDate: "2025-05-10",
       invoicedAmount: 2200,
+      pdcAmount: 7100,
       dueAmount: 2200,
     },
   ];
@@ -245,6 +250,7 @@ const CreateOrderPage: React.FC = () => {
       "Invoice Number",
       "Invoice Date",
       "Invoiced Amount",
+      "PDC Amount",
       "Due Amount",
     ];
     const tableRows = outstandingData.map((item) => [
@@ -252,6 +258,7 @@ const CreateOrderPage: React.FC = () => {
       item.invoiceNumber,
       item.invoiceDate,
       `${item.invoicedAmount.toFixed(2)}`,
+      `${item.pdcAmount.toFixed(2)}`,
       `${item.dueAmount.toFixed(2)}`,
     ]);
 

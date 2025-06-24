@@ -17,9 +17,12 @@ interface ModalProps {
   orderDetails: OrderItem[];
 }
 
-const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDetails }) => {
-
-//  console.log(orderDetails);
+const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
+  open,
+  onClose,
+  orderDetails,
+}) => {
+  //  console.log(orderDetails);
 
   if (!open) return null;
 
@@ -44,21 +47,29 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDe
     // Fix 1: Use correct variable names and calculate total
     const tableRows = orderDetails.map((item) => {
       // Calculate total = (unitPrice * quantity) - discount
-      const unitPrice = typeof item.unitPrice === 'string' ? parseFloat(item.unitPrice) : item.unitPrice;
-      const quantity = typeof item.quantity === 'string' ? parseFloat(item.quantity) : item.quantity;
-      const discountPercent = typeof item.discountPercent === 'string' ? parseFloat(item.discountPercent.toString()) : item.discountPercent;
+      const unitPrice =
+        typeof item.unitPrice === "string"
+          ? parseFloat(item.unitPrice)
+          : item.unitPrice;
+      const quantity =
+        typeof item.quantity === "string"
+          ? parseFloat(item.quantity)
+          : item.quantity;
+      const discountPercent =
+        typeof item.discountPercent === "string"
+          ? parseFloat(item.discountPercent.toString())
+          : item.discountPercent;
 
       const subtotal = unitPrice * quantity;
       const discountAmount = subtotal * (discountPercent / 100);
       const total = subtotal - discountAmount;
 
-
       return [
-        item.description,           // Item Code/Description
-        Number(item.unitPrice).toFixed(2),  // Unit Price
-        item.quantity,              // Quantity  
+        item.description, // Item Code/Description
+        Number(item.unitPrice).toFixed(2), // Unit Price
+        item.quantity, // Quantity
         `${item.discountPercent}%`, // Discount Percent
-        total.toFixed(2)            // Total
+        total.toFixed(2), // Total
       ];
     });
 
@@ -78,8 +89,8 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDe
 
     // Fix 2: Calculate grand total from orderDetails
     const grandTotal = orderDetails.reduce((sum, item) => {
-      const unitPrice = Number(item.unitPrice);           // Convert to number
-      const quantity = Number(item.quantity);             // Convert to number  
+      const unitPrice = Number(item.unitPrice); // Convert to number
+      const quantity = Number(item.quantity); // Convert to number
       const discountPercent = Number(item.discountPercent); // Convert to number
 
       const subtotal = unitPrice * quantity;
@@ -90,12 +101,9 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDe
 
     const finalY = pdf.lastAutoTable?.finalY || 60;
     pdf.setFontSize(12);
-    pdf.text(
-      `Grand Total: ${grandTotal.toFixed(2)}`,
-      195,
-      finalY + 10,
-      { align: "right" }
-    );
+    pdf.text(`Grand Total: ${grandTotal.toFixed(2)}`, 195, finalY + 10, {
+      align: "right",
+    });
 
     const blob = pdf.output("blob");
     const url = URL.createObjectURL(blob);
@@ -109,7 +117,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDe
         onClick={onClose}
       >
         <div
-          className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl bg-white px-4 sm:px-6 md:px-8 py-4 sm:py-6 rounded-sm overflow-auto"
+          className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl bg-white px-4 sm:px-6 md:px-8 py-4 sm:py-6 rounded-sm overflow-auto"
           onClick={(e) => {
             e.stopPropagation();
           }}
@@ -123,9 +131,24 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDe
               className="font-medium cursor-pointer transition-transform duration-300 ease-in-out transform hover:scale-[1.3] hover:text-red-600"
               onClick={onClose}
             >
-              <button type="button" className="bg-white rounded-md p-1 sm:p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500 cursor-pointer">
-                <svg className="h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              <button
+                type="button"
+                className="bg-white rounded-md p-1 sm:p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500 cursor-pointer"
+              >
+                <svg
+                  className="h-4 w-4"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  aria-hidden="true"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M6 18L18 6M6 6l12 12"
+                  />
                 </svg>
               </button>
             </p>
@@ -133,7 +156,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({ open, onClose, orderDe
           <hr className="border-t-2 border-gray-300 my-3 sm:my-4" />
 
           {/* Items Table */}
-          <div className="w-full overflow-x-auto">
+          <div className="w-full h-[500px] overflow-x-auto">
             <div className="overflow-auto max-h-[250px] sm:max-h-[300px] md:max-h-[400px] p-1 sm:p-2 rounded-sm">
               <table className="min-w-full rounded-sm">
                 <thead className="bg-gray-200">

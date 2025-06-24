@@ -112,7 +112,7 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole }) => {
 
       {/* Right side icons */}
       <div className="flex items-center space-x-4">
-        <div className="hidden lg:block lg:ml-4 font-bold">B & C DIVISION</div>
+        {/* <div className="hidden lg:block lg:ml-4 font-bold">B & C DIVISION</div> */}
         {/* Notification bell */}
         <div className="relative" ref={alertDropdownRef}>
           <div
