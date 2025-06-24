@@ -160,7 +160,7 @@ const CreateOrderPage: React.FC = () => {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
-        //console.log(data);
+        console.log(data);
         setLocations(data.locations);
         setCustomers(data.customers);
         // setPaymentTypes(data.paymentTypes);
@@ -296,7 +296,7 @@ const CreateOrderPage: React.FC = () => {
     const selected = customers.find((c) => c.customerCode === customerCode);
     if (selected) {
       setSelectedCustomer(selected);
- //     console.log(selected)
+      //     console.log(selected)
       setSelectedCustomerDueAmount(selected.dueAmount);
 
       const creditLimit = Number(selected.creditLimit) || 0;
@@ -315,13 +315,22 @@ const CreateOrderPage: React.FC = () => {
     if (selected) {
       setSelectedItemUnitPrice(selected.unitprice);
       setSelectedItemName(selected.itemName);
-      setSubstitutedItemsList(
-        Array.isArray(selected.substituteItems) ? selected.substituteItems : []
-      );
+      console.log(selected.substituteItems);
+
+      // Fix: Handle both single object and array cases
+      if (selected.substituteItems) {
+        if (Array.isArray(selected.substituteItems)) {
+          setSubstitutedItemsList(selected.substituteItems);
+        } else {
+          // Convert single object to array
+          setSubstitutedItemsList([selected.substituteItems]);
+        }
+      } else {
+        setSubstitutedItemsList([]);
+      }
     } else {
       setSubstitutedItemsList([]);
     }
- //   console.log(value);
   };
 
   const handleSave = async () => {
@@ -340,12 +349,12 @@ const CreateOrderPage: React.FC = () => {
         },
       });
 
-   //   console.log(response);
+      //   console.log(response);
       const data = await response.json();
 
       if (response.status === 200) {
         // Success case
-    //    console.log("Order successful:", data);
+        //    console.log("Order successful:", data);
         handleShowAlert("success", "Order created successfully");
 
         // Reset form after successful save
@@ -624,14 +633,13 @@ const CreateOrderPage: React.FC = () => {
                     // value={currentItem.itemName}
                     // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
-                      {substitutedItemsList &&
-                        substitutedItemsList.length === 0 ? (
+                      {substitutedItemsList?.length === 0 ? (
                         <option value="" disabled>
                           No substitute items available
                         </option>
                       ) : (
-                        substitutedItemsList.map((item, index) => (
-                          <option key={index} value={item.itemName}>
+                        substitutedItemsList?.map((item, index) => (
+                          <option key={index} value={item.itemName} >
                             {item.itemName}
                           </option>
                         ))
