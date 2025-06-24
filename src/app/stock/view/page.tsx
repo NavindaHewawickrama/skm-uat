@@ -362,7 +362,7 @@ const StockView = () => {
                   {displayedItems.map((item, index) => (
                     <tr
                       key={`${item.itemCode}-${item.location}-${index}`}
-                      className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : "bg-[#ffffff]"
+                      className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ?  "bg-[#62b1ff]" : item.location === "COLOMB-SKM" ? "bg-[#fa8484]":item.location === "COLOMB-SNS" ? "bg-[#9cffff]" :item.location === "WELI-SKM" ? "bg-[#f2fa84]": item.location === "WELI-SNS" ? "bg-[#84fa84]":"bg-[#ffffff]"
                         }`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

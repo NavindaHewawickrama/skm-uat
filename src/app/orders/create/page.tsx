@@ -543,6 +543,7 @@ const CreateOrderPage: React.FC = () => {
                   </label>
                   <div className="relative">
                     <select
+                      disabled
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
                       value={paymentType}
                     // onChange={(e) => setPaymentType(e.target.value)}
@@ -571,6 +572,13 @@ const CreateOrderPage: React.FC = () => {
                       </svg>
                     </div>
                   </div>
+                  <label className="block text-gray-400 font-medium mt-2">
+                    Credit Allowed: {selectedCustomer?.creditAllowed ? "Yes" : "No"}
+                  </label>
+
+                  <label className="block text-gray-400 font-medium mt-2">
+                    Credit Limit: {selectedCustomer?.creditLimit}
+                  </label>
                 </div>
 
                 <div>
