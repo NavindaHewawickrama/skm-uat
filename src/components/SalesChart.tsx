@@ -4,12 +4,18 @@ import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const SalesChart = ({ deliveredCount = 18898 }) => {
+interface PieChartData {
+  deliveredCount: number;
+  rejectedCount: number;
+  pendingCount: number;
+}
+
+const SalesChart = ({ pieChartData }: { pieChartData: PieChartData }) => {
   const data = {
-    labels: ["Delivered", "Pending", "Cancelled"],
+    labels: ["Delivered", "Rejected", "Pending"],
     datasets: [
       {
-        data: [deliveredCount, 5002, 1200], // Example data
+        data: [pieChartData.deliveredCount, pieChartData.rejectedCount, pieChartData.pendingCount], // Example data
         backgroundColor: ["#8F87F1", "#E9A5F1", "#261FB3"],
         borderWidth: 1,
       },

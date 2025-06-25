@@ -11,16 +11,50 @@ interface Notices {
   url: string;
 }
 
+interface pieChartData {
+  deliveredCount: number;
+  rejectedCount: number;
+  pendingCount: number;
+}
+
 const Dashboard = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [notices, setNotices] = useState<Notices[]>([]);
   const [user, setUser] = useState("");
+  const [dataPieChart, setDataPieChart] = useState<pieChartData>({
+    deliveredCount: 0,
+    rejectedCount: 0,
+    pendingCount: 0,
+  });
 
 
   useEffect(() => {
     fetchUserDetails();
     fetchNotices();
+    fetchPieChartDetails();
   }, [])
+
+  const fetchPieChartDetails = async () => {
+    try {
+      const response = await fetch('/api/dashboard/pieChart', {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw Error("Failed to fetch data");
+      } else {
+        const data = await response.json();
+        //console.log("Pie Chart Data:", data);
+        dataPieChart.deliveredCount = data.deliveredCount || 0;
+        dataPieChart.rejectedCount = data.rejectedCount || 0; 
+        dataPieChart.pendingCount = data.pendingCount || 0;
+        setDataPieChart(dataPieChart);
+      }
+    } catch (err) {
+      console.error("Error fetching pie chart data:", err);
+    }
+  }
 
   const fetchUserDetails = async () => {
     try {
@@ -151,7 +185,7 @@ const Dashboard = () => {
             {/* Sales Order Card */}
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 w-full md:w-1/2 sm:w-full">
               <h2 className="text-xl font-semibold mb-2">Total Sales Order &apos; s</h2>
-              <SalesChart deliveredCount={18898} />
+              <SalesChart pieChartData={dataPieChart} />
             </div>
 
             {/* Enhanced Notices card */}
