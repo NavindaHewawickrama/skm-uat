@@ -203,32 +203,31 @@ const CreateOrderPage: React.FC = () => {
         const invoicesData = await response.json();
 
         // Transform the API response to match your CustomerOutstandingData interface
-        const transformedData: CustomerOutstandingData[] = invoicesData.map(
-            (invoice: any) => ({
-                customerName:
-                    invoice.customerName || selectedCustomer?.customerName || "",
-                invoiceNumber: invoice.invoiceNumber || invoice.invoiceNo || "",
-                invoiceDate: invoice.invoiceDate
-                    ? new Date(invoice.invoiceDate).toLocaleDateString()
-                    : "",
-                invoicedAmount: parseFloat(
-                    invoice.remainingAmount || invoice.remainingAmount || 0
-                ),
-                pdcAmount: parseFloat(invoice.pdcAmount || 0),
-                dueAmount: parseFloat(
-                    invoice.dueAmount || invoice.balanceAmount || 0
-                ),
-            })
-        );
+        // const transformedData: CustomerOutstandingData[] = invoicesData.map(
+        //     (invoice: any) => ({
+        //         customerName:
+        //             invoice.customerName || selectedCustomer?.customerName || "",
+        //         invoiceNumber: invoice.invoiceNumber || invoice.invoiceNo || "",
+        //         invoiceDate: invoice.invoiceDate
+        //             ? new Date(invoice.invoiceDate).toLocaleDateString()
+        //             : "",
+        //         invoicedAmount: parseFloat(
+        //             invoice.remainingAmount || invoice.remainingAmount || 0
+        //         ),
+        //         pdcAmount: parseFloat(invoice.pdcAmount || 0),
+        //         dueAmount: parseFloat(
+        //             invoice.dueAmount || invoice.balanceAmount || 0
+        //         ),
+        //     })
+        // );
 
-        setOutstandingData(transformedData);
+        // setOutstandingData(transformedData);
 
-        // Update customer's due amount with the sum of all due amounts
-        const totalDueAmount = transformedData.reduce(
-            (sum, item) => sum + item.dueAmount,
-            0
-        );
-        setSelectedCustomerDueAmount(totalDueAmount);
+        // const totalDueAmount = transformedData.reduce(
+        //     (sum, item) => sum + item.dueAmount,
+        //     0
+        // );
+        // setSelectedCustomerDueAmount(totalDueAmount);
     } catch (error) {
         console.error("Error fetching customer invoices:", error);
         handleShowAlert("error", "Failed to fetch customer invoice data");
