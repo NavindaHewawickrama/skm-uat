@@ -41,6 +41,7 @@ interface Customer {
   creditLimit: number;
   balanceCredit: number;
   paymentTermCode: string;
+  outstandingData?: CustomerOutstandingData[]; // optional field for outstanding data
   // add more fields if necessary
 }
 
@@ -102,41 +103,42 @@ const CreateOrderPage: React.FC = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
+  const [outstandingData, setOutstandingData] = useState<CustomerOutstandingData[]>([]);
 
-  const outstandingData: CustomerOutstandingData[] = [
-    {
-      customerName: "ABC Corporation",
-      invoiceNumber: "INV-001",
-      invoiceDate: "2025-04-15",
-      invoicedAmount: 5000,
-      pdcAmount: 3200,
-      dueAmount: 5000,
-    },
-    {
-      customerName: "ABC Corporation",
-      invoiceNumber: "INV-002",
-      invoiceDate: "2025-04-25",
-      invoicedAmount: 3500,
-      pdcAmount: 1800,
-      dueAmount: 3500,
-    },
-    {
-      customerName: "XYZ Industries",
-      invoiceNumber: "INV-003",
-      invoiceDate: "2025-05-01",
-      invoicedAmount: 7500,
-      pdcAmount: 5200,
-      dueAmount: 7500,
-    },
-    {
-      customerName: "Smith Enterprises",
-      invoiceNumber: "INV-004",
-      invoiceDate: "2025-05-10",
-      invoicedAmount: 2200,
-      pdcAmount: 7100,
-      dueAmount: 2200,
-    },
-  ];
+  // const outstandingData: CustomerOutstandingData[] = [
+  //   {
+  //     customerName: "ABC Corporation",
+  //     invoiceNumber: "INV-001",
+  //     invoiceDate: "2025-04-15",
+  //     invoicedAmount: 5000,
+  //     pdcAmount: 3200,
+  //     dueAmount: 5000,
+  //   },
+  //   {
+  //     customerName: "ABC Corporation",
+  //     invoiceNumber: "INV-002",
+  //     invoiceDate: "2025-04-25",
+  //     invoicedAmount: 3500,
+  //     pdcAmount: 1800,
+  //     dueAmount: 3500,
+  //   },
+  //   {
+  //     customerName: "XYZ Industries",
+  //     invoiceNumber: "INV-003",
+  //     invoiceDate: "2025-05-01",
+  //     invoicedAmount: 7500,
+  //     pdcAmount: 5200,
+  //     dueAmount: 7500,
+  //   },
+  //   {
+  //     customerName: "Smith Enterprises",
+  //     invoiceNumber: "INV-004",
+  //     invoiceDate: "2025-05-10",
+  //     invoicedAmount: 2200,
+  //     pdcAmount: 7100,
+  //     dueAmount: 2200,
+  //   },
+  // ];
 
   useEffect(() => {
     fetchUserCustomerDetails();
@@ -240,6 +242,10 @@ const CreateOrderPage: React.FC = () => {
 
     pdf.setFontSize(18);
     pdf.text("Customer Outstanding Report", 105, 15, { align: "center" });
+    pdf.setFontSize(12);
+    pdf.text(selectedCustomer?.customerName || "", 105, 22, { align: "center" });
+    // pdf.setFontSize(12);
+    // pdf.text(selectedCustomer?.customerName || "", 105, 22, { align: "center" });
 
     const currentDate = new Date().toLocaleDateString("en-US");
     pdf.setFontSize(10);
@@ -281,9 +287,15 @@ const CreateOrderPage: React.FC = () => {
       0
     );
 
+    const totalPDC = 0; // Assuming PDC total is not provided in the data
+
     const finalY = pdf.lastAutoTable?.finalY || 60;
     pdf.setFontSize(12);
     pdf.text(`Total Outstanding: ${totalDue.toFixed(2)}`, 195, finalY + 10, {
+      align: "right",
+    });
+    pdf.setFontSize(12);
+    pdf.text(`PDC Total: ${totalPDC.toFixed(2)}`, 195, finalY + 20, {
       align: "right",
     });
 
@@ -303,6 +315,7 @@ const CreateOrderPage: React.FC = () => {
     const selected = customers.find((c) => c.customerCode === customerCode);
     if (selected) {
       setSelectedCustomer(selected);
+      setOutstandingData(selected.outstandingData || []);
       //     console.log(selected)
       setSelectedCustomerDueAmount(selected.dueAmount);
 
@@ -356,13 +369,12 @@ const CreateOrderPage: React.FC = () => {
         },
       });
 
-      //   console.log(response);
       const data = await response.json();
 
-      if (response.status === 200) {
-        // Success case
-        //    console.log("Order successful:", data);
-        handleShowAlert("success", "Order created successfully");
+      if (response.ok) {
+        // Success case - show backend success message or generic success
+        const successMessage = data.message || "Order created successfully";
+        handleShowAlert("success", successMessage);
 
         // Reset form after successful save
         setSelectedCustomer(null);
@@ -373,38 +385,37 @@ const CreateOrderPage: React.FC = () => {
         setOrderTotal(0);
         setTotal(0);
         setSelectedCustomerDueAmount(0);
-        // setSelectedCustomerTotal(0);
       } else {
-        // Error case - error message from the API response
-        // const errorMessage =
-        //   data.error  || "Order creation failed. Please try again.";
-        // handleShowAlert("error", errorMessage);
-        // console.error("Order creation failed:", data);
-        let errorMessage = "Order creation failed. Please try again.";
+        // Error case - check for 403 status first
+        if (response.status === 403) {
+          handleShowAlert("error", "Not authorized to create order");
+        } else {
+          // Show backend error message for other errors
+          let errorMessage = data.error || "Order creation failed";
 
-        if (data.error) {
-          errorMessage = data.error;
-          handleShowAlert("error", errorMessage);
-          // Try to parse details if it exists and show the inner message
+          // If there are additional details from backend, try to extract them
           if (data.details) {
             try {
               const parsedDetails = JSON.parse(data.details);
               if (parsedDetails.message) {
-                errorMessage = `${data.error}: ${parsedDetails.message}`;
+                errorMessage = parsedDetails.message;
+              } else if (typeof data.details === 'string') {
+                errorMessage = data.details;
               }
             } catch (e) {
-              // If parsing fails, just use the error field
-              console.warn("Could not parse error details:", e);
+              // If parsing fails, use details as string
+              console.error("Error parsing details:", e);
+              errorMessage = data.details;
             }
           }
-        }
 
-        handleShowAlert("error", errorMessage);
+          handleShowAlert("error", errorMessage);
+        }
         console.error("Order creation failed:", data);
       }
     } catch (error) {
       console.error("Network or unexpected error:", error);
-      handleShowAlert("error", "Unexpected error occurred");
+      handleShowAlert("error", "Network error occurred");
     }
   };
 
@@ -537,48 +548,41 @@ const CreateOrderPage: React.FC = () => {
 
               {/* Payment Type and Notes Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Payment Type:
-                  </label>
-                  <div className="relative">
-                    <select
-                      disabled
-                      className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                      value={paymentType}
-                    // onChange={(e) => setPaymentType(e.target.value)}
-                    >
-                      {/* <option value="">Select payment type</option>
-                      {paymentTypes.map((type, index) => (
-                        <option key={index} value={type.code}>
-                          {type.name}
-                        </option>
-                      ))} */}
-                      <option>Default payment type</option>
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-gray-700 font-medium mb-2">
+                      Payment Type:
+                    </label>
+                    <div className="relative">
+                      <select
+                        disabled
+                        className="block w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-600 appearance-none"
+                        value={paymentType}
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
+                        <option>Default payment type</option>
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        </svg>
+                      </div>
                     </div>
                   </div>
-                  <label className="block text-gray-400 font-medium mt-2">
-                    Credit Allowed: {selectedCustomer?.creditAllowed ? "Yes" : "No"}
-                  </label>
 
-                  <label className="block text-gray-400 font-medium mt-2">
-                    Credit Limit: {selectedCustomer?.creditLimit}
-                  </label>
+                  <div className="bg-gray-50 p-3 rounded border">
+                    <div className="space-y-2">
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 font-medium">Credit Allowed:</span>
+                        <span className={selectedCustomer?.creditAllowed ? "text-green-600" : "text-red-600"}>
+                          {selectedCustomer?.creditAllowed ? "Yes" : "No"}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-gray-600 font-medium">Credit Limit:</span>
+                        <span className="text-gray-700">{selectedCustomer?.creditLimit || "Not Set"}</span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <div>

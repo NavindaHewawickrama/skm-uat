@@ -21,11 +21,9 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
   const [trackingNumber, setTrackingNumber] = useState("");
   const [deliveryPerson, setDeliveryPerson] = useState("");
   const [deliveryDate, setDeliveryDate] = useState("");
-  const [specialNote, setSpecialNote] = useState("");
-
+  const [specialNote, setSpecialNote] = useState("")
   const [rejectReason, setRejectReason] = useState("");
   const [loading, setLoading] = useState(false);
-
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
@@ -68,24 +66,13 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
   if (!open) return null;
 
   const handleUpdate = async () => {
+    console.log("Updating order status...");
+    console.log("Selected Order:", selectedOrder);
     if (!selectedOrder) return;
 
     try {
       setLoading(true);
       setShowAlert(false); // Hide any existing alerts
-
-      // const deliveryDateParts = deliveryDate
-      //   ? new Date(deliveryDate)
-      //   : null;
-
-      // const formattedDeliveryDate = deliveryDateParts
-      //   ? {
-      //     year: deliveryDateParts.getFullYear(),
-      //     month: deliveryDateParts.getMonth() + 1, // Months are 0-based in JS
-      //     day: deliveryDateParts.getDate(),
-      //     dayOfWeek: deliveryDateParts.getDay(), // 0 = Sunday, 6 = Saturday
-      //   }
-      //   : null;
 
       const requestBody = {
         orderNumber: selectedOrder.orderNumber,
@@ -93,7 +80,6 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
         rejectReason: selectedStatus === "3" ? rejectReason : "",
         trackingNumber: trackingNumber,
         delivertPersonName: deliveryPerson,
-        // deliveryDate: formattedDeliveryDate,
         deliveryDate: deliveryDate,
         note: specialNote,
       };
@@ -103,9 +89,10 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
         return;
       }
 
-
-
-      //console.log(requestBody);
+      if (selectedStatus === "3" && rejectReason.trim() === "") {
+        handleShowAlert("error", "Reject reason is required for Rejected status.");
+        return;
+      }
 
       const response = await fetch("/api/orders/changeStatus", {
         method: "POST",
@@ -115,34 +102,53 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
         body: JSON.stringify(requestBody),
       });
 
-      if (!response.ok) {
-        if (response.status === 401) {
-          const result = await response.json();
-          handleShowAlert("error", result.error || "Unauthorized access.");
-        } else {
-          handleShowAlert("error", "Failed to update order status. Please try again.");
-        }
-        return; // Exit early to prevent continuing
-      }
-
       const result = await response.json();
-      console.log("Status updated successfully:", result);
 
-      // Show success message
-      handleShowAlert("success", "Order status updated successfully!");
+      if (response.ok) {
+        // Success case - show backend success message
+        const successMessage = result.message || "Order status updated successfully";
+        handleShowAlert("success", successMessage);
 
-      // Delay closing modal to show success message
-      setTimeout(() => {
-        onClose();
-        window.location.reload();
-      }, 1500);
+        // Delay closing modal to show success message
+        setTimeout(() => {
+          onClose();
+          window.location.reload();
+        }, 1500);
+
+      } else {
+        // Error case - check for 403 status first
+        if (response.status === 403) {
+          handleShowAlert("error", "No permission to change status");
+        } else if (response.status === 400) {
+          handleShowAlert("error", "Failed to update order status");
+        } else {
+          // Show backend error message for other errors
+          let errorMessage = result.error || "Failed to update order status";
+
+          // If there are additional details from backend, try to extract them
+          if (result.details) {
+            try {
+              const parsedDetails = JSON.parse(result.details);
+              if (parsedDetails.message) {
+                errorMessage = parsedDetails.message;
+              } else if (typeof result.details === 'string') {
+                errorMessage = result.details;
+              }
+            } catch (e) {
+              // If parsing fails, use details as string
+              console.error("Error parsing details:", e);
+              errorMessage = result.details;
+            }
+          }
+
+          handleShowAlert("error", errorMessage);
+        }
+        console.error("Status update failed:", result);
+      }
 
     } catch (error) {
       console.error("Error updating status:", error);
-      handleShowAlert(
-        "error",
-        "Failed to update order status. Please try again."
-      );
+      handleShowAlert("error", "Network error occurred");
     } finally {
       setLoading(false);
     }
@@ -311,9 +317,9 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
           <div className="flex justify-end mt-4 sm:mt-6">
             <button
               onClick={handleUpdate}
-              disabled={
-                loading || (selectedStatus === "3" && !rejectReason.trim())
-              }
+              // disabled={
+              //   loading || (selectedStatus === "3" && !rejectReason.trim())
+              // }
               className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded text-sm sm:text-base cursor-pointer ${loading || (selectedStatus === "4" && !rejectReason.trim())
                 ? "bg-gray-400 text-gray-200 cursor-not-allowed"
                 : "bg-green-600 text-white hover:bg-green-700"

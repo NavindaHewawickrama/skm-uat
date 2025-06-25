@@ -961,28 +961,32 @@ const CreateUserPage: React.FC = () => {
                 <table className="min-w-full bg-white border border-gray-200">
                   <thead className="bg-gray-100">
                     <tr>
-                      <th className="py-2 px-4 border-b text-left">Username</th>
-                      <th className="py-2 px-4 border-b text-left">First Name</th>
-                      <th className="py-2 px-4 border-b text-left">Last Name</th>
-                      <th className="py-2 px-4 border-b text-left">Sales Person Code</th> {/* Map the salespersons name to here*/}
-                      {/* <th className="py-2 px-4 border-b text-left">Email</th> */}
-                      {/* <th className="py-2 px-4 border-b text-left">Telephone</th> */}
-                      <th className="py-2 px-4 border-b text-left">Role</th> {/* Map the user role Id to the user role name */}
-                      {/* <th className="py-2 px-4 border-b text-left">Locations</th> */}
-                      <th className="py-2 px-4 border-b text-left">Status</th>
+                      <th className="py-2 px-4 border-b text-center">Username</th>
+                      <th className="py-2 px-4 border-b text-center">First Name</th>
+                      <th className="py-2 px-4 border-b text-center">Last Name</th>
+                      <th className="py-2 px-4 border-b text-center">Sales Person Code</th> {/* Map the salespersons name to here*/}
+                      {/* <th className="py-2 px-4 border-b text-center">Email</th> */}
+                      {/* <th className="py-2 px-4 border-b text-center">Telephone</th> */}
+                      <th className="py-2 px-4 border-b text-center">Role</th> {/* Map the user role Id to the user role name */}
+                      {/* <th className="py-2 px-4 border-b text-center">Locations</th> */}
+                      <th className="py-2 px-4 border-b text-center">Status</th>
                       <th className="py-2 px-4 border-b text-center">Actions</th>
                     </tr>
                   </thead>
                   <tbody>
                     {usersList.map((user, index) => (
                       <tr key={index}>
-                        <td className="py-2 px-4 border-b">{user.username}</td>
-                        <td className="py-2 px-4 border-b">{user.firstName}</td>
-                        <td className="py-2 px-4 border-b">{user.lastName}</td>
-                        <td className="py-2 px-4 border-b">{user.salesPersonCode}</td>
-                        {/* <td className="py-2 px-4 border-b">{user.email}</td>
-                          <td className="py-2 px-4 border-b">{user.telephone}</td> */}
-                        <td className="py-2 px-4 border-b">{user.userRoleId}</td>
+                        <td className="py-2 px-4 border-b text-center">{user.username}</td>
+                        <td className="py-2 px-4 border-b text-center">{user.firstName}</td>
+                        <td className="py-2 px-4 border-b text-center">{user.lastName}</td>
+                        <td className="py-2 px-4 border-b text-center">{user.salesPersonCode}</td>
+                        {/* <td className="py-2 px-4 border-b text-center">{user.email}</td>
+                          <td className="py-2 px-4 border-b text-center">{user.telephone}</td> */}
+                        <td className="py-2 px-4 border-b text-center">
+                          {
+                            userCreationDetails.roles.find((item) => item.roleId === parseInt(user.userRoleId))?.roleName || ""
+                          }
+                        </td>
                         {/* <td className="py-2 px-4 border-b">
                           {user.location.map(loc => {
                             const location = userCreationDetails.locations.find(l => l.locationCode === loc);

@@ -18,11 +18,11 @@ export async function POST(request: Request) {
 
         // Map the properties to match the API's expected format
         const apiBody = {
-            ordernumber: orderNumber,           
+            ordernumber: orderNumber,
             status: status,
             rejectReason: rejectReason,
             trackingNumber: trackingNumber,
-            delivertPersonName: deliveryPersonName,  
+            delivertPersonName: deliveryPersonName,
             deliveryDate: deliveryDate,
             note: note
         };
@@ -52,10 +52,7 @@ export async function POST(request: Request) {
         const data = await response.json();
         console.log('API success response:', data);
 
-        return NextResponse.json({
-            message: 'Order status changed successfully',
-            data: data
-        }, { status: 200 });
+        return NextResponse.json(data, { status: response.status });
 
     } catch (error) {
         console.error('Changing order status error:', error);

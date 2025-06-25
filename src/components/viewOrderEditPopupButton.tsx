@@ -7,6 +7,7 @@ import autoTable from "jspdf-autotable";
 interface OrderItem {
   description: string;
   unitPrice: string | number;
+  itemCode: string;
   quantity: string | number;
   discountPercent: string | number;
 }
@@ -31,7 +32,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
 
     pdf.setFontSize(18);
     pdf.text("Order Items Details Report", 105, 15, { align: "center" });
-
+    //pdf.text({}, 105, 15, { align: "center" });
     const currentDate = new Date().toLocaleDateString("en-US");
     pdf.setFontSize(10);
     pdf.text(currentDate, 195, 15, { align: "right" });
@@ -165,6 +166,9 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
                       Item Name
                     </th>
                     <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
+                      Item Code
+                    </th>
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
                       Unit Price
                     </th>
                     <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
@@ -173,9 +177,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
                     <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
                       Discount
                     </th>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
-                      Total
-                    </th>
+
                   </tr>
                 </thead>
                 <tbody className="text-center">
@@ -183,6 +185,9 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
                     <tr key={index} className="border-b border-gray-100">
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
                         {item.description}
+                      </td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
+                        {item.itemCode}
                       </td>
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
                         {item.unitPrice}
@@ -193,9 +198,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
                         {item.discountPercent}
                       </td>
-                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
-                        {/* {item.description} */}
-                      </td>
+
                     </tr>
                   ))}
                 </tbody>

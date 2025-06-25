@@ -58,7 +58,7 @@ const RejectedOrdersPage: React.FC = () => {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
-        // console.log(data);
+       //  console.log(data);
         setRejectedOrders(data);
       }
     } catch (err) {
