@@ -61,19 +61,19 @@ const SideNav: React.FC<SideNavProps> = ({ isOpen }) => {
         },
       ],
     },
-    {
-      icon: "reports",
-      label: "Reports",
-      href: "/reports",
-      expanded: false,
-      subItems: [
-        {
-          label: "Outstandings",
-          href: "/reports/viewOutstandings",
-          active: false,
-        },
-      ],
-    },
+    // {
+    //   icon: "reports",
+    //   label: "Reports",
+    //   href: "/reports",
+    //   expanded: false,
+    //   subItems: [
+    //     {
+    //       label: "Outstandings",
+    //       href: "/reports/viewOutstandings",
+    //       active: false,
+    //     },
+    //   ],
+    // },
     {
       icon: "users",
       label: "Users",

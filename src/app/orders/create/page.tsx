@@ -7,6 +7,23 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import Alert from "../../../components/Alert";
 
+type OrderType = {
+  orderNumber: number;
+  customerName: string;
+  salesPersonName: string;
+  orderDate: string;
+  paymentMethodType: string;
+  totalAmount: number;
+  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  specialNote: string;
+  rejectReason: string | null;
+  status: string;
+  delivertPersonName: string | null;
+  deliveryDate: string | null;
+  invoicedItems: string | null;
+  trackingNumber: string | null;
+};
+
 declare module "jspdf" {
   interface jsPDF {
     lastAutoTable?: {
@@ -73,6 +90,23 @@ interface Customer {
 //   name: string,
 // }
 
+interface InvoiceResponse {
+  customerNo: string;
+  totalDueAmount: number;
+  totalPdcAmount: number;
+  invoices: Invoice[];
+}
+
+interface Invoice {
+  invoiceNo: string;
+  orderNo: string;
+  invoiceDate: string;
+  pdcAmount: number;
+  dueAmount: number;
+  totalAmount: number;
+}
+
+
 const CreateOrderPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [location, setLocation] = useState("");
@@ -109,6 +143,13 @@ const CreateOrderPage: React.FC = () => {
     CustomerOutstandingData[]
   >([]);
   const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
+  const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
+
+  useEffect(() => {
+    const pendingOrderList = sessionStorage.getItem("notificationsData");
+    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+  }, []);
+
 
   // Add this in your component
   useEffect(() => {
@@ -116,41 +157,6 @@ const CreateOrderPage: React.FC = () => {
       generatePDF();
     }
   }, [outstandingData]);
-
-  // const outstandingData: CustomerOutstandingData[] = [
-  //   {
-  //     customerName: "ABC Corporation",
-  //     invoiceNumber: "INV-001",
-  //     invoiceDate: "2025-04-15",
-  //     invoicedAmount: 5000,
-  //     pdcAmount: 3200,
-  //     dueAmount: 5000,
-  //   },
-  //   {
-  //     customerName: "ABC Corporation",
-  //     invoiceNumber: "INV-002",
-  //     invoiceDate: "2025-04-25",
-  //     invoicedAmount: 3500,
-  //     pdcAmount: 1800,
-  //     dueAmount: 3500,
-  //   },
-  //   {
-  //     customerName: "XYZ Industries",
-  //     invoiceNumber: "INV-003",
-  //     invoiceDate: "2025-05-01",
-  //     invoicedAmount: 7500,
-  //     pdcAmount: 5200,
-  //     dueAmount: 7500,
-  //   },
-  //   {
-  //     customerName: "Smith Enterprises",
-  //     invoiceNumber: "INV-004",
-  //     invoiceDate: "2025-05-10",
-  //     invoicedAmount: 2200,
-  //     pdcAmount: 7100,
-  //     dueAmount: 2200,
-  //   },
-  // ];
 
   useEffect(() => {
     fetchUserCustomerDetails();
@@ -194,50 +200,50 @@ const CreateOrderPage: React.FC = () => {
     }
   };
 
-  const fetchCustomerInvoices = async (customerCode: string) => {
-    setIsLoadingInvoices(true);
-    try {
-      const response = await fetch(`/api/customerInvoice?customerId=${customerCode}`, {
-        method: 'GET',
-        credentials: 'include',
-      });
+  // const fetchCustomerInvoices = async (customerCode: string) => {
+  //   setIsLoadingInvoices(true);
+  //   try {
+  //     const response = await fetch(`/api/customerInvoice?customerId=${customerCode}`, {
+  //       method: 'GET',
+  //       credentials: 'include',
+  //     });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch customer invoices');
-      }
+  //     if (!response.ok) {
+  //       throw new Error('Failed to fetch customer invoices');
+  //     }
 
-      const transformedInvoices = await response.json();
+  //     const transformedInvoices = await response.json();
 
-      // Transform the array to match your CustomerOutstandingData interface
-      const transformedData: CustomerOutstandingData[] = transformedInvoices.map(
-        (invoice: any) => ({
-          customerName: selectedCustomer?.customerName || "",
-          invoiceNumber: invoice.invoiceNumber || "",
-          invoiceDate: invoice.invoiceDate
-            ? new Date(invoice.invoiceDate).toLocaleDateString()
-            : "",
-          invoicedAmount: parseFloat(invoice.remainingAmount || 0),
-          pdcAmount: parseFloat(invoice.pdcAmount || 0),
-          dueAmount: parseFloat(invoice.dueAmount || 0),
-        })
-      );
+  //     // Transform the array to match your CustomerOutstandingData interface
+  //     const transformedData: CustomerOutstandingData[] = transformedInvoices.map(
+  //       (invoice: any) => ({
+  //         customerName: selectedCustomer?.customerName || "",
+  //         invoiceNumber: invoice.invoiceNumber || "",
+  //         invoiceDate: invoice.invoiceDate
+  //           ? new Date(invoice.invoiceDate).toLocaleDateString()
+  //           : "",
+  //         invoicedAmount: parseFloat(invoice.remainingAmount || 0),
+  //         pdcAmount: parseFloat(invoice.pdcAmount || 0),
+  //         dueAmount: parseFloat(invoice.dueAmount || 0),
+  //       })
+  //     );
 
-      setOutstandingData(transformedData);
+  //     setOutstandingData(transformedData);
 
-      const totalDueAmount = transformedData.reduce(
-        (sum, item) => sum + item.dueAmount,
-        0
-      );
-      setSelectedCustomerDueAmount(totalDueAmount);
+  //     const totalDueAmount = transformedData.reduce(
+  //       (sum, item) => sum + item.dueAmount,
+  //       0
+  //     );
+  //     setSelectedCustomerDueAmount(totalDueAmount);
 
-    } catch (error) {
-      console.error("Error fetching customer invoices:", error);
-      handleShowAlert("error", "Failed to fetch customer invoice data");
-      setOutstandingData([]);
-    } finally {
-      setIsLoadingInvoices(false);
-    }
-  };
+  //   } catch (error) {
+  //     console.error("Error fetching customer invoices:", error);
+  //     handleShowAlert("error", "Failed to fetch customer invoice data");
+  //     setOutstandingData([]);
+  //   } finally {
+  //     setIsLoadingInvoices(false);
+  //   }
+  // };
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -354,10 +360,10 @@ const CreateOrderPage: React.FC = () => {
       (sum, item) => sum + item.pdcAmount,
       0
     );
-    const totalInvoiced = outstandingData.reduce(
-      (sum, item) => sum + item.invoicedAmount,
-      0
-    );
+    // const totalInvoiced = outstandingData.reduce(
+    //   (sum, item) => sum + item.invoicedAmount,
+    //   0
+    // );
 
     const finalY = pdf.lastAutoTable?.finalY || 60;
     pdf.setFontSize(12);
@@ -381,45 +387,34 @@ const CreateOrderPage: React.FC = () => {
     }
 
     setIsLoadingInvoices(true);
+    console.log("loading invoices", isLoadingInvoices);
     try {
       const response = await fetch(`/api/customerInvoice?customerCode=${selectedCustomer.customerCode}`, {
         method: 'GET',
         credentials: 'include',
       });
 
-      console.log('Response status:', response.status);
-
       if (!response.ok) {
         throw new Error('Failed to fetch customer invoices');
       }
 
-      const data = await response.json();
-      console.log('Response data:', data);
+      const data: InvoiceResponse = await response.json();
 
-      // Transform the array to match your CustomerOutstandingData interface
-      const transformedData: CustomerOutstandingData[] = data.map(
-        (invoice: any) => ({
-          customerName: selectedCustomer?.customerName || "",
-          invoiceNumber: invoice.invoiceNumber || "",
-          invoiceDate: invoice.invoiceDate
-            ? new Date(invoice.invoiceDate).toLocaleDateString()
-            : "",
-          invoicedAmount: parseFloat(invoice.remainingAmount || 0),
-          pdcAmount: parseFloat(invoice.pdcAmount || 0),
-          dueAmount: parseFloat(invoice.dueAmount || 0),
-        })
-      );
+      const transformedData: CustomerOutstandingData[] = data.invoices.map((invoice) => ({
+        customerName: selectedCustomer.customerName,
+        invoiceNumber: invoice.invoiceNo,
+        invoiceDate: invoice.invoiceDate
+          ? new Date(invoice.invoiceDate).toLocaleDateString("en-US")
+          : "",
+        invoicedAmount: parseFloat(invoice.totalAmount?.toString() || "0"),
+        pdcAmount: parseFloat(invoice.pdcAmount?.toString() || "0"),
+        dueAmount: parseFloat(invoice.dueAmount?.toString() || "0"),
+      }));
 
       setOutstandingData(transformedData);
+      setSelectedCustomerDueAmount(data.totalDueAmount);
 
-      const totalDueAmount = transformedData.reduce(
-        (sum, item) => sum + item.dueAmount,
-        0
-      );
-      setSelectedCustomerDueAmount(totalDueAmount);
-
-      handleShowAlert("success", `Loaded ${transformedData.length} invoice records`);
-
+      handleShowAlert("success", `Loaded ${transformedData.length} invoice record(s)`);
     } catch (error) {
       console.error('Error:', error);
       handleShowAlert("error", "Failed to fetch customer invoice data");
@@ -428,6 +423,7 @@ const CreateOrderPage: React.FC = () => {
       setIsLoadingInvoices(false);
     }
   };
+
 
   const handleCustomerChange = (customerCode: string) => {
     //console.log(customerCode);
@@ -543,7 +539,7 @@ const CreateOrderPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">

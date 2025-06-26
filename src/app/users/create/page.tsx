@@ -62,6 +62,26 @@ interface FormErrors {
   notice?: string;
 }
 
+type OrderType = {
+  orderNumber: number;
+  customerName: string;
+  salesPersonName: string;
+  orderDate: string;
+  paymentMethodType: string;
+  totalAmount: number;
+  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  specialNote: string;
+  rejectReason: string | null;
+  status: string;
+  delivertPersonName: string | null;
+  deliveryDate: string | null;
+  invoicedItems: string | null;
+  trackingNumber: string | null;
+  rejectedReason: string;
+  description?: string;
+};
+
 const CreateUserPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   // const [userData, setUserData] = useState<UserData>({
@@ -105,10 +125,13 @@ const CreateUserPage: React.FC = () => {
 
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
 
+  const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
+
   useEffect(() => {
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+    const pendingOrderList = sessionStorage.getItem("notificationsData");
+    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
-
   const handleShowAlert = (type: React.SetStateAction<string>, message: React.SetStateAction<string>) => {
     setAlertType(type);
     setAlertMessage(message);
@@ -531,7 +554,7 @@ const CreateUserPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-auto">

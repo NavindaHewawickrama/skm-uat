@@ -6,17 +6,20 @@ import Footer from "@/components/Footer";
 import CustomerSelectionPopup from "@/components/CustomerSelectionPopup";
 
 type OrderType = {
-  orderNumber: string;
+  orderNumber: number;
   customerName: string;
   salesPersonName: string;
   orderDate: string;
   paymentMethodType: string;
   totalAmount: number;
-  items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
   specialNote: string;
-  rejectedReason: string;
+  rejectReason: string | null;
   status: string;
-  description?: string;
+  delivertPersonName: string | null;
+  deliveryDate: string | null;
+  invoicedItems: string | null;
+  trackingNumber: string | null;
 };
 
 const OutstandingsPage: React.FC = () => {
@@ -255,7 +258,7 @@ const OutstandingsPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">

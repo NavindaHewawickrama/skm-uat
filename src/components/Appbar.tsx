@@ -19,7 +19,7 @@ type OrderType = {
   status: string;
   delivertPersonName: string | null;
   deliveryDate: string | null;
-  invoicedItems: any | null;
+  invoicedItems: string | null;
   trackingNumber: string | null;
 };
 

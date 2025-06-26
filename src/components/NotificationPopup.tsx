@@ -24,7 +24,7 @@ type NotificationDataType = {
     status: string;
     delivertPersonName: string | null;
     deliveryDate: string | null;
-    invoicedItems: any | null;
+    invoicedItems: string | null;
     trackingNumber: string | null;
 };
 
@@ -91,7 +91,7 @@ const NotificationPopup: React.FC<ModalProps> = ({
                     <p className="text-gray-500 text-center">No notifications available.</p>
                 ) : (
                     <div className="space-y-6 max-h-[70vh] overflow-y-auto pr-2">
-                        {notificationData.map((order, i) => (
+                        {notificationData.map((order) => (
                             <div
                                 key={order.orderNumber}
                                 className="border border-gray-200 rounded-lg p-5 hover:shadow-md transition-shadow"

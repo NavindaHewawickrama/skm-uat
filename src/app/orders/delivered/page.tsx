@@ -8,21 +8,37 @@ import ViewOrderDeliveryStatus from "@/components/ViewOrderDeliveryStatus";
 // import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 // import DeliveryDetailsPopup from "@/components/DeliveryDetailsPopup";
 
+// type OrderType = {
+//   orderNumber: string;
+//   customerName: string;
+//   salesPersonName: string;
+//   orderDate: string;
+//   paymentMethodType: string;
+//   totalAmount: number;
+//   specialNote: string;
+//   rejectedReason: string;
+//   status: string;
+//   description?: string
+//   trackingNumber: string,
+//   delivertPersonName: string,
+//   deliveryDate: string,
+// };
 type OrderType = {
-  orderNumber: string;
+  orderNumber: number;
   customerName: string;
   salesPersonName: string;
   orderDate: string;
   paymentMethodType: string;
   totalAmount: number;
+  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
   items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
   specialNote: string;
-  rejectedReason: string;
+  rejectReason: string | null;
   status: string;
-  description?: string
-  trackingNumber: string,
-  delivertPersonName: string,
-  deliveryDate: string,
+  delivertPersonName: string | null;
+  deliveryDate: string | null;
+  invoicedItems: string | null;
+  trackingNumber: string | null;
 };
 
 type ItemsType = { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }
@@ -43,11 +59,14 @@ const DeliveredOrdersPage: React.FC = () => {
   const [orderDeliveryPersonName, setOrderDeliverPersonName] = useState("");
   const [orderDeliveryDate, setOrderDeliveryDate] = useState("");
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
+  const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
 
   useEffect(() => {
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+    const pendingOrderList = sessionStorage.getItem("notificationsData");
+    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
-  
+
   // Sample delivered orders data based on the screenshot
   // const deliveredOrders = [
   //   {
@@ -194,7 +213,7 @@ const DeliveredOrdersPage: React.FC = () => {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
-       // console.log(data);
+        // console.log(data);
         setDeliveredOrders(data);
       }
     } catch (err) {
@@ -283,7 +302,7 @@ const DeliveredOrdersPage: React.FC = () => {
   };
 
   const handleItemDetailsView = (order: OrderType) => {
-  //  console.log(order);
+    //  console.log(order);
 
     if (Array.isArray(order.items)) {
       setSelectedOrderItems(order.items);
@@ -297,7 +316,7 @@ const DeliveredOrdersPage: React.FC = () => {
     // setSelectedDeliveryOrder(order);
     // setDeliveryDetailsOpen(true);
 
-  //  console.log(order);
+    //  console.log(order);
     setOrderTrackingNumber(order.trackingNumber ? order.trackingNumber : "");
     setOrderDeliverPersonName(order.delivertPersonName ? order.delivertPersonName : "");
     setOrderDeliveryDate(order.deliveryDate ? order.deliveryDate : "");
@@ -312,7 +331,7 @@ const DeliveredOrdersPage: React.FC = () => {
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -332,7 +351,7 @@ const DeliveredOrdersPage: React.FC = () => {
   if (error) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -353,7 +372,7 @@ const DeliveredOrdersPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">

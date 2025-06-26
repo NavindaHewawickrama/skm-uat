@@ -1,6 +1,16 @@
 import { getValidAccessToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
+interface Invoice {
+  invoiceNo: string;
+  orderNo: string;
+  invoiceDate: string;
+  pdcAmount: number;
+  dueAmount: number;
+  totalAmount: number;
+}
+
+
 // get customer invoices
 export async function GET(request: Request) {
     try {
@@ -43,7 +53,7 @@ export async function GET(request: Request) {
         const data = await response.json();
         
         // Transform the invoices while preserving the original structure
-        const transformedInvoices = data.invoices?.map((invoice: any) => ({
+        const transformedInvoices = data.invoices?.map((invoice: Invoice) => ({
             invoiceNo: invoice.invoiceNo,
             orderNo: invoice.orderNo,
             invoiceDate: invoice.invoiceDate,

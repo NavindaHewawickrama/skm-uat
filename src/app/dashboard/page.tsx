@@ -18,17 +18,20 @@ interface pieChartData {
 }
 
 type OrderType = {
-  orderNumber: string;
+  orderNumber: number;
   customerName: string;
   salesPersonName: string;
   orderDate: string;
   paymentMethodType: string;
   totalAmount: number;
-  items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
   specialNote: string;
-  rejectedReason: string;
+  rejectReason: string | null;
   status: string;
-  description?: string;
+  delivertPersonName: string | null;
+  deliveryDate: string | null;
+  invoicedItems: string | null;
+  trackingNumber: string | null;
 };
 
 const Dashboard = () => {
@@ -211,7 +214,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen w-screen bg-gray-100 flex flex-col">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={user} notificationData={pendingOrders}/>
+      <AppBar toggleSideNav={toggleSideNav} userRole={user} notificationData={pendingOrders} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">

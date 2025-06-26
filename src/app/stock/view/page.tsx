@@ -53,6 +53,23 @@ interface ApiStockItem {
   image?: string;
 }
 
+type OrderType = {
+  orderNumber: number;
+  customerName: string;
+  salesPersonName: string;
+  orderDate: string;
+  paymentMethodType: string;
+  totalAmount: number;
+  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  specialNote: string;
+  rejectReason: string | null;
+  status: string;
+  delivertPersonName: string | null;
+  deliveryDate: string | null;
+  invoicedItems: string | null;
+  trackingNumber: string | null;
+};
+
 const StockView = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [entriesPerPage, setEntriesPerPage] = useState<string>("50");
@@ -64,8 +81,12 @@ const StockView = () => {
   const [error, setError] = useState<string | null>(null);
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
 
+  const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
+
   useEffect(() => {
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+    const pendingOrderList = sessionStorage.getItem("notificationsData");
+    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
 
   const defaultImage: Image = {
@@ -232,7 +253,7 @@ const StockView = () => {
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -252,7 +273,7 @@ const StockView = () => {
   if (error) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -272,7 +293,7 @@ const StockView = () => {
 
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
 
       <div className="flex flex-1 overflow-hidden">
         <SideNav isOpen={sideNavOpen} />
@@ -362,7 +383,7 @@ const StockView = () => {
                   {displayedItems.map((item, index) => (
                     <tr
                       key={`${item.itemCode}-${item.location}-${index}`}
-                      className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ?  "bg-[#62b1ff]" : item.location === "COLOMB-SKM" ? "bg-[#fa8484]":item.location === "COLOMB-SNS" ? "bg-[#9cffff]" :item.location === "WELI-SKM" ? "bg-[#f2fa84]": item.location === "WELI-SNS" ? "bg-[#84fa84]":"bg-[#ffffff]"
+                      className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMB-SKM" ? "bg-[#fa8484]" : item.location === "COLOMB-SNS" ? "bg-[#9cffff]" : item.location === "WELI-SKM" ? "bg-[#f2fa84]" : item.location === "WELI-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
                         }`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">

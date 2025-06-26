@@ -6,18 +6,26 @@ import Footer from "@/components/Footer";
 import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 
 type OrderType = {
-  orderNumber: string;
+  orderNumber: number;
   customerName: string;
   salesPersonName: string;
   orderDate: string;
   paymentMethodType: string;
   totalAmount: number;
+  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
   items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
   specialNote: string;
-  rejectReason: string;
+  rejectReason: string | null;
   status: string;
+  delivertPersonName: string | null;
+  deliveryDate: string | null;
+  invoicedItems: string | null;
+  trackingNumber: string | null;
+  rejectedReason: string;
   description?: string;
 };
+
+
 
 type ItemsType = { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }
 
@@ -35,8 +43,12 @@ const RejectedOrdersPage: React.FC = () => {
   const [rejectedOrders, setRejectedOrders] = useState<OrderType[]>([]);
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
 
+  const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
+
   useEffect(() => {
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+    const pendingOrderList = sessionStorage.getItem("notificationsData");
+    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
 
   // Fetch rejected order data from API
@@ -58,7 +70,7 @@ const RejectedOrdersPage: React.FC = () => {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
-       //  console.log(data);
+        //  console.log(data);
         setRejectedOrders(data);
       }
     } catch (err) {
@@ -153,7 +165,7 @@ const RejectedOrdersPage: React.FC = () => {
   };
 
   const handleItemDetailsView = (order: OrderType) => {
-  //  console.log(order);
+    //  console.log(order);
     if (Array.isArray(order.items)) {
       setSelectedOrder(order.items);
     } else {
@@ -171,7 +183,7 @@ const RejectedOrdersPage: React.FC = () => {
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -191,7 +203,7 @@ const RejectedOrdersPage: React.FC = () => {
   if (error) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -212,7 +224,7 @@ const RejectedOrdersPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
