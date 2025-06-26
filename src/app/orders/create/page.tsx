@@ -85,18 +85,6 @@ interface Customer {
   customerName: string;
 }
 
-// interface Payment {
-//   code: string,
-//   name: string,
-// }
-
-// interface InvoiceResponse {
-//   customerNo: string;
-//   totalDueAmount: number;
-//   totalPdcAmount: number;
-//   invoices: Invoice[];
-// }
-
 interface Invoice {
   invoiceNo: string;
   orderNo: string;

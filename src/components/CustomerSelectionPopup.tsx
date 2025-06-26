@@ -2,49 +2,58 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 
+
+interface Customer {
+  customerCode: string;
+  customerName: string;
+}
+
 interface CustomerSelectionPopupProps {
   open: boolean;
   onClose: () => void;
   onAdd: (selectedCustomers: string[]) => void;
+  customersList: Customer[];
 }
 
 const CustomerSelectionPopup: React.FC<CustomerSelectionPopupProps> = ({
   open,
   onClose,
-  onAdd
+  onAdd,
+  customersList, // Default to empty array if no customers are passed
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [entriesPerPage, setEntriesPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
+  //const [customers, setCustomers] = useState<Customer[]>(customersList? customersList || []);
 
   // Sample customer data - replace with your actual data
-  const customers = [
-    { id: "1", name: "INTERLANKA AUTO SPARES COMPANY" },
-    { id: "2", name: "MAHA AUTO PARTS" },
-    { id: "3", name: "ROYAL MOTORS SUPPLIES" },
-    { id: "4", name: "ROYAL MOTORS SUPPLIES (BRANCH)" },
-    { id: "5", name: "AUTO WORLD PARTS" },
-    { id: "6", name: "QUICK FIX AUTO PARTS" },
-    { id: "7", name: "PRECISION AUTO COMPONENTS" },
-    { id: "8", name: "HIGHWAY AUTOMOTIVE SUPPLIES" },
-    { id: "9", name: "PREMIUM CAR ACCESSORIES" },
-    { id: "10", name: "STAR AUTO PARTS & SERVICES" },
-    { id: "11", name: "GLOBAL AUTO SPARES" },
-    { id: "12", name: "METRO AUTO SOLUTIONS" },
-    { id: "13", name: "ELITE CAR PARTS LTD" },
-    { id: "14", name: "SPEED DRIVE AUTO SHOP" },
-    { id: "15", name: "TURBO AUTO ACCESSORIES" },
-    // Add more customers as needed
-  ];
+  // const customers = [
+  //   { id: "1", name: "INTERLANKA AUTO SPARES COMPANY" },
+  //   { id: "2", name: "MAHA AUTO PARTS" },
+  //   { id: "3", name: "ROYAL MOTORS SUPPLIES" },
+  //   { id: "4", name: "ROYAL MOTORS SUPPLIES (BRANCH)" },
+  //   { id: "5", name: "AUTO WORLD PARTS" },
+  //   { id: "6", name: "QUICK FIX AUTO PARTS" },
+  //   { id: "7", name: "PRECISION AUTO COMPONENTS" },
+  //   { id: "8", name: "HIGHWAY AUTOMOTIVE SUPPLIES" },
+  //   { id: "9", name: "PREMIUM CAR ACCESSORIES" },
+  //   { id: "10", name: "STAR AUTO PARTS & SERVICES" },
+  //   { id: "11", name: "GLOBAL AUTO SPARES" },
+  //   { id: "12", name: "METRO AUTO SOLUTIONS" },
+  //   { id: "13", name: "ELITE CAR PARTS LTD" },
+  //   { id: "14", name: "SPEED DRIVE AUTO SHOP" },
+  //   { id: "15", name: "TURBO AUTO ACCESSORIES" },
+  //   // Add more customers as needed
+  // ];
 
   // Filter customers based on search query
   const filteredCustomers = useMemo(() => {
-    return customers.filter(
-      (customer) => customer.name.toLowerCase().includes(searchQuery.toLowerCase())
+    return customersList.filter(
+      (customer) => customer.customerName.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [customers, searchQuery]);
+  }, [customersList, searchQuery]);
 
   // Calculate total pages
   const totalPages = useMemo(() => {
@@ -67,7 +76,7 @@ const CustomerSelectionPopup: React.FC<CustomerSelectionPopupProps> = ({
     if (selectAll) {
       setSelectedCustomers([]);
     } else {
-      setSelectedCustomers(filteredCustomers.map(customer => customer.id));
+      setSelectedCustomers(filteredCustomers.map(customer => customer.customerCode));
     }
     setSelectAll(!selectAll);
   };
@@ -160,17 +169,17 @@ const CustomerSelectionPopup: React.FC<CustomerSelectionPopupProps> = ({
       >
         <div className="flex justify-between items-center p-4">
           <h2 className="text-xl font-semibold">Outstanding Customers</h2>
-          
+
           <button onClick={onClose} className="bg-white rounded-md p-1 sm:p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500 cursor-pointer">
             <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-          
+
         </div>
 
         <div className="p-4">
-        <hr className="border-t-2 border-gray-300 my-2 sm:my-4" />
+          <hr className="border-t-2 border-gray-300 my-2 sm:my-4" />
           {/* Checkbox for "All" */}
           <div className="mb-4 flex items-center">
             <input
@@ -239,21 +248,21 @@ const CustomerSelectionPopup: React.FC<CustomerSelectionPopupProps> = ({
               <tbody className="divide-y divide-gray-200">
                 {displayedCustomers.length > 0 ? (
                   displayedCustomers.map((customer) => (
-                    <tr 
-                      key={customer.id} 
+                    <tr
+                      key={customer.customerCode}
                       className="hover:bg-gray-50 cursor-pointer"
-                      onClick={() => handleSelectCustomer(customer.id)}
+                      onClick={() => handleSelectCustomer(customer.customerCode)}
                     >
                       <td className="px-4 py-2 border text-center">
                         <input
                           type="checkbox"
-                          checked={selectedCustomers.includes(customer.id)}
-                          onChange={() => handleSelectCustomer(customer.id)}
+                          checked={selectedCustomers.includes(customer.customerCode)}
+                          onChange={() => handleSelectCustomer(customer.customerCode)}
                           onClick={(e) => e.stopPropagation()}
                         />
                       </td>
                       <td className="px-4 py-2 border">
-                        {customer.name}
+                        {customer.customerName}
                       </td>
                     </tr>
                   ))
@@ -274,32 +283,31 @@ const CustomerSelectionPopup: React.FC<CustomerSelectionPopupProps> = ({
               Showing {filteredCustomers.length > 0 ? (currentPage - 1) * entriesPerPage + 1 : 0} to {Math.min(currentPage * entriesPerPage, filteredCustomers.length)} of {filteredCustomers.length} entries
             </div>
             <div className="flex space-x-1">
-              <button 
+              <button
                 className={`px-3 py-1 rounded ${currentPage === 1 ? 'bg-gray-200 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'}`}
                 onClick={() => goToPage(currentPage - 1)}
                 disabled={currentPage === 1}
               >
                 Previous
               </button>
-              
+
               {getPageNumbers().map((page, index) => (
                 <button
                   key={index}
                   onClick={() => typeof page === "number" && goToPage(page)}
-                  className={`px-3 py-1 rounded ${
-                    page === currentPage
-                      ? "bg-blue-500 text-white"
-                      : page === "..."
-                        ? "bg-gray-200 cursor-default"
-                        : "bg-gray-200 hover:bg-gray-300"
-                  }`}
+                  className={`px-3 py-1 rounded ${page === currentPage
+                    ? "bg-blue-500 text-white"
+                    : page === "..."
+                      ? "bg-gray-200 cursor-default"
+                      : "bg-gray-200 hover:bg-gray-300"
+                    }`}
                   disabled={page === "..."}
                 >
                   {page}
                 </button>
               ))}
-              
-              <button 
+
+              <button
                 className={`px-3 py-1 rounded ${currentPage === totalPages || totalPages === 0 ? 'bg-gray-200 cursor-not-allowed' : 'bg-gray-200 hover:bg-gray-300'}`}
                 onClick={() => goToPage(currentPage + 1)}
                 disabled={currentPage === totalPages || totalPages === 0}

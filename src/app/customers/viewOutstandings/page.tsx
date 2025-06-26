@@ -22,6 +22,11 @@ type OrderType = {
   trackingNumber: string | null;
 };
 
+interface Customer {
+  customerCode: string;
+  customerName: string;
+}
+
 const OutstandingsPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -30,12 +35,34 @@ const OutstandingsPage: React.FC = () => {
   const [isCustomerPopupOpen, setIsCustomerPopupOpen] = useState(false);
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
+  const [customers, setCustomers] = useState<Customer[]>([]);
 
   useEffect(() => {
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
     const pendingOrderList = sessionStorage.getItem("notificationsData");
     setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+    fetchUserCustomerDetails();
   }, []);
+
+  const fetchUserCustomerDetails = async () => {
+    try {
+      const response = await fetch(`/api/userCustomerDetails`, {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw Error("Failed to fetch pending order data");
+      } else {
+        const data = await response.json();
+        console.log(data);
+        setCustomers(data.customers);
+        // setPaymentTypes(data.paymentTypes);
+      }
+    } catch (err) {
+      console.error("Error fetching pending order data:", err);
+    }
+  };
   // Sample outstandings data
   const outstandingInvoices = [
     {
@@ -426,6 +453,7 @@ const OutstandingsPage: React.FC = () => {
             open={isCustomerPopupOpen}
             onClose={handleCloseCustomerPopup}
             onAdd={handleAddCustomers}
+            customersList={customers} 
           />
           {/* Footer Component */}
           <Footer />
