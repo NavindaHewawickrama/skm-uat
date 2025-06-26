@@ -3,15 +3,20 @@
 import React, { useState, useEffect } from "react";
 import Alert from "../components/Alert";
 
-interface Order {
+interface OrderforStatus {
   orderNumber: string;
+  customerName: string;
+  salesPersonName: string;
+  orderDate: string;
+  paymentMethodType: string;
+  totalAmount: number;
   status: string;
 }
 
 interface ModalProps {
   open: boolean;
   onClose: () => void;
-  selectedOrder: Order | null;
+  selectedOrder: OrderforStatus | null;
 }
 
 

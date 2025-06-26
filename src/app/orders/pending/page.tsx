@@ -6,15 +6,15 @@ import Footer from "@/components/Footer";
 import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 import ViewStatusPopup from "@/components/ViewStatusPopup";
 
-// type OrderType = {
-//   orderNumber: string;
-//   customerName: string;
-//   salesPersonName: string;
-//   orderDate: string;
-//   paymentMethodType: string;
-//   totalAmount: number;
-
-// };
+type OrderforStatus = {
+  orderNumber: string;
+  customerName: string;
+  salesPersonName: string;
+  orderDate: string;
+  paymentMethodType: string;
+  totalAmount: number;
+  status: string;
+};
 
 type OrderType = {
   orderNumber: number;
@@ -47,7 +47,7 @@ const PendingOrdersPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [listViewOpen, setListViewOpen] = useState(false);
   const [selectedOrderItems, setSelectedOrderItems] = useState<ItemsType[]>([]);
-  const [selectedOrderForStatus, setSelectedOrderForStatus] = useState<OrderType | null>(null);
+  const [selectedOrderForStatus, setSelectedOrderForStatus] = useState<OrderforStatus | null>(null);
   // const [status, setStatus] = useState("");
   const [statusViewOpen, setStatusViewOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -192,7 +192,7 @@ const PendingOrdersPage: React.FC = () => {
     setCurrentPage(1); // Reset to first page when changing entries per page
   };
 
-  const handleStatus = (order: OrderType) => {
+  const handleStatus = (order: OrderforStatus) => {
     setSelectedOrderForStatus(order);
     setStatusViewOpen(true);
     // console.log(order);
@@ -362,7 +362,17 @@ const PendingOrdersPage: React.FC = () => {
                         <td className="px-4 py-3 border text-sm text-center">
                           <button
                             className="bg-green-500 hover:bg-green-600 text-white py-1 px-4 rounded focus:outline-none cursor-pointer"
-                            onClick={() => handleStatus(order)}
+                            onClick={() =>
+                              handleStatus({
+                                orderNumber: order.orderNumber.toString(),
+                                customerName: order.customerName,
+                                salesPersonName: order.salesPersonName,
+                                orderDate: order.orderDate,
+                                paymentMethodType: order.paymentMethodType,
+                                totalAmount: order.totalAmount,
+                                status: order.status,
+                              })
+                            }
                           >
                             Edit
                           </button>
