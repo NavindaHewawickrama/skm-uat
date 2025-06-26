@@ -17,10 +17,25 @@ interface pieChartData {
   pendingCount: number;
 }
 
+type OrderType = {
+  orderNumber: string;
+  customerName: string;
+  salesPersonName: string;
+  orderDate: string;
+  paymentMethodType: string;
+  totalAmount: number;
+  items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  specialNote: string;
+  rejectedReason: string;
+  status: string;
+  description?: string;
+};
+
 const Dashboard = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [notices, setNotices] = useState<Notices[]>([]);
   const [user, setUser] = useState("");
+  const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [dataPieChart, setDataPieChart] = useState<pieChartData>({
     deliveredCount: 0,
     rejectedCount: 0,
@@ -33,6 +48,30 @@ const Dashboard = () => {
     fetchNotices();
     fetchPieChartDetails();
   }, [])
+  // Fetch pending order data from API
+  useEffect(() => {
+    const fetchPendingOrderData = async () => {
+      try {
+        const response = await fetch(`/api/orders/pending`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw Error("Failed to fetch pending order data");
+        } else {
+          const data = await response.json();
+          //console.log(data);
+          setPendingOrders(data);
+          sessionStorage.setItem("notificationsData", JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+      }
+    };
+
+    fetchPendingOrderData();
+  }, []);
 
   const fetchPieChartDetails = async () => {
     try {
@@ -45,9 +84,9 @@ const Dashboard = () => {
         throw Error("Failed to fetch data");
       } else {
         const data = await response.json();
-        //console.log("Pie Chart Data:", data);
+        console.log("Pie Chart Data:", data);
         dataPieChart.deliveredCount = data.deliveredCount || 0;
-        dataPieChart.rejectedCount = data.rejectedCount || 0; 
+        dataPieChart.rejectedCount = data.rejectedCount || 0;
         dataPieChart.pendingCount = data.pendingCount || 0;
         setDataPieChart(dataPieChart);
       }
@@ -67,8 +106,8 @@ const Dashboard = () => {
         throw Error("Failed to fetch data");
       } else {
         const data = await response.json();
-    //    console.log("Welcome to SKM Sales App...", data.firstName);
-      //  console.log(data);
+        //    console.log("Welcome to SKM Sales App...", data.firstName);
+        //  console.log(data);
         switch (data.userRoleId) {
           case 1:
             setUser("ADMIN");
@@ -76,15 +115,15 @@ const Dashboard = () => {
             break;
           case 3:
             setUser("SALES USER")
-            sessionStorage.setItem("userRoleName","SALES USER");
+            sessionStorage.setItem("userRoleName", "SALES USER");
             break;
           case 4:
             setUser("SALES CORDINATOR");
-            sessionStorage.setItem("userRoleName","SALES COORDINATOR");
+            sessionStorage.setItem("userRoleName", "SALES COORDINATOR");
             break;
           default:
             setUser("USER");
-            sessionStorage.setItem("userRoleName","USER");
+            sessionStorage.setItem("userRoleName", "USER");
             break;
         }
       }
@@ -104,7 +143,7 @@ const Dashboard = () => {
         throw Error("Failed to fetch data");
       } else {
         const data = await response.json();
-     //   console.log("Welcome to SKM Sales App...", data);
+        //   console.log("Welcome to SKM Sales App...", data);
         setNotices(data || []);
       }
     } catch (err) {
@@ -172,7 +211,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen w-screen bg-gray-100 flex flex-col">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={user} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={user} notificationData={pendingOrders}/>
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">

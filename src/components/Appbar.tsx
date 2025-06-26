@@ -5,19 +5,60 @@ import Image from "next/image";
 import NotificationPopup from "./NotificationPopup";
 import { useRouter } from "next/navigation";
 
+// Updated type to match your actual data structure
+type OrderType = {
+  orderNumber: number;
+  customerName: string;
+  salesPersonName: string;
+  orderDate: string;
+  paymentMethodType: string;
+  totalAmount: number;
+  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  specialNote: string;
+  rejectReason: string | null;
+  status: string;
+  delivertPersonName: string | null;
+  deliveryDate: string | null;
+  invoicedItems: any | null;
+  trackingNumber: string | null;
+};
+
+// Keep the original OrderType for backward compatibility if needed elsewhere
+// type OrderType = {
+//   orderNumber: string;
+//   customerName: string;
+//   salesPersonName: string;
+//   orderDate: string;
+//   paymentMethodType: string;
+//   totalAmount: number;
+//   items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+//   specialNote: string;
+//   rejectedReason: string;
+//   status: string;
+//   description?: string;
+// };
+
 interface AppBarProps {
   toggleSideNav: () => void;
   userRole: string | null;
+  notificationData?: OrderType[]; // Updated to use the correct type
 }
 
-const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole }) => {
+const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole, notificationData }) => {
   const router = useRouter();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [alertDropdownOpen, setAlertDropdownOpen] = useState(false);
   const alertDropdownRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const [openNotificationPopup, setOpenNotificationPopup] = useState(false);
+  const [notificationDataState, setNotificationDataState] = useState<OrderType[]>([]);
 
+  useEffect(() => {
+    // Initialize notification data state if provided
+    if (notificationData) {
+      setNotificationDataState(notificationData);
+    }
+  }, [notificationData]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -77,6 +118,20 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole }) => {
     router.push("/user/ResetPassword");
   }
 
+  // Format date for display
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Get notification count
+  const notificationCount = notificationDataState.length;
+
+  // Filter notifications to show (e.g., only pending ones, or recent ones)
+  const getDisplayNotifications = () => {
+    return notificationDataState.slice(0, 3); // Show only first 3 notifications in dropdown
+  };
+
   return (
     <div className="w-full bg-blue-900 text-white h-18 flex items-center justify-between px-4">
       {/* Mobile menu toggle */}
@@ -133,29 +188,54 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole }) => {
                 d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
               />
             </svg>
-            {/* Notification Count Badge */}
-            <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-green-500 text-white text-xs font-bold rounded-sm w-4 h-4 flex items-center justify-center">
-              3
-            </span>
+            {/* Dynamic Notification Count Badge */}
+            {notificationCount > 0 && (
+              <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-green-500 text-white text-xs font-bold rounded-sm w-4 h-4 flex items-center justify-center">
+                {notificationCount > 99 ? '99+' : notificationCount}
+              </span>
+            )}
           </div>
 
           {/* Alert Dropdown Menu */}
           {alertDropdownOpen && (
-            <div className="absolute right-0 mt-2 w-55 bg-white rounded-md shadow-lg z-50">
+            <div className="absolute right-0 mt-2 w-80 bg-white rounded-md shadow-lg z-50">
               <div className="border-b border-gray-200 bg-gray-700">
                 <div className="px-4 py-2 text-white font-medium">
-                  Notifications
+                  Notifications ({notificationCount})
                 </div>
               </div>
-              <div className="p-1">
-                <ul className="space-y-2">
-                  <li className="text-gray-800 text-sm hover:bg-gray-200 p-2">Notice 1: Your appointment is scheduled for tomorrow.</li>
-                  <li className="text-gray-800 text-sm hover:bg-gray-200 p-2">Notice 2: New updates are available for your application.</li>
-                  <li className="text-gray-800 text-sm hover:bg-gray-200 p-2">Notice 3: Your password will expire in 3 days.</li>
-                </ul>
+              <div className="p-1 max-h-64 overflow-y-auto">
+                {notificationDataState.length === 0 ? (
+                  <div className="text-gray-500 text-sm p-4 text-center">
+                    No notifications
+                  </div>
+                ) : (
+                  <ul className="space-y-2">
+                    {getDisplayNotifications().map((notification, index) => (
+                      <li key={`${notification.orderNumber}-${index}`} className="text-gray-800 text-sm hover:bg-gray-200 p-3 border-b border-gray-100">
+                        <div className="font-medium text-blue-800">
+                          Order #{notification.orderNumber} - {notification.status}
+                        </div>
+                        {/* <div className="text-gray-600 text-xs mt-1">
+                          Customer: {notification.customerName}
+                        </div> */}
+                        {/* <div className="text-gray-600 text-xs">
+                          Amount: ${notification.totalAmount.toLocaleString()}
+                        </div> */}
+                        <div className="text-gray-500 text-xs mt-1">
+                          {formatDate(notification.orderDate)}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
               <div className="border-t border-gray-200 p-2">
-                <button className="w-[50%] bg-blue-900 text-white rounded-md py-2 hover:bg-blue-700" onClick={handleNotificationPopupOpen}>
+                <button
+                  className="w-[50%] bg-blue-900 text-white rounded-md py-2 hover:bg-blue-700"
+                  onClick={handleNotificationPopupOpen}
+                  disabled={notificationCount === 0}
+                >
                   View All
                 </button>
               </div>
@@ -219,9 +299,6 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole }) => {
                 </button>
                 <button
                   className="px-4 py-2 text-gray-700 hover:bg-gray-100 w-full text-left flex items-center cursor-pointer"
-                  // onClick={() => {
-                  //   setProfileDropdownOpen(false);
-                  // }}
                   onClick={handleLogoutClick}
                 >
                   <svg
@@ -243,10 +320,12 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole }) => {
               </div>
             </div>
           )}
-
-
         </div>
-        <NotificationPopup open={openNotificationPopup} onClose={() => setOpenNotificationPopup(false)} />
+        <NotificationPopup
+          open={openNotificationPopup}
+          onClose={() => setOpenNotificationPopup(false)}
+          notificationData={notificationDataState} // Pass the notification data to popup
+        />
       </div>
     </div>
   );

@@ -5,6 +5,20 @@ import SideNav from "@/components/Sidenav";
 import Footer from "@/components/Footer";
 import CustomerSelectionPopup from "@/components/CustomerSelectionPopup";
 
+type OrderType = {
+  orderNumber: string;
+  customerName: string;
+  salesPersonName: string;
+  orderDate: string;
+  paymentMethodType: string;
+  totalAmount: number;
+  items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  specialNote: string;
+  rejectedReason: string;
+  status: string;
+  description?: string;
+};
+
 const OutstandingsPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -12,9 +26,12 @@ const OutstandingsPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isCustomerPopupOpen, setIsCustomerPopupOpen] = useState(false);
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
+  const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
 
   useEffect(() => {
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+    const pendingOrderList = sessionStorage.getItem("notificationsData");
+    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
   // Sample outstandings data
   const outstandingInvoices = [

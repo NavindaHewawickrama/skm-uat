@@ -44,7 +44,7 @@ const PendingOrdersPage: React.FC = () => {
 
   // Fetch pending order data from API
   useEffect(() => {
-    const fetchStockData = async () => {
+    const fetchPendingOrderData = async () => {
       try {
         setLoading(true);
         setError(null);
@@ -72,7 +72,7 @@ const PendingOrdersPage: React.FC = () => {
       }
     };
 
-    fetchStockData();
+    fetchPendingOrderData();
   }, []);
 
   // Filter orders based on search query
