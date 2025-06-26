@@ -67,7 +67,7 @@ export async function GET(request: Request) {
             dueAmount: invoice.dueAmount,
         })) || [];
 
-        console.log('Transformed invoices:', transformedInvoices);
+        //console.log('Transformed invoices:', transformedInvoices);
 
         // Return just the array of invoices as your frontend expects
         return NextResponse.json(transformedInvoices, { status: 200 });

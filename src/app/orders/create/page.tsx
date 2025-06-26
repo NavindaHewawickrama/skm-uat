@@ -90,12 +90,12 @@ interface Customer {
 //   name: string,
 // }
 
-interface InvoiceResponse {
-  customerNo: string;
-  totalDueAmount: number;
-  totalPdcAmount: number;
-  invoices: Invoice[];
-}
+// interface InvoiceResponse {
+//   customerNo: string;
+//   totalDueAmount: number;
+//   totalPdcAmount: number;
+//   invoices: Invoice[];
+// }
 
 interface Invoice {
   invoiceNo: string;
@@ -398,9 +398,9 @@ const CreateOrderPage: React.FC = () => {
         throw new Error('Failed to fetch customer invoices');
       }
 
-      const data: InvoiceResponse = await response.json();
-
-      const transformedData: CustomerOutstandingData[] = data.invoices.map((invoice) => ({
+      const data = await response.json();
+      console.log("Fetched data:", data);
+      const transformedData: CustomerOutstandingData[] = data.map((invoice: Invoice) => ({
         customerName: selectedCustomer.customerName,
         invoiceNumber: invoice.invoiceNo,
         invoiceDate: invoice.invoiceDate
