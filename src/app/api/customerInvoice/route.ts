@@ -1,20 +1,21 @@
 import { getValidAccessToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
-// get customer invoices
 export async function GET(request: Request) {
+    console.log('Customer Invoice API route called!');
+    
     try {
         const result = await getValidAccessToken();
-
         const { userId, token, status, message } = result;
 
         if (status !== 200 || !token || !userId) {
             return NextResponse.json({ error: message }, { status });
         }
 
-        // Get customerCode from URL query parameters (changed from customerId to customerCode)
         const { searchParams } = new URL(request.url);
         const customerCode = searchParams.get('customerCode');
+        
+        console.log('Customer Code received:', customerCode);
 
         if (!customerCode) {
             return NextResponse.json(
@@ -23,8 +24,11 @@ export async function GET(request: Request) {
             );
         }
 
-        // Use customerCode as customerId in the API call (assuming the backend expects customerId)
-        const response = await fetch(`http://173.212.233.90:8090/api/Business/GetInvoicesByCustomer?customerId=${customerCode}`, {
+        // Call the external API
+        const apiUrl = `http://173.212.233.90:8090/api/Business/GetInvoicesByCustomer?customerId=${customerCode}`;
+        console.log('Calling external API:', apiUrl);
+        
+        const response = await fetch(apiUrl, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -34,6 +38,7 @@ export async function GET(request: Request) {
 
         if (!response.ok) {
             const errorText = await response.text();
+            console.error('External API error:', response.status, errorText);
             return NextResponse.json(
                 { error: 'Failed to fetch customer invoices', details: errorText },
                 { status: response.status }
@@ -41,31 +46,26 @@ export async function GET(request: Request) {
         }
 
         const data = await response.json();
+        console.log('External API response:', data);
         
-        // Transform the invoices while preserving the original structure
+        // Transform the response to match your frontend expectations
         const transformedInvoices = data.invoices?.map((invoice: any) => ({
-            invoiceNo: invoice.invoiceNo,
-            orderNo: invoice.orderNo,
+            invoiceNumber: invoice.invoiceNo,
             invoiceDate: invoice.invoiceDate,
+            remainingAmount: invoice.totalAmount,
             pdcAmount: invoice.pdcAmount,
             dueAmount: invoice.dueAmount,
-            totalAmount: invoice.totalAmount
         })) || [];
 
-        // Return the complete response structure that your frontend expects
-        const responseData = {
-            customerNo: data.customerNo,
-            totalDueAmount: data.totalDueAmount,
-            totalPdcAmount: data.totalPdcAmount,
-            invoices: transformedInvoices
-        };
-
-        return NextResponse.json(responseData, { status: 200 });
+        console.log('Transformed invoices:', transformedInvoices);
+        
+        // Return just the array of invoices as your frontend expects
+        return NextResponse.json(transformedInvoices, { status: 200 });
 
     } catch (error) {
-        console.error('Error fetching customer invoices:', error);
+        console.error('Error in customer invoice API:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch customer invoices' },
+            { error: 'Failed to fetch customer invoices', details: error.message },
             { status: 500 }
         );
     }
