@@ -110,6 +110,13 @@ const CreateOrderPage: React.FC = () => {
   >([]);
   const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
 
+  // Add this in your component
+  useEffect(() => {
+    if (outstandingData.length > 0) {
+      generatePDF();
+    }
+  }, [outstandingData]);
+
   // const outstandingData: CustomerOutstandingData[] = [
   //   {
   //     customerName: "ABC Corporation",
@@ -190,47 +197,47 @@ const CreateOrderPage: React.FC = () => {
   const fetchCustomerInvoices = async (customerCode: string) => {
     setIsLoadingInvoices(true);
     try {
-        const response = await fetch(`/api/customerInvoice?customerId=${customerCode}`, {
-            method: 'GET',
-            credentials: 'include',
-        });
+      const response = await fetch(`/api/customerInvoice?customerId=${customerCode}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
 
-        if (!response.ok) {
-            throw new Error('Failed to fetch customer invoices');
-        }
+      if (!response.ok) {
+        throw new Error('Failed to fetch customer invoices');
+      }
 
-        const transformedInvoices = await response.json(); 
-        
-        // Transform the array to match your CustomerOutstandingData interface
-        const transformedData: CustomerOutstandingData[] = transformedInvoices.map(
-            (invoice: any) => ({
-                customerName: selectedCustomer?.customerName || "",
-                invoiceNumber: invoice.invoiceNumber || "",
-                invoiceDate: invoice.invoiceDate
-                    ? new Date(invoice.invoiceDate).toLocaleDateString()
-                    : "",
-                invoicedAmount: parseFloat(invoice.remainingAmount || 0),
-                pdcAmount: parseFloat(invoice.pdcAmount || 0),
-                dueAmount: parseFloat(invoice.dueAmount || 0),
-            })
-        );
+      const transformedInvoices = await response.json();
 
-        setOutstandingData(transformedData);
+      // Transform the array to match your CustomerOutstandingData interface
+      const transformedData: CustomerOutstandingData[] = transformedInvoices.map(
+        (invoice: any) => ({
+          customerName: selectedCustomer?.customerName || "",
+          invoiceNumber: invoice.invoiceNumber || "",
+          invoiceDate: invoice.invoiceDate
+            ? new Date(invoice.invoiceDate).toLocaleDateString()
+            : "",
+          invoicedAmount: parseFloat(invoice.remainingAmount || 0),
+          pdcAmount: parseFloat(invoice.pdcAmount || 0),
+          dueAmount: parseFloat(invoice.dueAmount || 0),
+        })
+      );
 
-        const totalDueAmount = transformedData.reduce(
-            (sum, item) => sum + item.dueAmount,
-            0
-        );
-        setSelectedCustomerDueAmount(totalDueAmount);
-        
+      setOutstandingData(transformedData);
+
+      const totalDueAmount = transformedData.reduce(
+        (sum, item) => sum + item.dueAmount,
+        0
+      );
+      setSelectedCustomerDueAmount(totalDueAmount);
+
     } catch (error) {
-        console.error("Error fetching customer invoices:", error);
-        handleShowAlert("error", "Failed to fetch customer invoice data");
-        setOutstandingData([]);
+      console.error("Error fetching customer invoices:", error);
+      handleShowAlert("error", "Failed to fetch customer invoice data");
+      setOutstandingData([]);
     } finally {
-        setIsLoadingInvoices(false);
+      setIsLoadingInvoices(false);
     }
-};
+  };
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -369,62 +376,58 @@ const CreateOrderPage: React.FC = () => {
 
   const handleViewDetails = async () => {
     if (!selectedCustomer) {
-        handleShowAlert("error", "Please select a customer first");
-        return;
+      handleShowAlert("error", "Please select a customer first");
+      return;
     }
 
     setIsLoadingInvoices(true);
     try {
-        const response = await fetch(`/api/customerInvoice?customerCode=${selectedCustomer.customerCode}`, {
-            method: 'GET',
-            credentials: 'include',
-        });
-        
-        console.log('Response status:', response.status);
-        
-        if (!response.ok) {
-            throw new Error('Failed to fetch customer invoices');
-        }
-        
-        const data = await response.json();
-        console.log('Response data:', data);
-        
-        // Transform the array to match your CustomerOutstandingData interface
-        const transformedData: CustomerOutstandingData[] = data.map(
-            (invoice: any) => ({
-                customerName: selectedCustomer?.customerName || "",
-                invoiceNumber: invoice.invoiceNumber || "",
-                invoiceDate: invoice.invoiceDate
-                    ? new Date(invoice.invoiceDate).toLocaleDateString()
-                    : "",
-                invoicedAmount: parseFloat(invoice.remainingAmount || 0),
-                pdcAmount: parseFloat(invoice.pdcAmount || 0),
-                dueAmount: parseFloat(invoice.dueAmount || 0),
-            })
-        );
+      const response = await fetch(`/api/customerInvoice?customerCode=${selectedCustomer.customerCode}`, {
+        method: 'GET',
+        credentials: 'include',
+      });
 
-        setOutstandingData(transformedData);
+      console.log('Response status:', response.status);
 
-        const totalDueAmount = transformedData.reduce(
-            (sum, item) => sum + item.dueAmount,
-            0
-        );
-        setSelectedCustomerDueAmount(totalDueAmount);
-        
-        handleShowAlert("success", `Loaded ${transformedData.length} invoice records`);
-        
-        setTimeout(() => {
-            generatePDF();
-        }, 1000); 
-        
+      if (!response.ok) {
+        throw new Error('Failed to fetch customer invoices');
+      }
+
+      const data = await response.json();
+      console.log('Response data:', data);
+
+      // Transform the array to match your CustomerOutstandingData interface
+      const transformedData: CustomerOutstandingData[] = data.map(
+        (invoice: any) => ({
+          customerName: selectedCustomer?.customerName || "",
+          invoiceNumber: invoice.invoiceNumber || "",
+          invoiceDate: invoice.invoiceDate
+            ? new Date(invoice.invoiceDate).toLocaleDateString()
+            : "",
+          invoicedAmount: parseFloat(invoice.remainingAmount || 0),
+          pdcAmount: parseFloat(invoice.pdcAmount || 0),
+          dueAmount: parseFloat(invoice.dueAmount || 0),
+        })
+      );
+
+      setOutstandingData(transformedData);
+
+      const totalDueAmount = transformedData.reduce(
+        (sum, item) => sum + item.dueAmount,
+        0
+      );
+      setSelectedCustomerDueAmount(totalDueAmount);
+
+      handleShowAlert("success", `Loaded ${transformedData.length} invoice records`);
+
     } catch (error) {
-        console.error('Error:', error);
-        handleShowAlert("error", "Failed to fetch customer invoice data");
-        setOutstandingData([]);
+      console.error('Error:', error);
+      handleShowAlert("error", "Failed to fetch customer invoice data");
+      setOutstandingData([]);
     } finally {
-        setIsLoadingInvoices(false);
+      setIsLoadingInvoices(false);
     }
-};
+  };
 
   const handleCustomerChange = (customerCode: string) => {
     //console.log(customerCode);
@@ -789,8 +792,8 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                      // value={currentItem.itemName}
-                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
+                    // value={currentItem.itemName}
+                    // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
                       {substitutedItemsList?.length === 0 ? (
                         <option value="" disabled>
