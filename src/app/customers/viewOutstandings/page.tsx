@@ -36,8 +36,10 @@ const OutstandingsPage: React.FC = () => {
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  const [error, setError] = useState(true);
 
   useEffect(() => {
+    setError(true);
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
     const pendingOrderList = sessionStorage.getItem("notificationsData");
     setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
@@ -282,6 +284,27 @@ const OutstandingsPage: React.FC = () => {
     // You would typically fetch invoices for these customers here
   };
 
+  if (error) {
+    return (
+      <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+        <div className="flex flex-1 overflow-hidden">
+          <SideNav isOpen={sideNavOpen} />
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              {/* <div className="text-red-500 text-6xl mb-4">⚠️</div> */}
+              <h2 className="text-2xl font-bold text-purple-500 mb-2">
+                No Permission to load this page !!
+              </h2>
+              <p className="text-gray-600 mb-4">{error}</p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
@@ -453,7 +476,7 @@ const OutstandingsPage: React.FC = () => {
             open={isCustomerPopupOpen}
             onClose={handleCloseCustomerPopup}
             onAdd={handleAddCustomers}
-            customersList={customers} 
+            customersList={customers}
           />
           {/* Footer Component */}
           <Footer />

@@ -25,7 +25,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
   const [selectedStatus, setSelectedStatus] = useState("1");
   const [trackingNumber, setTrackingNumber] = useState("");
   const [deliveryPerson, setDeliveryPerson] = useState("");
-  const [deliveryDate, setDeliveryDate] = useState("");
+  const [deliveryDate, setDeliveryDate] = useState<string | null>(null);
   const [specialNote, setSpecialNote] = useState("")
   const [rejectReason, setRejectReason] = useState("");
   const [loading, setLoading] = useState(false);
@@ -45,7 +45,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
       setSelectedStatus(statusMap[selectedOrder.status] || "1");
       setTrackingNumber("");
       setDeliveryPerson("");
-      setDeliveryDate("");
+      setDeliveryDate(null);
       setSpecialNote("");
       setRejectReason("");
       // Reset alert state when modal opens
@@ -85,7 +85,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
         rejectReason: selectedStatus === "3" ? rejectReason : "",
         trackingNumber: trackingNumber,
         delivertPersonName: deliveryPerson,
-        deliveryDate: deliveryDate,
+        deliveryDate: deliveryDate? deliveryDate : null,
         note: specialNote,
       };
 
@@ -295,7 +295,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
                 <input
                   type="date"
                   id="deliveryDate"
-                  value={deliveryDate}
+                  value={deliveryDate? deliveryDate : ""}
                   onChange={(e) => setDeliveryDate(e.target.value)}
                   className="block w-full border border-gray-300 rounded-md p-2"
                 />
