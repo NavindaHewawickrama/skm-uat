@@ -7,7 +7,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import Alert from "../../../components/Alert";
 
-declare module 'jspdf' {
+declare module "jspdf" {
   interface jsPDF {
     lastAutoTable?: {
       finalY: number;
@@ -97,13 +97,18 @@ const CreateOrderPage: React.FC = () => {
   const [selectedItemUnitPrice, setSelectedItemUnitPrice] = useState("");
   const [selectedItemQuantity, setSelectedItemQuantity] = useState(0);
   const [selectedItemDiscount, setSelectedItemDiscount] = useState(0);
-  const [substitutedItemsList, setSubstitutedItemsList] = useState<SubstituteItem[]>([]);
+  const [substitutedItemsList, setSubstitutedItemsList] = useState<
+    SubstituteItem[]
+  >([]);
 
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
-  const [outstandingData, setOutstandingData] = useState<CustomerOutstandingData[]>([]);
+  const [outstandingData, setOutstandingData] = useState<
+    CustomerOutstandingData[]
+  >([]);
+  const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
 
   // const outstandingData: CustomerOutstandingData[] = [
   //   {
@@ -142,7 +147,11 @@ const CreateOrderPage: React.FC = () => {
 
   useEffect(() => {
     fetchUserCustomerDetails();
-    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+    setUserRoleType(
+      sessionStorage.getItem("userRoleName")
+        ? sessionStorage.getItem("userRoleName")
+        : ""
+    );
   }, []);
 
   const handleShowAlert = (type: string, message: string) => {
@@ -177,6 +186,56 @@ const CreateOrderPage: React.FC = () => {
       console.error("Error fetching pending order data:", err);
     }
   };
+
+  // fetchCustomerInvoices function
+  const fetchCustomerInvoices = async (customerCode: string) => {
+    setIsLoadingInvoices(true);
+    try {
+        const response = await fetch(`/api/customerInvoice?customerCode=${customerCode}`, {
+            method: 'GET',
+            credentials: 'include',
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch customer invoices');
+        }
+
+        const invoicesData = await response.json();
+
+        // Transform the API response to match your CustomerOutstandingData interface
+        // const transformedData: CustomerOutstandingData[] = invoicesData.map(
+        //     (invoice: any) => ({
+        //         customerName:
+        //             invoice.customerName || selectedCustomer?.customerName || "",
+        //         invoiceNumber: invoice.invoiceNumber || invoice.invoiceNo || "",
+        //         invoiceDate: invoice.invoiceDate
+        //             ? new Date(invoice.invoiceDate).toLocaleDateString()
+        //             : "",
+        //         invoicedAmount: parseFloat(
+        //             invoice.remainingAmount || invoice.remainingAmount || 0
+        //         ),
+        //         pdcAmount: parseFloat(invoice.pdcAmount || 0),
+        //         dueAmount: parseFloat(
+        //             invoice.dueAmount || invoice.balanceAmount || 0
+        //         ),
+        //     })
+        // );
+
+        // setOutstandingData(transformedData);
+
+        // const totalDueAmount = transformedData.reduce(
+        //     (sum, item) => sum + item.dueAmount,
+        //     0
+        // );
+        // setSelectedCustomerDueAmount(totalDueAmount);
+    } catch (error) {
+        console.error("Error fetching customer invoices:", error);
+        handleShowAlert("error", "Failed to fetch customer invoice data");
+        setOutstandingData([]); // Clear data on error
+    } finally {
+        setIsLoadingInvoices(false);
+    }
+};
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -243,7 +302,9 @@ const CreateOrderPage: React.FC = () => {
     pdf.setFontSize(18);
     pdf.text("Customer Outstanding Report", 105, 15, { align: "center" });
     pdf.setFontSize(12);
-    pdf.text(selectedCustomer?.customerName || "", 105, 22, { align: "center" });
+    pdf.text(selectedCustomer?.customerName || "", 105, 22, {
+      align: "center",
+    });
     // pdf.setFontSize(12);
     // pdf.text(selectedCustomer?.customerName || "", 105, 22, { align: "center" });
 
@@ -287,7 +348,14 @@ const CreateOrderPage: React.FC = () => {
       0
     );
 
-    const totalPDC = 0; // Assuming PDC total is not provided in the data
+    const totalPDC = outstandingData.reduce(
+      (sum, item) => sum + item.pdcAmount,
+      0
+    );
+    const totalInvoiced = outstandingData.reduce(
+      (sum, item) => sum + item.invoicedAmount,
+      0
+    );
 
     const finalY = pdf.lastAutoTable?.finalY || 60;
     pdf.setFontSize(12);
@@ -304,8 +372,19 @@ const CreateOrderPage: React.FC = () => {
     window.open(url, "_blank");
   };
 
-  const handleViewDetails = () => {
-    generatePDF();
+  const handleViewDetails = async () => {
+    if (!selectedCustomer) {
+      handleShowAlert("error", "Please select a customer first");
+      return;
+    }
+
+    if (outstandingData.length === 0) {
+      // Fetch data if not already loaded
+      await fetchCustomerInvoices(selectedCustomer.customerCode);
+    }
+    setTimeout(() => {
+      generatePDF();
+    }, 100);
   };
 
   const handleCustomerChange = (customerCode: string) => {
@@ -399,7 +478,7 @@ const CreateOrderPage: React.FC = () => {
               const parsedDetails = JSON.parse(data.details);
               if (parsedDetails.message) {
                 errorMessage = parsedDetails.message;
-              } else if (typeof data.details === 'string') {
+              } else if (typeof data.details === "string") {
                 errorMessage = data.details;
               }
             } catch (e) {
@@ -562,8 +641,18 @@ const CreateOrderPage: React.FC = () => {
                         <option>Default payment type</option>
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                        <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                        <svg
+                          className="h-4 w-4"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M19 9l-7 7-7-7"
+                          />
                         </svg>
                       </div>
                     </div>
@@ -572,14 +661,26 @@ const CreateOrderPage: React.FC = () => {
                   <div className="bg-gray-50 p-3 rounded border">
                     <div className="space-y-2">
                       <div className="flex justify-between">
-                        <span className="text-gray-600 font-medium">Credit Allowed:</span>
-                        <span className={selectedCustomer?.creditAllowed ? "text-green-600" : "text-red-600"}>
+                        <span className="text-gray-600 font-medium">
+                          Credit Allowed:
+                        </span>
+                        <span
+                          className={
+                            selectedCustomer?.creditAllowed
+                              ? "text-green-600"
+                              : "text-red-600"
+                          }
+                        >
                           {selectedCustomer?.creditAllowed ? "Yes" : "No"}
                         </span>
                       </div>
                       <div className="flex justify-between">
-                        <span className="text-gray-600 font-medium">Credit Limit:</span>
-                        <span className="text-gray-700">{selectedCustomer?.creditLimit || "Not Set"}</span>
+                        <span className="text-gray-600 font-medium">
+                          Credit Limit:
+                        </span>
+                        <span className="text-gray-700">
+                          {selectedCustomer?.creditLimit || "Not Set"}
+                        </span>
                       </div>
                     </div>
                   </div>
@@ -649,8 +750,8 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                    // value={currentItem.itemName}
-                    // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
+                      // value={currentItem.itemName}
+                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
                       {substitutedItemsList?.length === 0 ? (
                         <option value="" disabled>
@@ -658,7 +759,7 @@ const CreateOrderPage: React.FC = () => {
                         </option>
                       ) : (
                         substitutedItemsList?.map((item, index) => (
-                          <option key={index} value={item.itemName} >
+                          <option key={index} value={item.itemName}>
                             {item.itemName}
                           </option>
                         ))
