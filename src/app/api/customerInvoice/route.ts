@@ -62,7 +62,7 @@ export async function GET(request: Request) {
         const transformedInvoices = data.invoices?.map((invoice: Invoice) => ({
             invoiceNumber: invoice.invoiceNo,
             invoiceDate: invoice.invoiceDate,
-            remainingAmount: invoice.totalAmount,
+            totalAmount: invoice.totalAmount,
             pdcAmount: invoice.pdcAmount,
             dueAmount: invoice.dueAmount,
         })) || [];

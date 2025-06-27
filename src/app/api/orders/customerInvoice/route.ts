@@ -8,6 +8,7 @@ interface Invoice {
   pdcAmount: number;
   dueAmount: number;
   totalAmount: number;
+  remainingAmount: number;
 }
 
 
@@ -59,7 +60,8 @@ export async function GET(request: Request) {
             invoiceDate: invoice.invoiceDate,
             pdcAmount: invoice.pdcAmount,
             dueAmount: invoice.dueAmount,
-            totalAmount: invoice.totalAmount
+            totalAmount: invoice.totalAmount,
+            //remainigAmount: invoice.remainingAmount,
         })) || [];
 
         // Return the complete response structure that your frontend expects

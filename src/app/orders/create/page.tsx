@@ -86,12 +86,13 @@ interface Customer {
 }
 
 interface Invoice {
-  invoiceNo: string;
+  invoiceNumber: string;
   orderNo: string;
   invoiceDate: string;
   pdcAmount: number;
   dueAmount: number;
   totalAmount: number;
+  remainingAmount: number;
 }
 
 
@@ -322,7 +323,7 @@ const CreateOrderPage: React.FC = () => {
       item.invoiceDate,
       `${item.invoicedAmount.toFixed(2)}`,
       `${item.pdcAmount.toFixed(2)}`,
-      `${item.dueAmount.toFixed(2)}`,
+      `${(item.dueAmount - item.invoicedAmount) > 0 ? (item.dueAmount - item.invoicedAmount).toFixed(2) : "0.00"}`,
     ]);
 
     autoTable(pdf, {
@@ -390,7 +391,7 @@ const CreateOrderPage: React.FC = () => {
       console.log("Fetched data:", data);
       const transformedData: CustomerOutstandingData[] = data.map((invoice: Invoice) => ({
         customerName: selectedCustomer.customerName,
-        invoiceNumber: invoice.invoiceNo,
+        invoiceNumber: invoice.invoiceNumber,
         invoiceDate: invoice.invoiceDate
           ? new Date(invoice.invoiceDate).toLocaleDateString("en-US")
           : "",

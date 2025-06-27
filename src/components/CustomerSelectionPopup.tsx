@@ -2,7 +2,6 @@
 
 import React, { useState, useMemo, useEffect } from "react";
 
-
 interface Customer {
   customerCode: string;
   customerName: string;
@@ -19,34 +18,13 @@ const CustomerSelectionPopup: React.FC<CustomerSelectionPopupProps> = ({
   open,
   onClose,
   onAdd,
-  customersList, // Default to empty array if no customers are passed
+  customersList,
 }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [entriesPerPage, setEntriesPerPage] = useState(5);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedCustomers, setSelectedCustomers] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);
-  //const [customers, setCustomers] = useState<Customer[]>(customersList? customersList || []);
-
-  // Sample customer data - replace with your actual data
-  // const customers = [
-  //   { id: "1", name: "INTERLANKA AUTO SPARES COMPANY" },
-  //   { id: "2", name: "MAHA AUTO PARTS" },
-  //   { id: "3", name: "ROYAL MOTORS SUPPLIES" },
-  //   { id: "4", name: "ROYAL MOTORS SUPPLIES (BRANCH)" },
-  //   { id: "5", name: "AUTO WORLD PARTS" },
-  //   { id: "6", name: "QUICK FIX AUTO PARTS" },
-  //   { id: "7", name: "PRECISION AUTO COMPONENTS" },
-  //   { id: "8", name: "HIGHWAY AUTOMOTIVE SUPPLIES" },
-  //   { id: "9", name: "PREMIUM CAR ACCESSORIES" },
-  //   { id: "10", name: "STAR AUTO PARTS & SERVICES" },
-  //   { id: "11", name: "GLOBAL AUTO SPARES" },
-  //   { id: "12", name: "METRO AUTO SOLUTIONS" },
-  //   { id: "13", name: "ELITE CAR PARTS LTD" },
-  //   { id: "14", name: "SPEED DRIVE AUTO SHOP" },
-  //   { id: "15", name: "TURBO AUTO ACCESSORIES" },
-  //   // Add more customers as needed
-  // ];
 
   // Filter customers based on search query
   const filteredCustomers = useMemo(() => {
@@ -72,32 +50,34 @@ const CustomerSelectionPopup: React.FC<CustomerSelectionPopupProps> = ({
     setCurrentPage(1);
   }, [searchQuery, entriesPerPage]);
 
+  // Update selectAll state when selectedCustomers changes
+  useEffect(() => {
+    setSelectAll(filteredCustomers.length > 0 && selectedCustomers.length === filteredCustomers.length);
+  }, [selectedCustomers, filteredCustomers]);
+
   const handleSelectAll = () => {
     if (selectAll) {
       setSelectedCustomers([]);
     } else {
       setSelectedCustomers(filteredCustomers.map(customer => customer.customerCode));
     }
-    setSelectAll(!selectAll);
   };
 
   const handleSelectCustomer = (customerId: string) => {
+    console.log("Selected Customer ID:", customerId);
     if (selectedCustomers.includes(customerId)) {
       setSelectedCustomers(selectedCustomers.filter(id => id !== customerId));
-      setSelectAll(false);
     } else {
       setSelectedCustomers([...selectedCustomers, customerId]);
-      // Check if all items are now selected
-      if (selectedCustomers.length + 1 === filteredCustomers.length) {
-        setSelectAll(true);
-      }
     }
   };
 
-  const handleAdd = () => {
-    onAdd(selectedCustomers);
-    onClose();
-  };
+  // const handleAdd = () => {
+  //   onAdd(selectedCustomers);
+  //   // Reset selections after adding
+  //   setSelectedCustomers([]);
+  //   onClose();
+  // };
 
   // Generate page numbers for pagination
   const getPageNumbers = () => {
@@ -105,41 +85,33 @@ const CustomerSelectionPopup: React.FC<CustomerSelectionPopupProps> = ({
     const maxPagesToShow = 5;
 
     if (totalPages <= maxPagesToShow) {
-      // If we have fewer pages than max, show all pages
       for (let i = 1; i <= totalPages; i++) {
         pages.push(i);
       }
     } else {
-      // Always include first page
       pages.push(1);
 
-      // Calculate start and end of page range
       let start = Math.max(2, currentPage - 1);
       let end = Math.min(totalPages - 1, currentPage + 1);
 
-      // Adjust if we're at edges
       if (currentPage <= 2) {
         end = 4;
       } else if (currentPage >= totalPages - 1) {
         start = totalPages - 3;
       }
 
-      // Add ellipsis if needed before middle pages
       if (start > 2) {
         pages.push("...");
       }
 
-      // Add middle pages
       for (let i = start; i <= end; i++) {
         pages.push(i);
       }
 
-      // Add ellipsis if needed after middle pages
       if (end < totalPages - 1) {
         pages.push("...");
       }
 
-      // Always include last page
       if (totalPages > 1) {
         pages.push(totalPages);
       }
@@ -154,12 +126,31 @@ const CustomerSelectionPopup: React.FC<CustomerSelectionPopupProps> = ({
     }
   };
 
+  // Handle Select button click - send selected customers to parent
+  const handleSelectButton = () => {
+    // Get full customer objects for selected customer codes
+    const selectedCustomerObjects = customersList.filter(customer =>
+      selectedCustomers.includes(customer.customerCode)
+    );
+
+    console.log("Selected customers being sent to parent:", selectedCustomerObjects);
+    onAdd(selectedCustomers);
+    setSelectedCustomers([]);
+    onClose();
+  };
+
+  // Reset selections when popup closes
+  const handleClose = () => {
+    setSelectedCustomers([]);
+    onClose();
+  };
+
   if (!open) return null;
 
   return (
     <div
       className="fixed inset-0 z-50 flex items-center justify-center backdrop-brightness-50 overflow-auto p-4"
-      onClick={onClose}
+      onClick={handleClose}
     >
       <div
         className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg xl:max-w-xl bg-white rounded shadow-lg overflow-auto"
@@ -170,16 +161,16 @@ const CustomerSelectionPopup: React.FC<CustomerSelectionPopupProps> = ({
         <div className="flex justify-between items-center p-4">
           <h2 className="text-xl font-semibold">Outstanding Customers</h2>
 
-          <button onClick={onClose} className="bg-white rounded-md p-1 sm:p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500 cursor-pointer">
+          <button onClick={handleClose} className="bg-white rounded-md p-1 sm:p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-red-500 cursor-pointer">
             <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
-
         </div>
 
         <div className="p-4">
           <hr className="border-t-2 border-gray-300 my-2 sm:my-4" />
+
           {/* Checkbox for "All" */}
           <div className="mb-4 flex items-center">
             <input
@@ -193,15 +184,15 @@ const CustomerSelectionPopup: React.FC<CustomerSelectionPopupProps> = ({
           </div>
 
           {/* Add button */}
-          <div className="mb-4">
+          {/* <div className="mb-4">
             <button
               onClick={handleAdd}
-              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none cursor-pointer"
+              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
               disabled={selectedCustomers.length === 0}
             >
               Add {selectedCustomers.length > 0 ? `(${selectedCustomers.length})` : ''}
             </button>
-          </div>
+          </div> */}
 
           {/* Table controls */}
           <div className="flex flex-wrap justify-between mb-4">
@@ -281,6 +272,11 @@ const CustomerSelectionPopup: React.FC<CustomerSelectionPopupProps> = ({
           <div className="mt-4 flex flex-wrap justify-between items-center">
             <div className="text-sm text-gray-600 mb-2 sm:mb-0">
               Showing {filteredCustomers.length > 0 ? (currentPage - 1) * entriesPerPage + 1 : 0} to {Math.min(currentPage * entriesPerPage, filteredCustomers.length)} of {filteredCustomers.length} entries
+              {selectedCustomers.length > 0 && (
+                <span className="ml-2 text-blue-600 font-medium">
+                  ({selectedCustomers.length} selected)
+                </span>
+              )}
             </div>
             <div className="flex space-x-1">
               <button
@@ -318,13 +314,14 @@ const CustomerSelectionPopup: React.FC<CustomerSelectionPopupProps> = ({
           </div>
         </div>
 
-        {/* Footer with close button */}
+        {/* Footer with Select button */}
         <div className="bg-gray-100 px-4 py-3 flex justify-end">
           <button
-            onClick={onClose}
-            className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-950 focus:outline-none cursor-pointer"
+            onClick={handleSelectButton}
+            className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-950 focus:outline-none cursor-pointer disabled:bg-gray-400 disabled:cursor-not-allowed"
+            disabled={selectedCustomers.length === 0}
           >
-            Report
+            Select ({selectedCustomers.length})
           </button>
         </div>
       </div>

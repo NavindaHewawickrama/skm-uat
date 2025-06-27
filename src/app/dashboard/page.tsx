@@ -87,7 +87,7 @@ const Dashboard = () => {
         throw Error("Failed to fetch data");
       } else {
         const data = await response.json();
-        console.log("Pie Chart Data:", data);
+        //console.log("Pie Chart Data:", data);
         dataPieChart.deliveredCount = data.deliveredCount || 0;
         dataPieChart.rejectedCount = data.rejectedCount || 0;
         dataPieChart.pendingCount = data.pendingCount || 0;
