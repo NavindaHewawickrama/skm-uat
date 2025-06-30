@@ -406,7 +406,7 @@ const CreateOrderPage: React.FC = () => {
       handleShowAlert("success", `Loaded ${transformedData.length} invoice record(s)`);
     } catch (error) {
       console.error('Error:', error);
-      handleShowAlert("error", "Failed to fetch customer invoice data");
+      handleShowAlert("error", "Failed to fetch customer invoice data... This Cutomer does not have any invoices...");
       setOutstandingData([]);
     } finally {
       setIsLoadingInvoices(false);
@@ -496,23 +496,43 @@ const CreateOrderPage: React.FC = () => {
         if (response.status === 403) {
           handleShowAlert("error", "Not authorized to create order");
         } else {
-          // Show backend error message for other errors
-          let errorMessage = data.error || "Order creation failed";
+          let errorMessage = "Order creation failed";
 
-          // If there are additional details from backend, try to extract them
           if (data.details) {
             try {
               const parsedDetails = JSON.parse(data.details);
-              if (parsedDetails.message) {
+
+              if (parsedDetails.errors && typeof parsedDetails.errors === 'object') {
+                const validationErrors: string[] = [];
+
+                Object.keys(parsedDetails.errors).forEach(field => {
+                  const fieldErrors = parsedDetails.errors[field];
+                  if (Array.isArray(fieldErrors)) {
+                    validationErrors.push(...fieldErrors);
+                  } else {
+                    validationErrors.push(fieldErrors);
+                  }
+                });
+
+                if (validationErrors.length > 0) {
+                  errorMessage = validationErrors.join(', ');
+                }
+              }
+              // Fallback to title or general message if no specific field errors
+              else if (parsedDetails.title) {
+                errorMessage = parsedDetails.title;
+              } else if (parsedDetails.message) {
                 errorMessage = parsedDetails.message;
-              } else if (typeof data.details === "string") {
-                errorMessage = data.details;
               }
             } catch (e) {
-              // If parsing fails, use details as string
+              // If parsing fails, try to use details as string or fall back to main error message
               console.error("Error parsing details:", e);
-              errorMessage = data.details;
+              errorMessage = typeof data.details === "string" ? data.details : data.error || errorMessage;
             }
+          }
+          // If no details, use the main error message
+          else if (data.error) {
+            errorMessage = data.error;
           }
 
           handleShowAlert("error", errorMessage);

@@ -304,8 +304,19 @@ const DeliveredOrdersPage: React.FC = () => {
   const handleItemDetailsView = (order: OrderType) => {
     //  console.log(order);
 
-    if (Array.isArray(order.items)) {
-      setSelectedOrderItems(order.items);
+    if (Array.isArray(order.orderedItems)) {
+      setSelectedOrderItems(order.orderedItems);
+    } else {
+      setSelectedOrderItems([]);
+    }
+    setListViewOpen(true);
+  };
+
+  const handleInvoicedItemDetailsView = (order: OrderType) => {
+    //console.log(order.invoicedItems);
+
+    if (Array.isArray(order.invoicedItems)) {
+      setSelectedOrderItems(order.invoicedItems);
     } else {
       setSelectedOrderItems([]);
     }
@@ -442,6 +453,9 @@ const DeliveredOrdersPage: React.FC = () => {
                         Item Details
                       </th>
                       <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                        Invoiced Item Details
+                      </th>
+                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                         Note
                       </th>
                       <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
@@ -477,6 +491,11 @@ const DeliveredOrdersPage: React.FC = () => {
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
                           <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer" onClick={() => handleItemDetailsView(order)}>
+                            View
+                          </button>
+                        </td>
+                        <td className="px-4 py-3 border text-sm text-center">
+                          <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer" onClick={() => handleInvoicedItemDetailsView(order)}>
                             View
                           </button>
                         </td>

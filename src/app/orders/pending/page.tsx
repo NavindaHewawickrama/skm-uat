@@ -176,10 +176,11 @@ const PendingOrdersPage: React.FC = () => {
   };
 
   const handleItemDetailsView = (order: OrderType) => {
-    //    console.log(order);
+   // console.log(order);
 
-    if (Array.isArray(order.items)) {
-      setSelectedOrderItems(order.items);
+    // Changed from order.items to order.orderedItems
+    if (Array.isArray(order.orderedItems)) {
+      setSelectedOrderItems(order.orderedItems);
     } else {
       setSelectedOrderItems([]);
     }

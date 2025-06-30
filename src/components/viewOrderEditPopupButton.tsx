@@ -23,7 +23,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
   onClose,
   orderDetails,
 }) => {
-  //  console.log(orderDetails);
+  //console.log(orderDetails);
 
   if (!open) return null;
 
@@ -125,7 +125,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
         >
           <div className="flex flex-row justify-between mb-3 sm:mb-5">
             <h4 className="capitalize font-medium text-lg sm:text-xl md:text-2xl truncate">
-              {/* order details - {orderDetails.orderNo} */}
+              Item Details
             </h4>
 
             <p
@@ -190,13 +190,13 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
                         {item.itemCode}
                       </td>
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
-                        {item.unitPrice}
+                        {Number(item.unitPrice).toFixed(2)}
                       </td>
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
                         {item.quantity}
                       </td>
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
-                        {item.discountPercent}
+                        {item.discountPercent} %
                       </td>
 
                     </tr>

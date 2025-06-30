@@ -45,7 +45,7 @@ const ViewOrderDeliveryStatus: React.FC<ModalProps> = ({ open, onClose, tracking
                 >
                     <div className="flex flex-row justify-between mb-3 sm:mb-5">
                         <h4 className="capitalize font-medium text-lg sm:text-xl md:text-2xl truncate">
-                            {/* order details - {orderDetails.orderNo} */}
+                            Dilivery Details
                         </h4>
 
                         <p

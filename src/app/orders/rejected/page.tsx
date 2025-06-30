@@ -166,8 +166,8 @@ const RejectedOrdersPage: React.FC = () => {
 
   const handleItemDetailsView = (order: OrderType) => {
     //  console.log(order);
-    if (Array.isArray(order.items)) {
-      setSelectedOrder(order.items);
+    if (Array.isArray(order.orderedItems)) {
+      setSelectedOrder(order.orderedItems);
     } else {
       setSelectedOrder([]);
     }

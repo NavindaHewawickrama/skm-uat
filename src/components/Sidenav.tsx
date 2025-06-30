@@ -156,7 +156,7 @@ const SideNav: React.FC<SideNavProps> = ({ isOpen }) => {
 
   return (
     <div className={navClass}>
-      <div className="px-6 mt-4 text-gray-500">Dashboard</div>
+      <Link href="/dashboard" className="cursor-pointer"><div className="px-6 mt-4 text-gray-500">Dashboard</div></Link>
       {/* Navigation Menu */}
       <nav className="mt-4">
         {navItems.map((item, index) => (
@@ -164,18 +164,16 @@ const SideNav: React.FC<SideNavProps> = ({ isOpen }) => {
             {item.subItems ? (
               // Items with subitems - click to expand
               <div
-                className={`flex items-center px-6 py-3 cursor-pointer ${
-                  item.active ? "text-blue-500 bg-blue-50" : "text-gray-600"
-                } hover:bg-gray-100`}
+                className={`flex items-center px-6 py-3 cursor-pointer ${item.active ? "text-blue-500 bg-blue-50" : "text-gray-600"
+                  } hover:bg-gray-100`}
                 onClick={() => toggleExpand(index)}
               >
                 <div className="w-6 mr-4">{getIcon(item.icon)}</div>
                 <span>{item.label}</span>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className={`h-4 w-4 ml-auto transition-transform ${
-                    item.expanded ? "rotate-180" : ""
-                  }`}
+                  className={`h-4 w-4 ml-auto transition-transform ${item.expanded ? "rotate-180" : ""
+                    }`}
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
@@ -192,9 +190,8 @@ const SideNav: React.FC<SideNavProps> = ({ isOpen }) => {
               // Items without subitems - direct link
               <Link
                 href={item.href}
-                className={`flex items-center px-6 py-3 cursor-pointer ${
-                  item.active ? "text-blue-500 bg-blue-50" : "text-gray-600"
-                } hover:bg-gray-100`}
+                className={`flex items-center px-6 py-3 cursor-pointer ${item.active ? "text-blue-500 bg-blue-50" : "text-gray-600"
+                  } hover:bg-gray-100`}
               >
                 <div className="w-6 mr-4">{getIcon(item.icon)}</div>
                 <span>{item.label}</span>
@@ -208,11 +205,10 @@ const SideNav: React.FC<SideNavProps> = ({ isOpen }) => {
                   <Link
                     href={subItem.href}
                     key={subIndex}
-                    className={`flex items-center pl-16 py-2 ${
-                      subItem.active
-                        ? "text-blue-500 bg-blue-50"
-                        : "text-gray-600"
-                    } hover:bg-gray-100`}
+                    className={`flex items-center pl-16 py-2 ${subItem.active
+                      ? "text-blue-500 bg-blue-50"
+                      : "text-gray-600"
+                      } hover:bg-gray-100`}
                   >
                     <span>{subItem.label}</span>
                   </Link>
@@ -226,7 +222,7 @@ const SideNav: React.FC<SideNavProps> = ({ isOpen }) => {
   );
 };
 
-// Helper function to return the appropriate icon
+// for bigger screens
 function getIcon(iconName: string) {
   switch (iconName) {
     case "dashboard":

@@ -85,7 +85,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
         rejectReason: selectedStatus === "3" ? rejectReason : "",
         trackingNumber: trackingNumber,
         delivertPersonName: deliveryPerson,
-        deliveryDate: deliveryDate? deliveryDate : null,
+        deliveryDate: deliveryDate ? deliveryDate : null,
         note: specialNote,
       };
 
@@ -124,8 +124,6 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
         // Error case - check for 403 status first
         if (response.status === 403) {
           handleShowAlert("error", "No permission to change status");
-        } else if (response.status === 400) {
-          handleShowAlert("error", "Failed to update order status");
         } else {
           // Show backend error message for other errors
           let errorMessage = result.error || "Failed to update order status";
@@ -134,15 +132,29 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
           if (result.details) {
             try {
               const parsedDetails = JSON.parse(result.details);
-              if (parsedDetails.message) {
+              if (parsedDetails.errors && typeof parsedDetails.errors === 'object') {
+                const validationErrors: string[] = [];
+
+                Object.keys(parsedDetails.errors).forEach(field => {
+                  const fieldErrors = parsedDetails.errors[field];
+                  if (Array.isArray(fieldErrors)) {
+                    validationErrors.push(...fieldErrors);
+                  } else {
+                    validationErrors.push(fieldErrors);
+                  }
+                });
+
+                if (validationErrors.length > 0) {
+                  errorMessage = validationErrors.join(', ');
+                }
+              } else if (parsedDetails.title) {
+                errorMessage = parsedDetails.title;
+              } else if (parsedDetails.message) {
                 errorMessage = parsedDetails.message;
-              } else if (typeof result.details === 'string') {
-                errorMessage = result.details;
               }
             } catch (e) {
-              // If parsing fails, use details as string
               console.error("Error parsing details:", e);
-              errorMessage = result.details;
+              errorMessage = typeof result.details === "string" ? result.details : result.error || errorMessage;
             }
           }
 
@@ -295,7 +307,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
                 <input
                   type="date"
                   id="deliveryDate"
-                  value={deliveryDate? deliveryDate : ""}
+                  value={deliveryDate ? deliveryDate : ""}
                   onChange={(e) => setDeliveryDate(e.target.value)}
                   className="block w-full border border-gray-300 rounded-md p-2"
                 />
