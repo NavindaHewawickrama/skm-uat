@@ -6,6 +6,7 @@ import Footer from "../../../components/Footer";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import Alert from "../../../components/Alert";
+import Select from 'react-select';
 
 type OrderType = {
   orderNumber: number;
@@ -123,7 +124,7 @@ const CreateOrderPage: React.FC = () => {
   const [substitutedItemsList, setSubstitutedItemsList] = useState<
     SubstituteItem[]
   >([]);
-
+  const [loading, setLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
@@ -133,6 +134,21 @@ const CreateOrderPage: React.FC = () => {
   >([]);
   const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
+
+  const locationOptions = locations.map((loc) => ({
+    value: loc.locationCode,
+    label: loc.locationName,
+  }));
+
+  const customerOptions = customers.map((customer) => ({
+    value: customer.customerCode,
+    label: customer.customerName
+  }));
+
+  // const itemOptions = itemsList.map((item) => ({
+  //   value: item.itemCode,
+  //   label: item.itemName,
+  // }));
 
   useEffect(() => {
     const pendingOrderList = sessionStorage.getItem("notificationsData");
@@ -148,12 +164,12 @@ const CreateOrderPage: React.FC = () => {
   }, [outstandingData]);
 
   useEffect(() => {
-    fetchUserCustomerDetails();
     setUserRoleType(
       sessionStorage.getItem("userRoleName")
         ? sessionStorage.getItem("userRoleName")
         : ""
     );
+    fetchUserCustomerDetails(sessionStorage.getItem("userRoleName") || "");
   }, []);
 
   const handleShowAlert = (type: string, message: string) => {
@@ -167,12 +183,23 @@ const CreateOrderPage: React.FC = () => {
     }, 5000);
   };
 
-  const fetchUserCustomerDetails = async () => {
+  const fetchUserCustomerDetails = async (userRole: string) => {
     try {
-      const response = await fetch(`/api/userCustomerDetails`, {
-        method: "GET",
-        credentials: "include",
-      });
+      setLoading(true);
+      let response;
+      if (userRole.toLowerCase() === "admin") {
+        response = await fetch(`/api/userCustomerDetails/admin`, {
+          method: "GET",
+          credentials: "include",
+        });
+      } else {
+        response = await fetch(`/api/userCustomerDetails/user`, {
+          method: "GET",
+          credentials: "include",
+        });
+      }
+
+
 
       if (!response.ok) {
         throw Error("Failed to fetch pending order data");
@@ -184,6 +211,7 @@ const CreateOrderPage: React.FC = () => {
         // setPaymentTypes(data.paymentTypes);
         setItemsList(data.items);
       }
+      setLoading(false);
     } catch (err) {
       console.error("Error fetching pending order data:", err);
     }
@@ -415,7 +443,7 @@ const CreateOrderPage: React.FC = () => {
 
 
   const handleCustomerChange = (customerCode: string) => {
-    //console.log(customerCode);
+    console.log(customerCode);
     setCustomer(customerCode);
 
     const selected = customers.find((c) => c.customerCode === customerCode);
@@ -461,6 +489,16 @@ const CreateOrderPage: React.FC = () => {
 
   const handleSave = async () => {
     try {
+
+      // const newdata = {
+      //   customerCode: selectedCustomer?.customerCode,
+      //   locationCode: location,
+      //   paymentMethodCode: selectedCustomer?.paymentTermCode,
+      //   totalAmount: orderTotal,
+      //   items: orderItems,
+      // }
+      // console.log("New Data:", newdata);
+
       const response = await fetch("/api/orders/create", {
         method: "POST",
         body: JSON.stringify({
@@ -545,6 +583,26 @@ const CreateOrderPage: React.FC = () => {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+        <div className="flex flex-1 overflow-hidden">
+          <SideNav isOpen={sideNavOpen} />
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="mt-4 text-lg text-gray-600">
+                Loading data...
+              </p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
@@ -565,7 +623,7 @@ const CreateOrderPage: React.FC = () => {
             <div className="bg-white p-6 rounded-md shadow-sm mb-4">
               <h2 className="text-lg font-bold mb-4">Order</h2>
               {/*Location*/}
-              <div className="mb-4 w-[250px]">
+              {/* <div className="mb-4 w-[250px]">
                 <label className="block text-gray-700 font-medium mb-2">
                   Location:
                 </label>
@@ -601,14 +659,35 @@ const CreateOrderPage: React.FC = () => {
                     </svg>
                   </div>
                 </div>
+              </div> */}
+              <div className="mb-4 w-[250px]">
+                <label className="block text-gray-700 font-medium mb-1.5">
+                  Location:
+                </label>
+                <Select
+                  className="w-full text-sm"
+                  styles={{
+                    control: (provided) => ({
+                      ...provided,
+                      minHeight: '40px',
+                      height: '40px',
+                    }),
+                  }}
+                  options={locationOptions}
+                  value={locationOptions.find((opt) => opt.value === location)}
+                  onChange={(selected) => setLocation(selected?.value || "")}
+                  placeholder="Select a Location"
+                  isSearchable
+                />
               </div>
+
               {/* Customer and Totals Row */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Customer:
                   </label>
-                  <div className="relative">
+                  {/* <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
                       value={customer}
@@ -636,7 +715,24 @@ const CreateOrderPage: React.FC = () => {
                         />
                       </svg>
                     </div>
-                  </div>
+                  </div> */}
+                  <Select
+                    className="w-full text-sm"
+                    styles={{
+                      control: (provided) => ({
+                        ...provided,
+                        minHeight: '41px',
+                        height: '41px',
+                      }),
+                    }}
+                    options={customerOptions}
+                    value={customerOptions.find((c) => c.value === customer) || null}
+                    onChange={(selected) => handleCustomerChange(selected?.value || "")}
+                    getOptionLabel={(option) => option.label}
+                    getOptionValue={(option) => option.value}
+                    placeholder="Select a Customer"
+                    isSearchable
+                  />
                 </div>
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
@@ -671,6 +767,8 @@ const CreateOrderPage: React.FC = () => {
                   />
                 </div>
               </div>
+
+
 
               {/* Payment Type and Notes Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -758,7 +856,7 @@ const CreateOrderPage: React.FC = () => {
                     Items by Code:
                   </label>
                   <div className="relative">
-                    <select
+                    {/* <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
                       value={selectedItem}
                       onChange={(e) =>
@@ -771,8 +869,25 @@ const CreateOrderPage: React.FC = () => {
                           {item.itemCode}
                         </option>
                       ))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    </select> */}
+                    <Select<Item>
+                      options={itemsList}
+                      className="w-full text-sm"
+                      styles={{
+                        control: (provided) => ({
+                          ...provided,
+                          minHeight: '42px',
+                          height: '42px',
+                        }),
+                      }}
+                      value={itemsList.find((item) => item.itemCode === selectedItem) || null}
+                      onChange={(e) => updateCurrentItem("itemCode", e?.itemCode || "")}
+                      getOptionLabel={(option) => option.itemCode}
+                      getOptionValue={(option) => option.itemCode}
+                      placeholder="Select item code"
+                      isSearchable
+                    />
+                    {/* <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
                       <svg
                         className="h-4 w-4"
                         fill="none"
@@ -786,7 +901,7 @@ const CreateOrderPage: React.FC = () => {
                           d="M19 9l-7 7-7-7"
                         />
                       </svg>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
 

@@ -103,54 +103,185 @@ const StockView = () => {
 
   // Fetch stock data from API
   useEffect(() => {
-    const fetchStockData = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    // const fetchStockData = async () => {
+    //   try {
+    //     setLoading(true);
+    //     setError(null);
 
-        const response = await fetch("/api/stock", {
-          method: "GET",
-          credentials: "include",
-        });
+    //     // const response = await fetch("/api/stock", {
+    //     //   method: "GET",
+    //     //   credentials: "include",
+    //     // });
 
-        if (!response.ok) {
-          throw Error("Failed to fetch stock data");
-        }
+    //     // if (!response.ok) {
+    //     //   throw Error("Failed to fetch stock data");
+    //     // }
 
-        const apiData: ApiStockItem[] = await response.json();
+    //     // const apiData: ApiStockItem[] = await response.json();
 
-        // Transform API data to match component interface
-        const transformedData: StockItem[] = apiData.map((item) => ({
-          itemCode: item.itemCode,
-          itemName: item.itemName,
-          location: item.location,
-          stock: item.stock,
-          unitPrice: item.unitPrice,
-          itemCategory: item.itemCategory,
-          category: item.category,
-          subCategory: item.subCategory,
-          description: item.description,
-          description2: item.description2,
-          unitOfMeasure: item.unitOfMeasure,
-          size: item.size,
-          reorderQuantity: item.reorderQuantity,
-          image: item.image,
-          img: item.image ? item.image : productImage,
-        }));
+    //     // // Transform API data to match component interface
+    //     // const transformedData: StockItem[] = apiData.map((item) => ({
+    //     //   itemCode: item.itemCode,
+    //     //   itemName: item.itemName,
+    //     //   location: item.location,
+    //     //   stock: item.stock,
+    //     //   unitPrice: item.unitPrice,
+    //     //   itemCategory: item.itemCategory,
+    //     //   category: item.category,
+    //     //   subCategory: item.subCategory,
+    //     //   description: item.description,
+    //     //   description2: item.description2,
+    //     //   unitOfMeasure: item.unitOfMeasure,
+    //     //   size: item.size,
+    //     //   reorderQuantity: item.reorderQuantity,
+    //     //   image: item.image,
+    //     //   img: item.image ? item.image : productImage,
+    //     // }));
 
-        setStockItems(transformedData);
-      } catch (err) {
-        console.error("Error fetching stock data:", err);
-        setError(
-          err instanceof Error ? err.message : "Failed to fetch stock data"
-        );
-      } finally {
-        setLoading(false);
-      }
-    };
+    //     // setStockItems(transformedData);
+    //     const response = await fetch("/api/stock", {
+    //       method: "GET",
+    //       credentials: "include",
+    //     });
+
+    //     if (!response.ok) {
+    //       throw new Error("Failed to fetch stock data");
+    //     }
+
+    //     const reader = response.body?.getReader();
+    //     const decoder = new TextDecoder("utf-8");
+
+    //     let buffer = "";
+    //     let done = false;
+
+    //     while (!done) {
+    //       const { value, done: readerDone } = await reader!.read();
+    //       done = readerDone;
+    //       buffer += decoder.decode(value || new Uint8Array(), { stream: true });
+
+    //       // Split buffer into JSON objects if backend sends newline-delimited JSON
+    //       let lines = buffer.split("\n");
+
+    //       // Keep the last partial line in the buffer
+    //       buffer = lines.pop() || "";
+
+    //       for (const line of lines) {
+    //         if (line.trim()) {
+    //           try {
+    //             const item: ApiStockItem = JSON.parse(line);
+    //             const transformed: StockItem = {
+    //               itemCode: item.itemCode,
+    //               itemName: item.itemName,
+    //               location: item.location,
+    //               stock: item.stock,
+    //               unitPrice: item.unitPrice,
+    //               itemCategory: item.itemCategory,
+    //               category: item.category,
+    //               subCategory: item.subCategory,
+    //               description: item.description,
+    //               description2: item.description2,
+    //               unitOfMeasure: item.unitOfMeasure,
+    //               size: item.size,
+    //               reorderQuantity: item.reorderQuantity,
+    //               image: item.image,
+    //               img: item.image ? item.image : productImage,
+    //             };
+
+    //             // Append item as it arrives
+    //             setStockItems(prev => [...prev, transformed]);
+    //           } catch (err) {
+    //             console.error("Failed to parse chunk", err);
+    //           }
+    //         }
+    //       }
+    //     }
+
+    //     setLoading(false);
+
+    //   } catch (err) {
+    //     console.error("Error fetching stock data:", err);
+    //     setError(
+    //       err instanceof Error ? err.message : "Failed to fetch stock data"
+    //     );
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
 
     fetchStockData();
   }, []);
+
+  const fetchStockData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const response = await fetch("/api/stock", {
+        method: "GET",
+        credentials: "include",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch stock data");
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder("utf-8");
+      let buffer = "";
+
+      if (!reader) throw new Error("Readable stream not supported");
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || ""; // Keep incomplete JSON in buffer
+
+        for (const line of lines) {
+          if (line.trim()) {
+            try {
+              const item: ApiStockItem = JSON.parse(line);
+
+              const transformed: StockItem = {
+                itemCode: item.itemCode,
+                itemName: item.itemName,
+                location: item.location,
+                stock: item.stock,
+                unitPrice: item.unitPrice,
+                itemCategory: item.itemCategory,
+                category: item.category,
+                subCategory: item.subCategory,
+                description: item.description,
+                description2: item.description2,
+                unitOfMeasure: item.unitOfMeasure,
+                size: item.size,
+                reorderQuantity: item.reorderQuantity,
+                image: item.image,
+                img: item.image ? item.image : productImage,
+              };
+
+              // Add each item as it streams in
+              setStockItems(prev => [...prev, transformed]);
+            } catch (parseErr) {
+              console.error("JSON parse error:", parseErr);
+            }
+          }
+        }
+      }
+
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching stock data:", err);
+      setError(
+        err instanceof Error ? err.message : "Failed to fetch stock data"
+      );
+      setLoading(false);
+    }
+  };
+
 
   // Filter items based on search query
   const filteredItems = useMemo(() => {
@@ -383,16 +514,16 @@ const StockView = () => {
                   {displayedItems.map((item, index) => (
                     <tr
                       key={`${item.itemCode}-${item.location}-${index}`}
-                      className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMB-SKM" ? "bg-[#fa8484]" : item.location === "COLOMB-SNS" ? "bg-[#9cffff]" : item.location === "WELI-SKM" ? "bg-[#f2fa84]" : item.location === "WELI-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
+                      className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-01-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-02-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH-01-SKM" ? "bg-[#f2fa84]" : item.location === "WELISARA-WH-01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
                         }`}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
                         {item.itemCode}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
                         {item.itemName}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs">
                         {item.location}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
@@ -404,10 +535,10 @@ const StockView = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.itemCategory}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-xs text-gray-900">
                         {item.category}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-center text-xs text-gray-900">
                         {item.subCategory}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">

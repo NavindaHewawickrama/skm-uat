@@ -65,20 +65,30 @@ const OutstandingsPage: React.FC = () => {
   const [alertType, setAlertType] = useState("");
   const [outstandingInvoices, setOutstandingInvoices] = useState<CustomerOutstandingData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  //const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
     const pendingOrderList = sessionStorage.getItem("notificationsData");
     setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
-    fetchUserCustomerDetails();
+    fetchUserCustomerDetails(sessionStorage.getItem("userRoleName") || "");
   }, []);
 
-  const fetchUserCustomerDetails = async () => {
+  const fetchUserCustomerDetails = async (userRole: string) => {
     try {
-      const response = await fetch(`/api/userCustomerDetails`, {
-        method: "GET",
-        credentials: "include",
-      });
+      setIsLoading(true);
+      let response;
+      if (userRole.toLowerCase() === "admin") {
+        response = await fetch(`/api/userCustomerDetails/admin`, {
+          method: "GET",
+          credentials: "include",
+        });
+      } else {
+        response = await fetch(`/api/userCustomerDetails/user`, {
+          method: "GET",
+          credentials: "include",
+        });
+      }
 
       if (!response.ok) {
         throw Error("Failed to fetch pending order data");
@@ -87,6 +97,7 @@ const OutstandingsPage: React.FC = () => {
         console.log(data);
         setCustomers(data.customers);
       }
+      setIsLoading(false);
     } catch (err) {
       console.error("Error fetching pending order data:", err);
     }
@@ -294,7 +305,25 @@ const OutstandingsPage: React.FC = () => {
     window.open(url, "_blank");
   };
 
-  
+  if (isLoading) {
+    return (
+      <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+        <div className="flex flex-1 overflow-hidden">
+          <SideNav isOpen={sideNavOpen} />
+          <div className="flex-1 flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto"></div>
+              <p className="mt-4 text-lg text-gray-600">
+                Loading data...
+              </p>
+            </div>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
