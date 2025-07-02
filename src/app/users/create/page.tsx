@@ -122,12 +122,13 @@ const CreateUserPage: React.FC = () => {
   const [viewpw, setViewPw] = useState(false);
   const [viewpw1, setViewPw1] = useState(false);
   const [userRoleId, setUserRoleId] = useState(0);
-  const userNameAppbar = sessionStorage.getItem("userName") || "Guest";
+  // const userNameAppbar = sessionStorage.getItem("userName") || "Guest";
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
-
+  const [userNameAppbar, setUserNameAppbar] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
 
   useEffect(() => {
+    setUserNameAppbar(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
     const pendingOrderList = sessionStorage.getItem("notificationsData");
     setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);

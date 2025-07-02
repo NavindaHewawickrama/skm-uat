@@ -134,7 +134,7 @@ const CreateOrderPage: React.FC = () => {
   >([]);
   const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
-  const userName = sessionStorage.getItem("userName") || "Guest";
+  const [userName, setUserName] = useState<string | null>(null);
   const locationOptions = locations.map((loc) => ({
     value: loc.locationCode,
     label: loc.locationName,
@@ -153,6 +153,7 @@ const CreateOrderPage: React.FC = () => {
   useEffect(() => {
     const pendingOrderList = sessionStorage.getItem("notificationsData");
     setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+    setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
   }, []);
 
 

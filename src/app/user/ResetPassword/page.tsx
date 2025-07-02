@@ -41,8 +41,10 @@ const ResetPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
+  const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
+    setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
     const pendingOrderList = sessionStorage.getItem("notificationsData");
     setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
@@ -53,7 +55,6 @@ const ResetPassword = () => {
     setAlertMessage(message);
     setShowAlert(true);
   };
-  const userName = sessionStorage.getItem("userName") || "Guest";
 
   const [errors, setErrors] = useState({
     newPassword: "",

@@ -8,9 +8,10 @@ const ReportsOutstandings = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState("");
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
-  const userName = sessionStorage.getItem("userName") || "Guest";
+  const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
+    setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
   }, []);
 

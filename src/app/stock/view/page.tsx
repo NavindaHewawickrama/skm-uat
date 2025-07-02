@@ -80,10 +80,11 @@ const StockView = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
-  const userName = sessionStorage.getItem("userName") || "Guest";
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
+  const [userName, setUserName] = useState<string | null>(null);
 
   useEffect(() => {
+    setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
     const pendingOrderList = sessionStorage.getItem("notificationsData");
     setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);

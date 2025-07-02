@@ -42,10 +42,11 @@ const RejectedOrdersPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [rejectedOrders, setRejectedOrders] = useState<OrderType[]>([]);
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
-  const userName = sessionStorage.getItem("userName") || "Guest";
+  const [userName, setUserName] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
 
   useEffect(() => {
+    setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
     const pendingOrderList = sessionStorage.getItem("notificationsData");
     setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);

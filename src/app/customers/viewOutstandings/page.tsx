@@ -65,10 +65,11 @@ const OutstandingsPage: React.FC = () => {
   const [alertType, setAlertType] = useState("");
   const [outstandingInvoices, setOutstandingInvoices] = useState<CustomerOutstandingData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const userName = sessionStorage.getItem("userName") || "Guest";
+  const [userName, setUserName] = useState<string | null>(null);
   //const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
     const pendingOrderList = sessionStorage.getItem("notificationsData");
     setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
