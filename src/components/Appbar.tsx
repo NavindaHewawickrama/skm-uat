@@ -54,7 +54,7 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole, userName, noti
   const [openNotificationPopup, setOpenNotificationPopup] = useState(false);
   const [notificationDataState, setNotificationDataState] = useState<OrderType[]>([]);
 
-  console.log(userName);
+  //console.log(userName);
 
   useEffect(() => {
     // Initialize notification data state if provided

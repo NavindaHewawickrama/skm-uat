@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
     (await cookieStore).set({
       name: 'refreshtoken',
-      value: data.refreshtoken, // adjust according to actual token field in API response
+      value: data.refreshToken, // adjust according to actual token field in API response
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
