@@ -261,7 +261,7 @@ const OutstandingsPage: React.FC = () => {
       item.invoiceDate,
       `${item.invoicedAmount.toFixed(2)}`,
       `${item.pdcAmount.toFixed(2)}`,
-      `${(item.dueAmount - item.invoicedAmount) > 0 ? (item.dueAmount - item.invoicedAmount).toFixed(2) : "0.00"}`,
+      `${item.dueAmount.toFixed(2)}`,
     ]);
 
     autoTable(pdf, {
@@ -493,7 +493,7 @@ const OutstandingsPage: React.FC = () => {
                               {invoice.pdcAmount.toFixed(2)}
                             </td>
                             <td className="px-4 py-3 border text-sm text-right font-medium">
-                              {(invoice.dueAmount - invoice.invoicedAmount) > 0 ? (invoice.dueAmount - invoice.invoicedAmount).toFixed(2) : 0.00}
+                              {invoice.dueAmount.toFixed(2)}
                             </td>
                           </tr>
                         ))}
