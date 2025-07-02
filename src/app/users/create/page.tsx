@@ -139,6 +139,9 @@ const CreateUserPage: React.FC = () => {
     setShowAlert(true);
   };
 
+  console.log(isMfaEnabled);
+  console.log(mfaType);
+
   // API data states
   const [userCreationDetails, setUserCreationDetails] = useState<UserCreationDetails>({
     salesPersons: [],
@@ -382,8 +385,8 @@ const CreateUserPage: React.FC = () => {
             email: email,
             phoneNumber: telephone,
             isActive: isActive,
-            isMfaEnabled: isMfaEnabled,
-            mfaType: mfaType
+            isMfaEnabled: false,
+            mfaType: ""
           }),
           headers: {
             'Content-Type': 'application/json',
@@ -468,8 +471,8 @@ const CreateUserPage: React.FC = () => {
             email: email,
             phoneNumber: telephone,
             isActive: isActive,
-            isMfaEnabled: isMfaEnabled,
-            mfaType: mfaType
+            isMfaEnabled: false,
+            mfaType: ""
           }),
           headers: {
             'Content-Type': 'application/json',
