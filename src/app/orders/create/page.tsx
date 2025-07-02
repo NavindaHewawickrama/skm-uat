@@ -134,7 +134,7 @@ const CreateOrderPage: React.FC = () => {
   >([]);
   const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
-
+  const userName = sessionStorage.getItem("userName") || "Guest";
   const locationOptions = locations.map((loc) => ({
     value: loc.locationCode,
     label: loc.locationName,
@@ -586,7 +586,7 @@ const CreateOrderPage: React.FC = () => {
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -606,7 +606,7 @@ const CreateOrderPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">

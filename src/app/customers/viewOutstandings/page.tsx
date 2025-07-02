@@ -65,6 +65,7 @@ const OutstandingsPage: React.FC = () => {
   const [alertType, setAlertType] = useState("");
   const [outstandingInvoices, setOutstandingInvoices] = useState<CustomerOutstandingData[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const userName = sessionStorage.getItem("userName") || "Guest";
   //const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -308,7 +309,7 @@ const OutstandingsPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -328,7 +329,7 @@ const OutstandingsPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
 
       {/* Alert Component */}
       {showAlert && (

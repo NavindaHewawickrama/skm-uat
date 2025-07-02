@@ -80,7 +80,7 @@ const StockView = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
-
+  const userName = sessionStorage.getItem("userName") || "Guest";
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
 
   useEffect(() => {
@@ -384,7 +384,7 @@ const StockView = () => {
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -404,7 +404,7 @@ const StockView = () => {
   if (error) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -424,7 +424,7 @@ const StockView = () => {
 
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
 
       <div className="flex flex-1 overflow-hidden">
         <SideNav isOpen={sideNavOpen} />

@@ -8,6 +8,7 @@ const ReportsOutstandings = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [selectedCustomer, setSelectedCustomer] = useState("");
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
+  const userName = sessionStorage.getItem("userName") || "Guest";
 
   useEffect(() => {
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
@@ -24,7 +25,7 @@ const ReportsOutstandings = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">

@@ -63,6 +63,7 @@ const CreateNoticePage: React.FC = () => {
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
 
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
+  const userName = sessionStorage.getItem("userName") || "Guest";
 
   useEffect(() => {
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
@@ -180,7 +181,7 @@ const CreateNoticePage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-auto">

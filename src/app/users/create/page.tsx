@@ -122,7 +122,7 @@ const CreateUserPage: React.FC = () => {
   const [viewpw, setViewPw] = useState(false);
   const [viewpw1, setViewPw1] = useState(false);
   const [userRoleId, setUserRoleId] = useState(0);
-
+  const userNameAppbar = sessionStorage.getItem("userName") || "Guest";
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
 
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
@@ -554,7 +554,7 @@ const CreateUserPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userNameAppbar} notificationData={pendingOrders} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-auto">

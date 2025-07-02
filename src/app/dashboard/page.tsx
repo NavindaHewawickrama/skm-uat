@@ -38,12 +38,14 @@ const Dashboard = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [notices, setNotices] = useState<Notices[]>([]);
   const [user, setUser] = useState("");
+  const [userName, setUserName] = useState("");
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [dataPieChart, setDataPieChart] = useState<pieChartData>({
     deliveredCount: 0,
     rejectedCount: 0,
     pendingCount: 0,
   });
+  
 
 
   useEffect(() => {
@@ -110,7 +112,7 @@ const Dashboard = () => {
       } else {
         const data = await response.json();
         //    console.log("Welcome to SKM Sales App...", data.firstName);
-        //  console.log(data);
+        console.log(data);
         switch (data.userRoleId) {
           case 1:
             setUser("ADMIN");
@@ -129,6 +131,9 @@ const Dashboard = () => {
             sessionStorage.setItem("userRoleName", "USER");
             break;
         }
+
+        sessionStorage.setItem("userName", data.username);
+        setUserName(data.username);
       }
     } catch (err) {
       console.error("Error fetching pending order data:", err);
@@ -214,7 +219,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen w-screen bg-gray-100 flex flex-col">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={user} notificationData={pendingOrders} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={user} userName={userName} notificationData={pendingOrders} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">

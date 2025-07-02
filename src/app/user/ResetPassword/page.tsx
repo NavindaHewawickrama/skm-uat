@@ -53,6 +53,7 @@ const ResetPassword = () => {
     setAlertMessage(message);
     setShowAlert(true);
   };
+  const userName = sessionStorage.getItem("userName") || "Guest";
 
   const [errors, setErrors] = useState({
     newPassword: "",
@@ -159,7 +160,7 @@ const ResetPassword = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">

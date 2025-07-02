@@ -42,7 +42,7 @@ const RejectedOrdersPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [rejectedOrders, setRejectedOrders] = useState<OrderType[]>([]);
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
-
+  const userName = sessionStorage.getItem("userName") || "Guest";
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
 
   useEffect(() => {
@@ -183,7 +183,7 @@ const RejectedOrdersPage: React.FC = () => {
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -203,7 +203,7 @@ const RejectedOrdersPage: React.FC = () => {
   if (error) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -224,7 +224,7 @@ const RejectedOrdersPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={pendingOrders} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">

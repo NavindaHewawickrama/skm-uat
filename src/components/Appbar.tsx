@@ -41,10 +41,11 @@ type OrderType = {
 interface AppBarProps {
   toggleSideNav: () => void;
   userRole: string | null;
+  userName: string | null;
   notificationData?: OrderType[]; // Updated to use the correct type
 }
 
-const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole, notificationData }) => {
+const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole, userName, notificationData }) => {
   const router = useRouter();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [alertDropdownOpen, setAlertDropdownOpen] = useState(false);
@@ -52,6 +53,8 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole, notificationDa
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const [openNotificationPopup, setOpenNotificationPopup] = useState(false);
   const [notificationDataState, setNotificationDataState] = useState<OrderType[]>([]);
+
+  console.log(userName);
 
   useEffect(() => {
     // Initialize notification data state if provided
@@ -243,8 +246,19 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole, notificationDa
           )}
         </div>
 
+        {/* User name display
+        <div className="font-bold">{userName ? userName : ""}</div>
+
         {/* Admin label */}
-        <div className="font-bold">{userRole}</div>
+        {/* <div className="font-bold">{userRole ? userRole : ""}</div>  */}
+        {/* User name display */}
+        <div className="space-y-1">
+          {/* User name display */}
+          <div className="font-bold text-xl">{userName ? userName : ""}</div>
+
+          {/* User role as subtitle */}
+          <div className="text-xs text-gray-300 font-medium mt-[-5]">{userRole ? userRole : ""}</div>
+        </div>
 
         {/* User profile icon with dropdown */}
         <div className="relative" ref={profileDropdownRef}>

@@ -53,7 +53,7 @@ const PendingOrdersPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
-
+  const userName = sessionStorage.getItem("userName") || "Guest";
   const [notificationOrders, setNotificationOrders] = useState<OrderType[]>([]);
 
   useEffect(() => {
@@ -176,7 +176,7 @@ const PendingOrdersPage: React.FC = () => {
   };
 
   const handleItemDetailsView = (order: OrderType) => {
-   // console.log(order);
+    // console.log(order);
 
     // Changed from order.items to order.orderedItems
     if (Array.isArray(order.orderedItems)) {
@@ -202,7 +202,7 @@ const PendingOrdersPage: React.FC = () => {
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={notificationOrders} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={notificationOrders} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -222,7 +222,7 @@ const PendingOrdersPage: React.FC = () => {
   if (error) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={notificationOrders} />
+        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={notificationOrders} />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -243,7 +243,7 @@ const PendingOrdersPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} notificationData={notificationOrders} />
+      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={notificationOrders} />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
