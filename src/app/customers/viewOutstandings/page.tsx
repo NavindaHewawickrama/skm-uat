@@ -79,25 +79,17 @@ const OutstandingsPage: React.FC = () => {
   const fetchUserCustomerDetails = async (userRole: string) => {
     try {
       setIsLoading(true);
-      let response;
-      if (userRole.toLowerCase() === "admin") {
-        response = await fetch(`/api/userCustomerDetails/admin`, {
-          method: "GET",
-          credentials: "include",
-        });
-      } else {
-        response = await fetch(`/api/userCustomerDetails/user`, {
-          method: "GET",
-          credentials: "include",
-        });
-      }
+      const response = await fetch(`/api/orders/getCustomers`, {
+        method: "GET",
+        credentials: "include",
+      });
 
       if (!response.ok) {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
-        console.log(data);
-        setCustomers(data.customers);
+        //console.log(data);
+        setCustomers(data);
       }
       setIsLoading(false);
     } catch (err) {
@@ -250,7 +242,7 @@ const OutstandingsPage: React.FC = () => {
     const tableColumn = [
       "Customer Name",
       "Invoice Number",
-      "Invoice Date",
+      "Order Date",
       "Invoiced Amount",
       "PDC Amount",
       "Due Amount",
@@ -461,7 +453,7 @@ const OutstandingsPage: React.FC = () => {
                             Invoice No
                           </th>
                           <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
-                            Invoice Date
+                            Order Date
                           </th>
                           <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                             Invoiced Amount
