@@ -6,7 +6,7 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { usernameOrEmail, password, rememberme } = body;
 
-    const response = await fetch('http://173.212.233.90:8090/api/User/login', {
+    const response = await fetch('http://173.212.233.90:8089/api/User/login', {
       method: 'POST',
       body: JSON.stringify({ usernameOrEmail, password, rememberme }),
       headers: {

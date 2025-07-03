@@ -8,7 +8,7 @@ export async function GET() {
     const cookieStore = await cookies();
     const userDetailsCookie = cookieStore.get('userDetails')?.value;
 
-    const response = await fetch('http://173.212.233.90:8090/api/User/GetUserCreationDetails', {
+    const response = await fetch('http://173.212.233.90:8089/api/User/GetUserCreationDetails', {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',

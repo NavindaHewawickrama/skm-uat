@@ -14,7 +14,7 @@ export async function GET() {
 
 
         // ✅ Make request with userId
-        const response = await fetch(`http://173.212.233.90:8090/api/Business/GetListOfOrderCreationDetails`, {
+        const response = await fetch(`http://173.212.233.90:8089/api/Business/GetListOfOrderCreationDetails`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,

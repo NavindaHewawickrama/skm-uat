@@ -14,7 +14,7 @@ export async function GET() {
 
     // Fetch user details from your API
     const response = await fetch(
-      `http://173.212.233.90:8090/api/User/GetUserDetailsById?userId=${userId}`,
+      `http://173.212.233.90:8089/api/User/GetUserDetailsById?userId=${userId}`,
       {
         method: 'GET',
         headers: {

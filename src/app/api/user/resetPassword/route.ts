@@ -32,7 +32,7 @@ export async function POST(request: Request) {
         }
 
         // Call your backend API
-        const response = await fetch('http://173.212.233.90:8090/api/User/new-password', {
+        const response = await fetch('http://173.212.233.90:8089/api/User/new-password', {
             method: 'POST',
             body: JSON.stringify({ userId, newPassword, confirmPassword }),
             headers: {

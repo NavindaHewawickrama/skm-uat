@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
    //     console.log('Uploading document:', document.name);
 
-        const response = await fetch(`http://173.212.233.90:8090/api/Business/UploadUserDocument`, {
+        const response = await fetch(`http://173.212.233.90:8089/api/Business/UploadUserDocument`, {
             method: 'POST',
             body: apiFormData,
             headers: {

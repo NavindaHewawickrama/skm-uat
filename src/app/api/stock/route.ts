@@ -66,7 +66,7 @@ export async function GET() {
       return NextResponse.json({ error: message }, { status });
     }
 
-    const response = await fetch('http://173.212.233.90:8090/api/Business/GetStockDetails', {
+    const response = await fetch('http://173.212.233.90:8089/api/Business/GetStockDetails', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

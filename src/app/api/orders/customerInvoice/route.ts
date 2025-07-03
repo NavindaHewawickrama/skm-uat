@@ -35,7 +35,7 @@ export async function GET(request: Request) {
         }
 
         // Use customerCode as customerId in the API call (assuming the backend expects customerId)
-        const response = await fetch(`http://173.212.233.90:8090/api/Business/GetInvoicesByCustomer?customerId=${customerCode}`, {
+        const response = await fetch(`http://173.212.233.90:8089/api/Business/GetInvoicesByCustomer?customerId=${customerCode}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,

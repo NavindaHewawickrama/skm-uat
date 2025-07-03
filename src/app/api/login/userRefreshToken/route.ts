@@ -12,7 +12,7 @@ export async function POST() {
     }
 
     try {
-        const response = await fetch('http://173.212.233.90:8090/api/User/refresh-token', {
+        const response = await fetch('http://173.212.233.90:8089/api/User/refresh-token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ refreshToken })

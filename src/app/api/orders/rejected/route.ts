@@ -14,7 +14,7 @@ export async function GET() {
         }
 
         // ✅ Include userId as query param in API URL
-        const response = await fetch(`http://173.212.233.90:8090/api/Business/GetRejectedOrders?userId=${userId}`, {
+        const response = await fetch(`http://173.212.233.90:8089/api/Business/GetRejectedOrders?userId=${userId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
