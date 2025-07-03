@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getValidAccessToken } from '@/lib/auth';
+import baseUrl from '../../../config';
 
 //get customer details based on the user
 export async function GET() {
@@ -14,7 +15,7 @@ export async function GET() {
 
 
     // ✅ Make request with userId
-    const response = await fetch(`http://173.212.233.90:8089/api/Business/GetOrderCreationDetailsByUser?userId=${userId}`, {
+    const response = await fetch(`${baseUrl.apiBaseUrl}/api/Business/GetOrderCreationDetailsByUser?userId=${userId}`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

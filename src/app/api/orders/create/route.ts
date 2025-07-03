@@ -1,5 +1,6 @@
 import { getValidAccessToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import baseUrl from '../../../config';
 
 //create an order
 export async function POST(request: Request) {
@@ -14,7 +15,7 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { customerCode, locationCode, paymentMethodCode, totalAmount, items } = body;
 
-        const response = await fetch(`http://173.212.233.90:8089/api/Business/CreateOrder?userId=${userId}`, {
+        const response = await fetch(`${baseUrl.apiBaseUrl}/api/Business/CreateOrder?userId=${userId}`, {
             method: 'POST',
             body: JSON.stringify({ customerCode, locationCode, paymentMethodCode, totalAmount, items }),
             headers: {

@@ -1,5 +1,6 @@
 import { getValidAccessToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import baseUrl from '../../config';
 
 interface Invoice {
     invoiceNo: string;
@@ -35,7 +36,7 @@ export async function GET(request: Request) {
         }
 
         // Call the external API
-        const apiUrl = `http://173.212.233.90:8089/api/Business/GetInvoicesByCustomer?customerId=${customerCode}`;
+        const apiUrl = `${baseUrl.apiBaseUrl}/api/Business/GetInvoicesByCustomer?customerId=${customerCode}`;
         console.log('Calling external API:', apiUrl);
 
         const response = await fetch(apiUrl, {

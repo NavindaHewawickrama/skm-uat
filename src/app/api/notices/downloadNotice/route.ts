@@ -1,5 +1,6 @@
 import { getValidAccessToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import baseUrl from '../../../config';
 
 export async function GET(request: Request) {
     try {
@@ -19,7 +20,7 @@ export async function GET(request: Request) {
         }
 
         // Call the download API
-        const response = await fetch(`http://173.212.233.90:8089/api/Business/download?documentUrl=${encodeURIComponent(documentUrl)}`, {
+        const response = await fetch(`${baseUrl.apiBaseUrl}/api/Business/download?documentUrl=${encodeURIComponent(documentUrl)}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,

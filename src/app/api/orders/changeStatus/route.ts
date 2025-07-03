@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getValidAccessToken } from '@/lib/auth';
+import baseUrl from '../../../config';
 
 export async function POST(request: Request) {
     try {
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
 
         console.log('API body being sent:', apiBody);
 
-        const response = await fetch('http://173.212.233.90:8089/api/Business/ChangeStatus', {
+        const response = await fetch(`${baseUrl.apiBaseUrl}/api/Business/ChangeStatus`, {
             method: 'POST',
             body: JSON.stringify(apiBody),
             headers: {

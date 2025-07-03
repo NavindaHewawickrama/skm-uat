@@ -1,5 +1,6 @@
 import { getValidAccessToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import baseUrl from '../../../config';
 
 // Upload a document
 export async function POST(request: Request) {
@@ -12,7 +13,7 @@ export async function POST(request: Request) {
             return NextResponse.json({ error: message }, { status });
         }
 
-       // console.log('UserId:', userId);
+        // console.log('UserId:', userId);
 
         const formData = await request.formData();
 
@@ -31,9 +32,9 @@ export async function POST(request: Request) {
         // Add the document to the API form data
         apiFormData.append('Document', document);
 
-   //     console.log('Uploading document:', document.name);
+        //     console.log('Uploading document:', document.name);
 
-        const response = await fetch(`http://173.212.233.90:8089/api/Business/UploadUserDocument`, {
+        const response = await fetch(`${baseUrl.apiBaseUrl}/api/Business/UploadUserDocument`, {
             method: 'POST',
             body: apiFormData,
             headers: {

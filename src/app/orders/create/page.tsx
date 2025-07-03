@@ -341,7 +341,7 @@ const CreateOrderPage: React.FC = () => {
     const tableColumn = [
       "Customer Name",
       "Invoice Number",
-      "Invoice Date",
+      "Order Date",
       "Invoiced Amount",
       "PDC Amount",
       "Due Amount",

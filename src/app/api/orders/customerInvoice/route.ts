@@ -1,14 +1,15 @@
 import { getValidAccessToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import baseUrl from '../../../config';
 
 interface Invoice {
-  invoiceNo: string;
-  orderNo: string;
-  invoiceDate: string;
-  pdcAmount: number;
-  dueAmount: number;
-  totalAmount: number;
-  remainingAmount: number;
+    invoiceNo: string;
+    orderNo: string;
+    invoiceDate: string;
+    pdcAmount: number;
+    dueAmount: number;
+    totalAmount: number;
+    remainingAmount: number;
 }
 
 
@@ -35,7 +36,7 @@ export async function GET(request: Request) {
         }
 
         // Use customerCode as customerId in the API call (assuming the backend expects customerId)
-        const response = await fetch(`http://173.212.233.90:8089/api/Business/GetInvoicesByCustomer?customerId=${customerCode}`, {
+        const response = await fetch(`${baseUrl.apiBaseUrl}/api/Business/GetInvoicesByCustomer?customerId=${customerCode}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,
@@ -52,7 +53,7 @@ export async function GET(request: Request) {
         }
 
         const data = await response.json();
-        
+
         // Transform the invoices while preserving the original structure
         const transformedInvoices = data.invoices?.map((invoice: Invoice) => ({
             invoiceNo: invoice.invoiceNo,

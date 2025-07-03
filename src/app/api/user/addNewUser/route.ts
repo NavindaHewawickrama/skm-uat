@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getValidAccessToken } from '@/lib/auth';
+import baseUrl from '../../../config';
 
 export async function POST(request: Request) {
     try {
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
 
         const body = await request.json();
         const { username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCodes, email, phoneNumber, isActive, isMfaEnabled, mfaType } = body;
-        const response = await fetch('http://173.212.233.90:8089/api/User/AddUser', {
+        const response = await fetch(`${baseUrl.apiBaseUrl}/api/User/AddUser`, {
             method: 'POST',
             body: JSON.stringify({ username, password, reEnteredPassword, firstName, lastName, userRoleId, salesPersonCode, locationCodes, email, phoneNumber, isActive, isMfaEnabled, mfaType }),
             headers: {

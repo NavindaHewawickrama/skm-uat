@@ -56,6 +56,7 @@
 // File: app/api/stock/route.ts
 import { getValidAccessToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import baseUrl from '../../config';
 
 export async function GET() {
   try {
@@ -66,7 +67,7 @@ export async function GET() {
       return NextResponse.json({ error: message }, { status });
     }
 
-    const response = await fetch('http://173.212.233.90:8089/api/Business/GetStockDetails', {
+    const response = await fetch(`${baseUrl.apiBaseUrl}/api/Business/GetStockDetails`, {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${token}`,

@@ -1,5 +1,6 @@
 import { getValidAccessToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
+import baseUrl from '../../../config';
 
 // get delivered order details
 export async function GET() {
@@ -13,7 +14,7 @@ export async function GET() {
         }
 
         // ✅ Include userId as query param in API URL
-        const response = await fetch(`http://173.212.233.90:8089/api/Business/GetDeliveredOrders?userId=${userId}`, {
+        const response = await fetch(`${baseUrl.apiBaseUrl}/api/Business/GetDeliveredOrders?userId=${userId}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,

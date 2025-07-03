@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getValidAccessToken } from '@/lib/auth';
+import baseUrl from '../../../config';
 
 //get users list
 export async function GET() {
@@ -14,7 +15,7 @@ export async function GET() {
 
 
         // ✅ Make request with userId
-        const response = await fetch("http://173.212.233.90:8089/api/User/GetAllUsers", {
+        const response = await fetch(`${baseUrl.apiBaseUrl}/api/User/GetAllUsers`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${token}`,

@@ -1,6 +1,6 @@
 import { getValidAccessToken } from '@/lib/auth';
 import { NextResponse } from 'next/server';
-
+import baseUrl from '../../../config';
 
 export async function GET() {
   try {
@@ -14,7 +14,7 @@ export async function GET() {
 
     // Fetch user details from your API
     const response = await fetch(
-      `http://173.212.233.90:8089/api/User/GetUserDetailsById?userId=${userId}`,
+      `${baseUrl.apiBaseUrl}/api/User/GetUserDetailsById?userId=${userId}`,
       {
         method: 'GET',
         headers: {
@@ -54,7 +54,7 @@ export async function GET() {
       secure: false,
       sameSite: 'lax',
       path: '/',
-      maxAge: 60*60,
+      maxAge: 60 * 60,
     });
 
     return responseWithCookie;
