@@ -145,10 +145,6 @@ const CreateOrderPage: React.FC = () => {
     label: customer.customerName
   }));
 
-  // const itemOptions = itemsList.map((item) => ({
-  //   value: item.itemCode,
-  //   label: item.itemName,
-  // }));
 
   useEffect(() => {
     const pendingOrderList = sessionStorage.getItem("notificationsData");
@@ -170,7 +166,9 @@ const CreateOrderPage: React.FC = () => {
         ? sessionStorage.getItem("userRoleName")
         : ""
     );
-    fetchUserCustomerDetails(sessionStorage.getItem("userRoleName") || "");
+    fetchLocationDetails();
+    fetchCustomersDetails();
+    fetchItemsDetails();
   }, []);
 
   const handleShowAlert = (type: string, message: string) => {
@@ -184,33 +182,19 @@ const CreateOrderPage: React.FC = () => {
     }, 5000);
   };
 
-  const fetchUserCustomerDetails = async (userRole: string) => {
+  const fetchCustomersDetails = async () => {
     try {
       setLoading(true);
-      let response;
-      if (userRole.toLowerCase() === "admin") {
-        response = await fetch(`/api/userCustomerDetails/admin`, {
-          method: "GET",
-          credentials: "include",
-        });
-      } else {
-        response = await fetch(`/api/userCustomerDetails/user`, {
-          method: "GET",
-          credentials: "include",
-        });
-      }
 
-
-
+      const response = await fetch(`/api/orders/getCustomers`, {
+        method: "GET",
+        credentials: "include",
+      });
       if (!response.ok) {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
-        console.log(data);
-        setLocations(data.locations);
-        setCustomers(data.customers);
-        // setPaymentTypes(data.paymentTypes);
-        setItemsList(data.items);
+        setCustomers(data);
       }
       setLoading(false);
     } catch (err) {
@@ -218,50 +202,48 @@ const CreateOrderPage: React.FC = () => {
     }
   };
 
-  // const fetchCustomerInvoices = async (customerCode: string) => {
-  //   setIsLoadingInvoices(true);
-  //   try {
-  //     const response = await fetch(`/api/customerInvoice?customerId=${customerCode}`, {
-  //       method: 'GET',
-  //       credentials: 'include',
-  //     });
+  const fetchLocationDetails = async () => {
+    try {
+      setLoading(true);
 
-  //     if (!response.ok) {
-  //       throw new Error('Failed to fetch customer invoices');
-  //     }
+      const response = await fetch(`/api/orders/getLocations`, {
+        method: "GET",
+        credentials: "include",
+      });
 
-  //     const transformedInvoices = await response.json();
+      if (!response.ok) {
+        throw Error("Failed to fetch pending order data");
+      } else {
+        const data = await response.json();
+        setLocations(data);
+      }
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching pending order data:", err);
+    }
+  };
 
-  //     // Transform the array to match your CustomerOutstandingData interface
-  //     const transformedData: CustomerOutstandingData[] = transformedInvoices.map(
-  //       (invoice: any) => ({
-  //         customerName: selectedCustomer?.customerName || "",
-  //         invoiceNumber: invoice.invoiceNumber || "",
-  //         invoiceDate: invoice.invoiceDate
-  //           ? new Date(invoice.invoiceDate).toLocaleDateString()
-  //           : "",
-  //         invoicedAmount: parseFloat(invoice.remainingAmount || 0),
-  //         pdcAmount: parseFloat(invoice.pdcAmount || 0),
-  //         dueAmount: parseFloat(invoice.dueAmount || 0),
-  //       })
-  //     );
+  const fetchItemsDetails = async () => {
+    try {
+      setLoading(true);
 
-  //     setOutstandingData(transformedData);
+      const response = await fetch(`/api/orders/getItems`, {
+        method: "GET",
+        credentials: "include",
+      });
 
-  //     const totalDueAmount = transformedData.reduce(
-  //       (sum, item) => sum + item.dueAmount,
-  //       0
-  //     );
-  //     setSelectedCustomerDueAmount(totalDueAmount);
+      if (!response.ok) {
+        throw Error("Failed to fetch pending order data");
+      } else {
+        const data = await response.json();
+        setItemsList(data);
+      }
+      setLoading(false);
+    } catch (err) {
+      console.error("Error fetching pending order data:", err);
+    }
+  };
 
-  //   } catch (error) {
-  //     console.error("Error fetching customer invoices:", error);
-  //     handleShowAlert("error", "Failed to fetch customer invoice data");
-  //     setOutstandingData([]);
-  //   } finally {
-  //     setIsLoadingInvoices(false);
-  //   }
-  // };
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
