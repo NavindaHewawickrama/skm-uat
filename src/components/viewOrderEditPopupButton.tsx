@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
@@ -16,14 +15,16 @@ interface ModalProps {
   open: boolean;
   onClose: () => void;
   orderDetails: OrderItem[];
+  orderNumber: number;
 }
 
 const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
   open,
   onClose,
   orderDetails,
+  orderNumber = 0,
 }) => {
-  //console.log(orderDetails);
+  console.log(orderDetails);
 
   if (!open) return null;
 
@@ -32,6 +33,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
 
     pdf.setFontSize(18);
     pdf.text("Order Items Details Report", 105, 15, { align: "center" });
+    //pdf.text(orderNumber.toString(), 95, 15, { align: "center" });
     //pdf.text({}, 105, 15, { align: "center" });
     const currentDate = new Date().toLocaleDateString("en-US");
     pdf.setFontSize(10);
@@ -39,6 +41,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
 
     const tableColumn = [
       "Item Code",
+      "Item Name",
       "Unit Price",
       "Quantity",
       "Discount(%)",
@@ -66,6 +69,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
       const total = subtotal - discountAmount;
 
       return [
+        item.itemCode, // Item Code
         item.description, // Item Code/Description
         Number(item.unitPrice).toFixed(2), // Unit Price
         item.quantity, // Quantity
@@ -162,11 +166,12 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
               <table className="min-w-full rounded-sm">
                 <thead className="bg-gray-200">
                   <tr>
-                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
-                      Item Name
-                    </th>
+
                     <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
                       Item Code
+                    </th>
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
+                      Item Name
                     </th>
                     <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
                       Unit Price
@@ -184,10 +189,10 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
                   {orderDetails.map((item: OrderItem, index: number) => (
                     <tr key={index} className="border-b border-gray-100">
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
-                        {item.description}
+                        {item.itemCode}
                       </td>
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
-                        {item.itemCode}
+                        {item.description}
                       </td>
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
                         {Number(item.unitPrice).toFixed(2)}

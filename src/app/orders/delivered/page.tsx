@@ -61,6 +61,7 @@ const DeliveredOrdersPage: React.FC = () => {
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
+  const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(null);
 
   useEffect(() => {
     setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
@@ -308,6 +309,7 @@ const DeliveredOrdersPage: React.FC = () => {
 
     if (Array.isArray(order.orderedItems)) {
       setSelectedOrderItems(order.orderedItems);
+      setSelectedOrderNumber(order.orderNumber);
     } else {
       setSelectedOrderItems([]);
     }
@@ -319,6 +321,7 @@ const DeliveredOrdersPage: React.FC = () => {
 
     if (Array.isArray(order.invoicedItems)) {
       setSelectedOrderItems(order.invoicedItems);
+      setSelectedOrderNumber(order.orderNumber);
     } else {
       setSelectedOrderItems([]);
     }
@@ -481,7 +484,7 @@ const DeliveredOrdersPage: React.FC = () => {
                           {order.salesPersonName}
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.orderDate}
+                          {order.orderDate.split("T")[0]}
                         </td>
                         <td className="px-4 py-3 border text-sm">
                           {order.paymentMethodType}
@@ -594,6 +597,7 @@ const DeliveredOrdersPage: React.FC = () => {
             open={listViewOpen}
             onClose={() => setListViewOpen(false)}
             orderDetails={selectedOrderItems}
+            orderNumber={selectedOrderNumber ?? 0}
           />
 
           <ViewOrderDeliveryStatus

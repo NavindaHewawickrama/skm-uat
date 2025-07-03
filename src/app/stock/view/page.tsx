@@ -518,13 +518,13 @@ const StockView = () => {
                       className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-01-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-02-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH-01-SKM" ? "bg-[#f2fa84]" : item.location === "WELISARA-WH-01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
                         }`}
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 text-center">
                         {item.itemCode}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-gray-900 text-center">
                         {item.itemName}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-xs">
+                      <td className="px-6 py-4 whitespace-nowrap text-xs text-center">
                         {item.location}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">

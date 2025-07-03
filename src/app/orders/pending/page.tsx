@@ -55,6 +55,7 @@ const PendingOrdersPage: React.FC = () => {
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [notificationOrders, setNotificationOrders] = useState<OrderType[]>([]);
+  const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(null);
 
   useEffect(() => {
     setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
@@ -182,6 +183,7 @@ const PendingOrdersPage: React.FC = () => {
     // Changed from order.items to order.orderedItems
     if (Array.isArray(order.orderedItems)) {
       setSelectedOrderItems(order.orderedItems);
+      setSelectedOrderNumber(order.orderNumber);
     } else {
       setSelectedOrderItems([]);
     }
@@ -443,6 +445,7 @@ const PendingOrdersPage: React.FC = () => {
             open={listViewOpen}
             onClose={() => setListViewOpen(false)}
             orderDetails={selectedOrderItems}
+            orderNumber={selectedOrderNumber ?? 0}
           />
           <ViewStatusPopup
             open={statusViewOpen}
