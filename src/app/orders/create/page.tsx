@@ -6,7 +6,7 @@ import Footer from "../../../components/Footer";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import Alert from "../../../components/Alert";
-import Select from 'react-select';
+import Select from "react-select";
 
 type OrderType = {
   orderNumber: number;
@@ -15,7 +15,14 @@ type OrderType = {
   orderDate: string;
   paymentMethodType: string;
   totalAmount: number;
-  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  orderedItems: {
+    itemCode: string;
+    description: string;
+    unitPrice: number;
+    quantity: string;
+    discountPercent: number;
+    total: number;
+  }[];
   specialNote: string;
   rejectReason: string | null;
   status: string;
@@ -102,7 +109,6 @@ interface Invoice {
   remainingAmount: number;
 }
 
-
 const CreateOrderPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [location, setLocation] = useState("");
@@ -139,6 +145,7 @@ const CreateOrderPage: React.FC = () => {
   const [outstandingData, setOutstandingData] = useState<
     CustomerOutstandingData[]
   >([]);
+  const [isSaving, setIsSaving] = useState(false);
   const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
@@ -170,13 +177,15 @@ const CreateOrderPage: React.FC = () => {
   //   label: customer.customerName
   // }));
 
-
   useEffect(() => {
     const pendingOrderList = sessionStorage.getItem("notificationsData");
     setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
-    setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
+    setUserName(
+      sessionStorage.getItem("userName")
+        ? sessionStorage.getItem("userName")
+        : ""
+    );
   }, []);
-
 
   // Add this in your component
   useEffect(() => {
@@ -269,7 +278,6 @@ const CreateOrderPage: React.FC = () => {
       console.error("Error fetching pending order data:", err);
     }
   };
-
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -416,41 +424,51 @@ const CreateOrderPage: React.FC = () => {
     setIsLoadingInvoices(true);
     console.log("loading invoices", isLoadingInvoices);
     try {
-      const response = await fetch(`/api/customerInvoice?customerCode=${selectedCustomer.customerCode}`, {
-        method: 'GET',
-        credentials: 'include',
-      });
+      const response = await fetch(
+        `/api/customerInvoice?customerCode=${selectedCustomer.customerCode}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to fetch customer invoices');
+        throw new Error("Failed to fetch customer invoices");
       }
 
       const data = await response.json();
       console.log("Fetched data:", data);
-      const transformedData: CustomerOutstandingData[] = data.map((invoice: Invoice) => ({
-        customerName: selectedCustomer.customerName,
-        invoiceNumber: invoice.invoiceNumber,
-        invoiceDate: invoice.invoiceDate
-          ? new Date(invoice.invoiceDate).toLocaleDateString("en-US")
-          : "",
-        invoicedAmount: parseFloat(invoice.totalAmount?.toString() || "0"),
-        pdcAmount: parseFloat(invoice.pdcAmount?.toString() || "0"),
-        dueAmount: parseFloat(invoice.dueAmount?.toString() || "0"),
-      }));
+      const transformedData: CustomerOutstandingData[] = data.map(
+        (invoice: Invoice) => ({
+          customerName: selectedCustomer.customerName,
+          invoiceNumber: invoice.invoiceNumber,
+          invoiceDate: invoice.invoiceDate
+            ? new Date(invoice.invoiceDate).toLocaleDateString("en-US")
+            : "",
+          invoicedAmount: parseFloat(invoice.totalAmount?.toString() || "0"),
+          pdcAmount: parseFloat(invoice.pdcAmount?.toString() || "0"),
+          dueAmount: parseFloat(invoice.dueAmount?.toString() || "0"),
+        })
+      );
 
       setOutstandingData(transformedData);
       setSelectedCustomerDueAmount(data.totalDueAmount);
 
-      handleShowAlert("success", `Loaded ${transformedData.length} invoice record(s)`);
+      handleShowAlert(
+        "success",
+        `Loaded ${transformedData.length} invoice record(s)`
+      );
     } catch (error) {
-      console.error('Error:', error);
-      handleShowAlert("error", "Failed to fetch customer invoice data... This Cutomer does not have any invoices...");
+      console.error("Error:", error);
+      handleShowAlert(
+        "error",
+        "Failed to fetch customer invoice data... This Cutomer does not have any invoices..."
+      );
       setOutstandingData([]);
     } finally {
       setIsLoadingInvoices(false);
     }
   };
-
 
   const handleCustomerChange = (customerCode: string) => {
     console.log(customerCode);
@@ -502,15 +520,7 @@ const CreateOrderPage: React.FC = () => {
 
   const handleSave = async () => {
     try {
-
-      // const newdata = {
-      //   customerCode: selectedCustomer?.customerCode,
-      //   locationCode: location,
-      //   paymentMethodCode: selectedCustomer?.paymentTermCode,
-      //   totalAmount: orderTotal,
-      //   items: orderItems,
-      // }
-      // console.log("New Data:", newdata);
+      setIsSaving(true);
 
       const response = await fetch("/api/orders/create", {
         method: "POST",
@@ -553,10 +563,13 @@ const CreateOrderPage: React.FC = () => {
             try {
               const parsedDetails = JSON.parse(data.details);
 
-              if (parsedDetails.errors && typeof parsedDetails.errors === 'object') {
+              if (
+                parsedDetails.errors &&
+                typeof parsedDetails.errors === "object"
+              ) {
                 const validationErrors: string[] = [];
 
-                Object.keys(parsedDetails.errors).forEach(field => {
+                Object.keys(parsedDetails.errors).forEach((field) => {
                   const fieldErrors = parsedDetails.errors[field];
                   if (Array.isArray(fieldErrors)) {
                     validationErrors.push(...fieldErrors);
@@ -566,7 +579,7 @@ const CreateOrderPage: React.FC = () => {
                 });
 
                 if (validationErrors.length > 0) {
-                  errorMessage = validationErrors.join(', ');
+                  errorMessage = validationErrors.join(", ");
                 }
               }
               // Fallback to title or general message if no specific field errors
@@ -578,7 +591,10 @@ const CreateOrderPage: React.FC = () => {
             } catch (e) {
               // If parsing fails, try to use details as string or fall back to main error message
               console.error("Error parsing details:", e);
-              errorMessage = typeof data.details === "string" ? data.details : data.error || errorMessage;
+              errorMessage =
+                typeof data.details === "string"
+                  ? data.details
+                  : data.error || errorMessage;
             }
           }
           // If no details, use the main error message
@@ -593,21 +609,26 @@ const CreateOrderPage: React.FC = () => {
     } catch (error) {
       console.error("Network or unexpected error:", error);
       handleShowAlert("error", "Network error occurred");
+    } finally {
+      setIsSaving(false);
     }
   };
 
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
+        <AppBar
+          toggleSideNav={toggleSideNav}
+          userRole={userRoleType}
+          userName={userName}
+          notificationData={pendingOrders}
+        />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto"></div>
-              <p className="mt-4 text-lg text-gray-600">
-                Loading data...
-              </p>
+              <p className="mt-4 text-lg text-gray-600">Loading data...</p>
             </div>
           </div>
         </div>
@@ -619,7 +640,12 @@ const CreateOrderPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
+      <AppBar
+        toggleSideNav={toggleSideNav}
+        userRole={userRoleType}
+        userName={userName}
+        notificationData={pendingOrders}
+      />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
@@ -682,8 +708,8 @@ const CreateOrderPage: React.FC = () => {
                   styles={{
                     control: (provided) => ({
                       ...provided,
-                      minHeight: '40px',
-                      height: '40px',
+                      minHeight: "40px",
+                      height: "40px",
                     }),
                   }}
                   options={locationOptions}
@@ -734,13 +760,17 @@ const CreateOrderPage: React.FC = () => {
                     styles={{
                       control: (provided) => ({
                         ...provided,
-                        minHeight: '41px',
-                        height: '41px',
+                        minHeight: "41px",
+                        height: "41px",
                       }),
                     }}
                     options={customerOptions}
-                    value={customerOptions.find((c) => c.value === customer) || null}
-                    onChange={(selected) => handleCustomerChange(selected?.value || "")}
+                    value={
+                      customerOptions.find((c) => c.value === customer) || null
+                    }
+                    onChange={(selected) =>
+                      handleCustomerChange(selected?.value || "")
+                    }
                     getOptionLabel={(option) => option.label}
                     getOptionValue={(option) => option.value}
                     placeholder="Select a Customer"
@@ -780,8 +810,6 @@ const CreateOrderPage: React.FC = () => {
                   />
                 </div>
               </div>
-
-
 
               {/* Payment Type and Notes Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -889,8 +917,8 @@ const CreateOrderPage: React.FC = () => {
                       styles={{
                         control: (provided) => ({
                           ...provided,
-                          minHeight: '42px',
-                          height: '42px',
+                          minHeight: "42px",
+                          height: "42px",
                         }),
                       }}
                       value={itemsList.find((item) => item.itemCode === selectedItem) || null}
@@ -928,8 +956,8 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                    // value={currentItem.itemName}
-                    // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
+                      // value={currentItem.itemName}
+                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
                       {substitutedItemsList?.length === 0 ? (
                         <option value="" disabled>
@@ -1152,10 +1180,15 @@ const CreateOrderPage: React.FC = () => {
               {orderItems.length > 0 && (
                 <div className="mt-6 flex justify-end">
                   <button
+                    disabled={isSaving}
                     onClick={handleSave}
-                    className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 focus:outline-none cursor-pointer"
+                    className={`px-6 py-2 rounded font-medium transition duration-300 ${
+                      isSaving
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                    } text-white`}
                   >
-                    Save
+                    {isSaving ? "Saving..." : "Save"}
                   </button>
                 </div>
               )}
