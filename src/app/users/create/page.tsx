@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import AppBar from "../../../components/Appbar";
 import SideNav from "../../../components/Sidenav";
 import Footer from "../../../components/Footer";
-import Alert from '../../../components/Alert';
+import Alert from "../../../components/Alert";
 import MultiSelectDropdown from "@/components/MultiSelectDropdown";
 
 interface UserData {
@@ -69,8 +69,24 @@ type OrderType = {
   orderDate: string;
   paymentMethodType: string;
   totalAmount: number;
-  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
-  items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  orderedItems: {
+    itemCode: string;
+    description: string;
+    unitPrice: number;
+    quantity: string;
+    discountPercent: number;
+    total: number;
+  }[];
+  items:
+    | string
+    | {
+        itemCode: string;
+        description: string;
+        unitPrice: number;
+        quantity: string;
+        discountPercent: number;
+        total: number;
+      }[];
   specialNote: string;
   rejectReason: string | null;
   status: string;
@@ -116,24 +132,37 @@ const CreateUserPage: React.FC = () => {
   const [mfaType, setMfaType] = useState("");
   const [selectedForUpdatingUser, setSelectedForUpdatingUser] = useState(0);
   const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('');
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
   const [editingUser, setEditingUser] = useState(false);
   const [viewpw, setViewPw] = useState(false);
   const [viewpw1, setViewPw1] = useState(false);
   const [userRoleId, setUserRoleId] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
+
   // const userNameAppbar = sessionStorage.getItem("userName") || "Guest";
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
   const [userNameAppbar, setUserNameAppbar] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
 
   useEffect(() => {
-    setUserNameAppbar(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
-    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+    setUserNameAppbar(
+      sessionStorage.getItem("userName")
+        ? sessionStorage.getItem("userName")
+        : ""
+    );
+    setUserRoleType(
+      sessionStorage.getItem("userRoleName")
+        ? sessionStorage.getItem("userRoleName")
+        : ""
+    );
     const pendingOrderList = sessionStorage.getItem("notificationsData");
     setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
-  const handleShowAlert = (type: React.SetStateAction<string>, message: React.SetStateAction<string>) => {
+  const handleShowAlert = (
+    type: React.SetStateAction<string>,
+    message: React.SetStateAction<string>
+  ) => {
     setAlertType(type);
     setAlertMessage(message);
     setShowAlert(true);
@@ -143,11 +172,12 @@ const CreateUserPage: React.FC = () => {
   console.log(mfaType);
 
   // API data states
-  const [userCreationDetails, setUserCreationDetails] = useState<UserCreationDetails>({
-    salesPersons: [],
-    roles: [],
-    locations: []
-  });
+  const [userCreationDetails, setUserCreationDetails] =
+    useState<UserCreationDetails>({
+      salesPersons: [],
+      roles: [],
+      locations: [],
+    });
   //const [loading, setLoading] = useState(true);
   const [apiError, setApiError] = useState<string | null>(null);
 
@@ -159,10 +189,10 @@ const CreateUserPage: React.FC = () => {
   const fetchUsers = async () => {
     try {
       //setLoading(true);
-      const response = await fetch('/api/user/fetchUserList'); // Using relative path to your API route
+      const response = await fetch("/api/user/fetchUserList"); // Using relative path to your API route
 
       if (!response.ok) {
-        throw new Error('Failed to fetch user list');
+        throw new Error("Failed to fetch user list");
       }
 
       const data = await response.json();
@@ -170,19 +200,18 @@ const CreateUserPage: React.FC = () => {
       setShowUsersList(true);
       setUsersList(data);
     } catch (error) {
-      console.error('Error fetching user creation details:', error);
-      setApiError('Failed to fetch user list details. Please try again.');
+      console.error("Error fetching user creation details:", error);
+      setApiError("Failed to fetch user list details. Please try again.");
     }
-  }
-
+  };
 
   const fetchUserCreationDetails = async () => {
     try {
       //setLoading(true);
-      const response = await fetch('/api/user-creation-details'); // Using relative path to your API route
+      const response = await fetch("/api/user-creation-details"); // Using relative path to your API route
 
       if (!response.ok) {
-        throw new Error('Failed to fetch user creation details');
+        throw new Error("Failed to fetch user creation details");
       }
 
       const data = await response.json();
@@ -197,8 +226,8 @@ const CreateUserPage: React.FC = () => {
       }
       setApiError(null);
     } catch (error) {
-      console.error('Error fetching user creation details:', error);
-      setApiError('Failed to load user creation details. Please try again.');
+      console.error("Error fetching user creation details:", error);
+      setApiError("Failed to load user creation details. Please try again.");
     }
   };
 
@@ -220,59 +249,7 @@ const CreateUserPage: React.FC = () => {
     setTelephone("");
     setIsActive(false);
     setEditingUser(false);
-
   };
-
-  // const handleInputChange = (
-  //   field: keyof UserData,
-  //   value: string | boolean | string[]
-  // ) => {
-  //   // Clear error when field is modified
-  //   if (field in errors) {
-  //     setErrors(prev => {
-  //       const newErrors = { ...prev };
-  //       delete newErrors[field as keyof FormErrors];
-  //       return newErrors;
-  //     });
-  //   }
-
-  //   // setUserData((prev) => ({
-  //   //   ...prev,
-  //   //   [field]: value,
-  //   // }));
-  // };
-
-  // const handleSalesPersonChange = (salesPersonCode: string) => {
-  //   const selectedSalesPerson = userCreationDetails.salesPersons.find(
-  //     sp => sp.salesPersonCode === salesPersonCode
-  //   );
-
-  //   if (selectedSalesPerson) {
-  //     // Clear errors related to posName, email, and telephone as they are now being auto-filled
-  //     setErrors(prev => {
-  //       const newErrors = { ...prev };
-  //       delete newErrors.posName;
-  //       delete newErrors.email;
-  //       delete newErrors.telephone;
-  //       return newErrors;
-  //     });
-
-  //     // setUserData(prev => ({
-  //     //   ...prev,
-  //     //   posName: selectedSalesPerson.salesPersonName,
-  //     //   email: selectedSalesPerson.email || prev.email,
-  //     //   telephone: selectedSalesPerson.phone || prev.telephone
-  //     // }));
-  //   } else {
-  //     // If no sales person is selected (e.g., "Select Sales Person" is chosen)
-  //     // setUserData(prev => ({
-  //     //   ...prev,
-  //     //   posName: "",
-  //     //   email: "",
-  //     //   telephone: ""
-  //     // }));
-  //   }
-  // };
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -355,24 +332,9 @@ const CreateUserPage: React.FC = () => {
       // setIsLoading(true);
 
       try {
-        // const apiBody = {
-        //   username: userName,
-        //   password: password,
-        //   reEnteredPassword: reTypePassword,
-        //   firstName: firstName,
-        //   lastName: lastName,
-        //   userRoleId: role,
-        //   salesPersonCode: selectedSalesPerson,
-        //   locationCode: location,
-        //   email: email,
-        //   phoneNumber: telephone,
-        //   isActive: isActive,
-        //   isMfaEnabled: isMfaEnabled,
-        //   mfaType: mfaType
-        // }
-        // console.log(apiBody);
-        const response = await fetch('/api/user/addNewUser', {
-          method: 'POST',
+        setIsSaving(true);
+        const response = await fetch("/api/user/addNewUser", {
+          method: "POST",
           body: JSON.stringify({
             username: userName,
             password: password,
@@ -386,17 +348,17 @@ const CreateUserPage: React.FC = () => {
             phoneNumber: telephone,
             isActive: isActive,
             isMfaEnabled: false,
-            mfaType: ""
+            mfaType: "",
           }),
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         });
 
         const data = await response.json();
 
         if (response.ok) {
-          handleShowAlert('success', 'User Created successfully!');
+          handleShowAlert("success", "User Created successfully!");
           fetchUsers();
           handleReset();
         } else {
@@ -415,6 +377,8 @@ const CreateUserPage: React.FC = () => {
               } catch (e) {
                 // If parsing fails, just use the error field
                 console.warn("Could not parse error details:", e);
+              } finally {
+                setIsSaving(false);
               }
             }
           }
@@ -425,15 +389,13 @@ const CreateUserPage: React.FC = () => {
             setShowAlert(false);
           }, 3000);
         }
-
       } catch (error) {
-        console.error('User Createing error:', error);
-        handleShowAlert('error', 'Network error. Please try again.');
+        console.error("User Createing error:", error);
+        handleShowAlert("error", "Network error. Please try again.");
       }
     } else {
-      handleShowAlert('error', 'No permission to create a user');
+      handleShowAlert("error", "No permission to create a user");
     }
-
   };
 
   const handleUpdateUser = async () => {
@@ -456,8 +418,8 @@ const CreateUserPage: React.FC = () => {
         //   mfaType: mfaType
         // }
         // console.log(apiBody);
-        const response = await fetch('/api/user/updateUser', {
-          method: 'PUT',
+        const response = await fetch("/api/user/updateUser", {
+          method: "PUT",
           body: JSON.stringify({
             updatingUserId: selectedForUpdatingUser,
             username: userName,
@@ -472,17 +434,17 @@ const CreateUserPage: React.FC = () => {
             phoneNumber: telephone,
             isActive: isActive,
             isMfaEnabled: false,
-            mfaType: ""
+            mfaType: "",
           }),
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         });
 
         const data = await response.json();
 
         if (response.ok) {
-          handleShowAlert('success', 'User Updated successfully!');
+          handleShowAlert("success", "User Updated successfully!");
           handleReset();
           fetchUsers();
           setEditingUser(false);
@@ -512,16 +474,14 @@ const CreateUserPage: React.FC = () => {
             setShowAlert(false);
           }, 3000);
         }
-
       } catch (error) {
-        console.error('User Updating error:', error);
-        handleShowAlert('error', 'Network error. Please try again.');
+        console.error("User Updating error:", error);
+        handleShowAlert("error", "Network error. Please try again.");
       }
     } else {
-      handleShowAlert('error', 'No Permisison to update users');
+      handleShowAlert("error", "No Permisison to update users");
     }
-
-  }
+  };
 
   const toggleUsersList = () => {
     setShowUsersList(!showUsersList);
@@ -547,18 +507,20 @@ const CreateUserPage: React.FC = () => {
       // Remove the currently selected user from the list
       setUsersList(usersList.filter((item) => item.username !== user.username));
     } else {
-      handleShowAlert('error', 'You do not have permission to edit users.');
+      handleShowAlert("error", "You do not have permission to edit users.");
     }
     //console.log(user);
-
-
-
-  }
+  };
 
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userNameAppbar} notificationData={pendingOrders} />
+      <AppBar
+        toggleSideNav={toggleSideNav}
+        userRole={userRoleType}
+        userName={userNameAppbar}
+        notificationData={pendingOrders}
+      />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-auto">
@@ -566,7 +528,10 @@ const CreateUserPage: React.FC = () => {
         <SideNav isOpen={sideNavOpen} />
 
         {/* Content Area */}
-        <div className="flex-1 overflow-auto p-6" style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}>
+        <div
+          className="flex-1 overflow-auto p-6"
+          style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
+        >
           <div className="bg-white p-6 rounded shadow lg:w-[75%]">
             <h2 className="text-xl font-bold mb-6">Create User</h2>
 
@@ -586,10 +551,14 @@ const CreateUserPage: React.FC = () => {
 
             {/* User Name */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">User Name :</label>
+              <label className="block text-gray-700 font-semibold mb-2">
+                User Name :
+              </label>
               <input
                 type="text"
-                className={`w-full p-2 border ${errors.username ? 'border-red-500' : 'border-gray-300'} rounded`}
+                className={`w-full p-2 border ${
+                  errors.username ? "border-red-500" : "border-gray-300"
+                } rounded`}
                 placeholder="Username"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
@@ -602,7 +571,9 @@ const CreateUserPage: React.FC = () => {
             {/* Password */}
             <div className="mb-4">
               <div className="flex flex-row">
-                <label className="block text-gray-700 font-semibold mb-2">Password :</label>
+                <label className="block text-gray-700 font-semibold mb-2">
+                  Password :
+                </label>
                 <div className="p-1 mt-1">
                   <div className="relative group">
                     <svg
@@ -629,13 +600,14 @@ const CreateUserPage: React.FC = () => {
                     </div>
                   </div>
                 </div>
-
               </div>
               <div className="relative">
                 <input
                   disabled={editingUser ? true : false}
                   type={viewpw1 ? "text" : "password"}
-                  className={`w-full p-2 border ${errors.password ? 'border-red-500' : 'border-gray-300'} ${editingUser ? 'bg-gray-300' : 'bg-white'} rounded`}
+                  className={`w-full p-2 border ${
+                    errors.password ? "border-red-500" : "border-gray-300"
+                  } ${editingUser ? "bg-gray-300" : "bg-white"} rounded`}
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -683,12 +655,10 @@ const CreateUserPage: React.FC = () => {
                     </svg>
                   )}
                 </button>
-
               </div>
               {errors.password && (
                 <p className="text-red-500 text-sm mt-1">{errors.password}</p>
               )}
-
             </div>
 
             {/* Re-Type Password */}
@@ -700,12 +670,14 @@ const CreateUserPage: React.FC = () => {
                 <input
                   disabled={editingUser ? true : false}
                   type={viewpw ? "text" : "password"}
-                  className={`w-full p-2 border ${errors.confirmPassword ? 'border-red-500' : 'border-gray-300'} ${editingUser ? 'bg-gray-300' : 'bg-white'} rounded`}
+                  className={`w-full p-2 border ${
+                    errors.confirmPassword
+                      ? "border-red-500"
+                      : "border-gray-300"
+                  } ${editingUser ? "bg-gray-300" : "bg-white"} rounded`}
                   placeholder="Re-Type Password"
                   value={reTypePassword}
-                  onChange={(e) =>
-                    setReTypePassword(e.target.value)
-                  }
+                  onChange={(e) => setReTypePassword(e.target.value)}
                 />
                 <button
                   type="button"
@@ -752,16 +724,22 @@ const CreateUserPage: React.FC = () => {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p className="text-red-500 text-sm mt-1">{errors.confirmPassword}</p>
+                <p className="text-red-500 text-sm mt-1">
+                  {errors.confirmPassword}
+                </p>
               )}
             </div>
 
             {/* First Name */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">First Name :</label>
+              <label className="block text-gray-700 font-semibold mb-2">
+                First Name :
+              </label>
               <input
                 type="text"
-                className={`w-full p-2 border ${errors.firstName ? 'border-red-500' : 'border-gray-300'} rounded`}
+                className={`w-full p-2 border ${
+                  errors.firstName ? "border-red-500" : "border-gray-300"
+                } rounded`}
                 placeholder="First Name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
@@ -773,10 +751,14 @@ const CreateUserPage: React.FC = () => {
 
             {/* Last Name */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">Last Name :</label>
+              <label className="block text-gray-700 font-semibold mb-2">
+                Last Name :
+              </label>
               <input
                 type="text"
-                className={`w-full p-2 border ${errors.lastName ? 'border-red-500' : 'border-gray-300'} rounded`}
+                className={`w-full p-2 border ${
+                  errors.lastName ? "border-red-500" : "border-gray-300"
+                } rounded`}
                 placeholder="Last Name"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
@@ -788,10 +770,14 @@ const CreateUserPage: React.FC = () => {
 
             {/* Sales Person Selection */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">Sales Person :</label>
+              <label className="block text-gray-700 font-semibold mb-2">
+                Sales Person :
+              </label>
               <div className="relative">
                 <select
-                  className={`w-full p-2 border ${errors.posName ? 'border-red-500' : 'border-gray-300'} rounded appearance-none`}
+                  className={`w-full p-2 border ${
+                    errors.posName ? "border-red-500" : "border-gray-300"
+                  } rounded appearance-none`}
                   // The value here needs to be the salesPersonCode that matches userData.posName (salesPersonName)
                   // value={userCreationDetails.salesPersons.find(sp => sp.salesPersonName === userData.posName)?.salesPersonCode || ""}
                   value={selectedSalesPerson}
@@ -801,8 +787,12 @@ const CreateUserPage: React.FC = () => {
                 >
                   <option value="">Select Sales Person</option>
                   {userCreationDetails.salesPersons.map((salesPerson) => (
-                    <option key={salesPerson.salesPersonCode} value={salesPerson.salesPersonCode}>
-                      {salesPerson.salesPersonName} ({salesPerson.salesPersonCode})
+                    <option
+                      key={salesPerson.salesPersonCode}
+                      value={salesPerson.salesPersonCode}
+                    >
+                      {salesPerson.salesPersonName} (
+                      {salesPerson.salesPersonCode})
                     </option>
                   ))}
                 </select>
@@ -829,10 +819,14 @@ const CreateUserPage: React.FC = () => {
 
             {/* E-Mail */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">E-Mail :</label>
+              <label className="block text-gray-700 font-semibold mb-2">
+                E-Mail :
+              </label>
               <input
                 type="email"
-                className={`w-full p-2 border ${errors.email ? 'border-red-500' : 'border-gray-300'} rounded`}
+                className={`w-full p-2 border ${
+                  errors.email ? "border-red-500" : "border-gray-300"
+                } rounded`}
                 placeholder="Enter a valid e-mail"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -844,10 +838,14 @@ const CreateUserPage: React.FC = () => {
 
             {/* Telephone */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">Telephone :</label>
+              <label className="block text-gray-700 font-semibold mb-2">
+                Telephone :
+              </label>
               <input
                 type="text"
-                className={`w-full p-2 border ${errors.telephone ? 'border-red-500' : 'border-gray-300'} rounded`}
+                className={`w-full p-2 border ${
+                  errors.telephone ? "border-red-500" : "border-gray-300"
+                } rounded`}
                 placeholder="Enter a valid Number"
                 value={telephone}
                 onChange={(e) => setTelephone(e.target.value)}
@@ -859,10 +857,14 @@ const CreateUserPage: React.FC = () => {
 
             {/* Role */}
             <div className="mb-4">
-              <label className="block text-gray-700 font-semibold mb-2">Role :</label>
+              <label className="block text-gray-700 font-semibold mb-2">
+                Role :
+              </label>
               <div className="relative">
                 <select
-                  className={`w-full p-2 border ${errors.role ? 'border-red-500' : 'border-gray-300'} rounded appearance-none`}
+                  className={`w-full p-2 border ${
+                    errors.role ? "border-red-500" : "border-gray-300"
+                  } rounded appearance-none`}
                   value={role}
                   onChange={(e) => setRole(parseInt(e.target.value))}
                 >
@@ -906,7 +908,6 @@ const CreateUserPage: React.FC = () => {
               )}
             </div>
 
-
             {/* Is Active */}
             <div className="mb-6">
               <label className="flex items-center text-gray-700 font-semibold">
@@ -915,24 +916,24 @@ const CreateUserPage: React.FC = () => {
                   type="checkbox"
                   className="form-checkbox h-5 w-5 text-blue-600"
                   checked={isActive}
-                  onChange={(e) =>
-                    setIsActive(e.target.checked)
-                  }
+                  onChange={(e) => setIsActive(e.target.checked)}
                 />
               </label>
             </div>
 
             {/* MFA Type Checkboxes */}
             <div className="mb-6">
-              <label className="block text-gray-700 font-semibold mb-2">MFA Type:</label>
+              <label className="block text-gray-700 font-semibold mb-2">
+                MFA Type:
+              </label>
               <div className="flex gap-4">
                 <label className="flex items-center">
                   <input
                     type="checkbox"
                     value="sms"
-                    checked={mfaType.includes('sms')}
+                    checked={mfaType.includes("sms")}
                     onChange={() => {
-                      setMfaType('sms');
+                      setMfaType("sms");
                       setIsMfaEnabled(true);
                     }}
                     className="form-checkbox h-5 w-5 text-blue-600"
@@ -944,9 +945,9 @@ const CreateUserPage: React.FC = () => {
                   <input
                     type="checkbox"
                     value="email"
-                    checked={mfaType.includes('email')}
+                    checked={mfaType.includes("email")}
                     onChange={() => {
-                      setMfaType('email');
+                      setMfaType("email");
                       setIsMfaEnabled(true);
                     }}
                     className="form-checkbox h-5 w-5 text-blue-600"
@@ -956,14 +957,18 @@ const CreateUserPage: React.FC = () => {
               </div>
             </div>
 
-
             {/* Buttons */}
             <div className="flex flex-wrap gap-2">
               <button
-                className="px-4 py-2 bg-blue-900 text-white rounded hover:bg-blue-950 cursor-pointer"
+                disabled={isSaving}
+                className={`px-4 py-2 rounded font-medium transition duration-300 ${
+                  isSaving
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
+                } text-white`}
                 onClick={editingUser ? handleUpdateUser : handleCreateUser}
               >
-                Create / Update User
+                {isSaving ? "Saving..." : "Create / Update User"}
               </button>
               <button
                 className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 cursor-pointer"
@@ -988,31 +993,51 @@ const CreateUserPage: React.FC = () => {
                 <table className="min-w-full bg-white border border-gray-200">
                   <thead className="bg-gray-100">
                     <tr>
-                      <th className="py-2 px-4 border-b text-center">Username</th>
-                      <th className="py-2 px-4 border-b text-center">First Name</th>
-                      <th className="py-2 px-4 border-b text-center">Last Name</th>
-                      <th className="py-2 px-4 border-b text-center">Sales Person Code</th> {/* Map the salespersons name to here*/}
+                      <th className="py-2 px-4 border-b text-center">
+                        Username
+                      </th>
+                      <th className="py-2 px-4 border-b text-center">
+                        First Name
+                      </th>
+                      <th className="py-2 px-4 border-b text-center">
+                        Last Name
+                      </th>
+                      <th className="py-2 px-4 border-b text-center">
+                        Sales Person Code
+                      </th>{" "}
+                      {/* Map the salespersons name to here*/}
                       {/* <th className="py-2 px-4 border-b text-center">Email</th> */}
                       {/* <th className="py-2 px-4 border-b text-center">Telephone</th> */}
-                      <th className="py-2 px-4 border-b text-center">Role</th> {/* Map the user role Id to the user role name */}
+                      <th className="py-2 px-4 border-b text-center">Role</th>{" "}
+                      {/* Map the user role Id to the user role name */}
                       {/* <th className="py-2 px-4 border-b text-center">Locations</th> */}
                       <th className="py-2 px-4 border-b text-center">Status</th>
-                      <th className="py-2 px-4 border-b text-center">Actions</th>
+                      <th className="py-2 px-4 border-b text-center">
+                        Actions
+                      </th>
                     </tr>
                   </thead>
                   <tbody>
                     {usersList.map((user, index) => (
                       <tr key={index}>
-                        <td className="py-2 px-4 border-b text-center">{user.username}</td>
-                        <td className="py-2 px-4 border-b text-center">{user.firstName}</td>
-                        <td className="py-2 px-4 border-b text-center">{user.lastName}</td>
-                        <td className="py-2 px-4 border-b text-center">{user.salesPersonCode}</td>
+                        <td className="py-2 px-4 border-b text-center">
+                          {user.username}
+                        </td>
+                        <td className="py-2 px-4 border-b text-center">
+                          {user.firstName}
+                        </td>
+                        <td className="py-2 px-4 border-b text-center">
+                          {user.lastName}
+                        </td>
+                        <td className="py-2 px-4 border-b text-center">
+                          {user.salesPersonCode}
+                        </td>
                         {/* <td className="py-2 px-4 border-b text-center">{user.email}</td>
                           <td className="py-2 px-4 border-b text-center">{user.telephone}</td> */}
                         <td className="py-2 px-4 border-b text-center">
-                          {
-                            userCreationDetails.roles.find((item) => item.roleId === parseInt(user.userRoleId))?.roleName || ""
-                          }
+                          {userCreationDetails.roles.find(
+                            (item) => item.roleId === parseInt(user.userRoleId)
+                          )?.roleName || ""}
                         </td>
                         {/* <td className="py-2 px-4 border-b">
                           {user.location.map(loc => {
@@ -1029,7 +1054,7 @@ const CreateUserPage: React.FC = () => {
                             onClick={() => {
                               // Edit functionality would go here
                               // alert(`Edit user: ${user.username}`);
-                              handleEditUser(user)
+                              handleEditUser(user);
                             }}
                           >
                             <svg
@@ -1053,7 +1078,9 @@ const CreateUserPage: React.FC = () => {
                               const newUsers = [...usersList];
                               newUsers.splice(index, 1);
                               setUsersList(newUsers);
-                              setErrors({ notice: "User deleted successfully!" }); // Optional: Add a success notice
+                              setErrors({
+                                notice: "User deleted successfully!",
+                              }); // Optional: Add a success notice
                               setTimeout(() => setErrors({}), 3000); // Clear notice after 3 seconds
                             }}
                           >
@@ -1089,19 +1116,13 @@ const CreateUserPage: React.FC = () => {
           )}
         </div>
       </div>
-      {
-        showAlert && (
-          <Alert
-            message={alertMessage}
-            type={alertType}
-            duration={5000}
-          />
-        )
-      }
+      {showAlert && (
+        <Alert message={alertMessage} type={alertType} duration={5000} />
+      )}
 
       {/* Footer Component */}
       <Footer />
-    </div >
+    </div>
   );
 };
 
