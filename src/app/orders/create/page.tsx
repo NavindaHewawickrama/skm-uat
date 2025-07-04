@@ -69,11 +69,17 @@ interface SubstituteItem {
   unitPrice: number;
 }
 
+interface LocationWiseInventory {
+  locationCode: string;
+  inventory: number;
+}
+
 interface Item {
   itemCode: string;
   itemName: string;
   substituteItems: SubstituteItem[];
   unitprice: string;
+  locationWiseInventory?: LocationWiseInventory[];
 }
 
 interface Location {
@@ -124,6 +130,7 @@ const CreateOrderPage: React.FC = () => {
   const [substitutedItemsList, setSubstitutedItemsList] = useState<
     SubstituteItem[]
   >([]);
+  const [selectedItemSelectedLocationStock, setSelectedItemSelectedLocationStock] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -135,15 +142,33 @@ const CreateOrderPage: React.FC = () => {
   const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
-  const locationOptions = locations.map((loc) => ({
-    value: loc.locationCode,
-    label: loc.locationName,
-  }));
+  const locationOptions = locations
+    .filter((loc) =>
+      loc.locationCode &&
+      loc.locationName &&
+      loc.locationCode.toString().trim() !== '' &&
+      loc.locationName.toString().trim() !== ''
+    )
+    .map((loc) => ({
+      value: loc.locationCode,
+      label: loc.locationName,
+    }));
 
-  const customerOptions = customers.map((customer) => ({
-    value: customer.customerCode,
-    label: customer.customerName
-  }));
+  const customerOptions = customers
+    .filter((customer) =>
+      customer.customerCode &&
+      customer.customerName &&
+      customer.customerCode.toString().trim() !== '' &&
+      customer.customerName.toString().trim() !== ''
+    ).
+    map((customer) => ({
+      value: customer.customerCode,
+      label: customer.customerName,
+    }));
+  // const customerOptions = customers.map((customer) => ({
+  //   value: customer.customerCode,
+  //   label: customer.customerName
+  // }));
 
 
   useEffect(() => {
@@ -236,6 +261,7 @@ const CreateOrderPage: React.FC = () => {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
+        console.log(data);
         setItemsList(data);
       }
       setLoading(false);
@@ -301,6 +327,7 @@ const CreateOrderPage: React.FC = () => {
       setSelectedItemUnitPrice("");
       setSelectedItemQuantity(0);
       setSelectedItemDiscount(0);
+      setSelectedItemSelectedLocationStock(0);
     }
   };
 
@@ -446,14 +473,17 @@ const CreateOrderPage: React.FC = () => {
   };
 
   // Update current item field
-  const updateCurrentItem = (field: keyof OrderItem, value: string) => {
+  const updateCurrentItem = (name: string, value: string) => {
+    console.log("Updating item:", value, name);
     setSelectedItem(value);
     const selected = itemsList.find((item) => item.itemCode === value);
     if (selected) {
       setSelectedItemUnitPrice(selected.unitprice);
-      setSelectedItemName(selected.itemName);
-      console.log(selected.substituteItems);
-
+      setSelectedItemName(name);
+      setSelectedItemSelectedLocationStock(selected.locationWiseInventory
+        ? selected.locationWiseInventory.find((loc) => loc.locationCode === location)?.inventory || 0
+        : 0
+      );
       // Fix: Handle both single object and array cases
       if (selected.substituteItems) {
         if (Array.isArray(selected.substituteItems)) {
@@ -864,7 +894,7 @@ const CreateOrderPage: React.FC = () => {
                         }),
                       }}
                       value={itemsList.find((item) => item.itemCode === selectedItem) || null}
-                      onChange={(e) => updateCurrentItem("itemCode", e?.itemCode || "")}
+                      onChange={(e) => updateCurrentItem(e?.itemName || "", e?.itemCode || "")}
                       getOptionLabel={(option) => option.itemCode}
                       getOptionValue={(option) => option.itemCode}
                       placeholder="Select item code"
@@ -886,6 +916,9 @@ const CreateOrderPage: React.FC = () => {
                       </svg>
                     </div> */}
                   </div>
+                  <label className="block text-blue-500 text-xs mt-2">
+                    Item: {selectedItemName || "Select an item code to see the item name"} {location == "" ? "(Please select a location)" : selectedItemSelectedLocationStock > 0 ? `(${selectedItemSelectedLocationStock} in stock)` : "(Out of stock)"}
+                  </label>
                 </div>
 
                 <div>
@@ -936,7 +969,7 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="number"
                     className="block w-full p-2 border border-gray-300 rounded"
-                    value={selectedItemUnitPrice}
+                    value={parseFloat(selectedItemUnitPrice)}
                     disabled
                   />
                 </div>
@@ -953,9 +986,14 @@ const CreateOrderPage: React.FC = () => {
                     min={0}
                     className="block w-full p-2 border border-gray-300 rounded"
                     value={selectedItemQuantity}
-                    onChange={(e) =>
-                      setSelectedItemQuantity(parseInt(e.target.value))
-                    }
+                    onChange={(e) => {
+                      const value = parseInt(e.target.value);
+                      if (value > selectedItemSelectedLocationStock) {
+                        handleShowAlert("error", "Please select a Quantity amout lower than stock amount");
+                      } else {
+                        setSelectedItemQuantity(value);
+                      }
+                    }}
                   />
                 </div>
 

@@ -73,10 +73,10 @@ const OutstandingsPage: React.FC = () => {
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
     const pendingOrderList = sessionStorage.getItem("notificationsData");
     setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
-    fetchUserCustomerDetails(sessionStorage.getItem("userRoleName") || "");
+    fetchUserCustomerDetails();
   }, []);
 
-  const fetchUserCustomerDetails = async (userRole: string) => {
+  const fetchUserCustomerDetails = async () => {
     try {
       setIsLoading(true);
       const response = await fetch(`/api/orders/getCustomers`, {

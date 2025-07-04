@@ -33,7 +33,8 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
 
     pdf.setFontSize(18);
     pdf.text("Order Items Details Report", 105, 15, { align: "center" });
-    //pdf.text(orderNumber.toString(), 95, 15, { align: "center" });
+    pdf.setFontSize(12);
+    pdf.text(`Order Number ${orderNumber.toString()}`, 105, 21, { align: "center" });
     //pdf.text({}, 105, 15, { align: "center" });
     const currentDate = new Date().toLocaleDateString("en-US");
     pdf.setFontSize(10);
