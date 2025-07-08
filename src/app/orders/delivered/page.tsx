@@ -5,24 +5,7 @@ import SideNav from "@/components/Sidenav";
 import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 import Footer from "@/components/Footer";
 import ViewOrderDeliveryStatus from "@/components/ViewOrderDeliveryStatus";
-// import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
-// import DeliveryDetailsPopup from "@/components/DeliveryDetailsPopup";
 
-// type OrderType = {
-//   orderNumber: string;
-//   customerName: string;
-//   salesPersonName: string;
-//   orderDate: string;
-//   paymentMethodType: string;
-//   totalAmount: number;
-//   specialNote: string;
-//   rejectedReason: string;
-//   status: string;
-//   description?: string
-//   trackingNumber: string,
-//   delivertPersonName: string,
-//   deliveryDate: string,
-// };
 type OrderType = {
   orderNumber: number;
   customerName: string;
@@ -423,7 +406,12 @@ const DeliveredOrdersPage: React.FC = () => {
                         </td>
                         <td className="px-4 py-3 border text-sm text-right">
                           {typeof order.totalAmount === "number"
-                            ? order.totalAmount.toFixed(2)
+                            ? Number(
+                                order.totalAmount.toFixed(2)
+                              ).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })
                             : order.totalAmount}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
