@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Alert from '../../../components/Alert';
+import Alert from "../../../components/Alert";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -11,15 +11,15 @@ const LoginPage = () => {
   const [rememberMe, setRememberMe] = useState(false);
   // const [error, setError] = useState<string | null>(null);
   const [showAlert, setShowAlert] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
-  const [alertType, setAlertType] = useState('');
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [viewpw, setViewPw] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const res = await fetch('/api/login/checkAuth');
+        const res = await fetch("/api/login/checkAuth");
         const data = await res.json();
         if (data.authenticated) {
           router.push("/dashboard"); // Redirect if already logged in
@@ -32,7 +32,10 @@ const LoginPage = () => {
     checkAuth();
   }, []);
 
-  const handleShowAlert = (type: React.SetStateAction<string>, message: React.SetStateAction<string>) => {
+  const handleShowAlert = (
+    type: React.SetStateAction<string>,
+    message: React.SetStateAction<string>
+  ) => {
     setAlertType(type);
     setAlertMessage(message);
     setShowAlert(true);
@@ -44,15 +47,15 @@ const LoginPage = () => {
     setShowAlert(false);
 
     try {
-      const response = await fetch('/api/login/userlogin', {
-        method: 'POST',
+      const response = await fetch("/api/login/userlogin", {
+        method: "POST",
         body: JSON.stringify({
           usernameOrEmail: username,
           password: password,
-          rememberme: rememberMe
+          rememberme: rememberMe,
         }),
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       });
 
@@ -60,21 +63,27 @@ const LoginPage = () => {
 
       if (response.ok) {
         // Success case
-        handleShowAlert('success', 'Login successful! Redirecting to dashboard...');
-      //  console.log('Login successful:', data);
+        handleShowAlert(
+          "success",
+          "Login successful! Redirecting to dashboard..."
+        );
+        //  console.log('Login successful:', data);
 
         setTimeout(() => {
           router.push("/dashboard");
         }, 2000);
       } else {
         // Error case - error message from the API response
-        const errorMessage = data.error || 'Login failed. Please try again.';
-        handleShowAlert('error', errorMessage);
-        console.error('Login failed:', data);
+        const errorMessage = data.error || "Login failed. Please try again.";
+        handleShowAlert("error", errorMessage);
+        console.error("Login failed:", data);
       }
     } catch (error) {
-      console.error('Network or unexpected error:', error);
-      handleShowAlert('error', 'Network error. Please check your connection and try again.');
+      console.error("Network or unexpected error:", error);
+      handleShowAlert(
+        "error",
+        "Network error. Please check your connection and try again."
+      );
     } finally {
       setIsLoading(false);
     }
@@ -85,11 +94,7 @@ const LoginPage = () => {
       {/* Main content area */}
       <div className="flex items-center justify-center px-4">
         {showAlert && (
-          <Alert
-            message={alertMessage}
-            type={alertType}
-            duration={5000}
-          />
+          <Alert message={alertMessage} type={alertType} duration={5000} />
         )}
         <div className="bg-white p-8 mt-24 h-[450px] rounded-lg w-full max-w-md border-[6px] border-double border-blue-950">
           {/* Logo */}
@@ -111,6 +116,11 @@ const LoginPage = () => {
                 placeholder="Username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === " ") {
+                    e.preventDefault();
+                  }
+                }}
                 required
                 disabled={isLoading}
               />
@@ -194,12 +204,13 @@ const LoginPage = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className={`w-full font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${isLoading
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-red-500 hover:bg-red-600 cursor-pointer'
-                } text-white`}
+              className={`w-full font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${
+                isLoading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-red-500 hover:bg-red-600 cursor-pointer"
+              } text-white`}
             >
-              {isLoading ? 'Logging in...' : 'Log In'}
+              {isLoading ? "Logging in..." : "Log In"}
             </button>
           </form>
         </div>
@@ -210,7 +221,7 @@ const LoginPage = () => {
         <Image
           src="/images/bg-account.png"
           alt="Decorative footer"
-          width={800}  // Add actual width
+          width={800} // Add actual width
           height={150} // Add actual height
           className="w-full object-cover"
           style={{ height: "150px" }}
