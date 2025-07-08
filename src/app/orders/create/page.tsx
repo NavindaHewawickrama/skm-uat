@@ -142,7 +142,7 @@ const CreateOrderPage: React.FC = () => {
     selectedItemSelectedLocationStock,
     setSelectedItemSelectedLocationStock,
   ] = useState<number>(0);
-  const [formattedAmount, setFormattedAmount] = useState("");
+  // const [formattedAmount, setFormattedAmount] = useState("");
   const [loading, setLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -195,17 +195,14 @@ const CreateOrderPage: React.FC = () => {
     );
   }, [location, itemsList]);
 
-  useEffect(() => {
-    const formatted = Number(selectedCustomerDueAmount).toLocaleString(
-      "en-US",
-      {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }
-    );
-    setFormattedAmount(formatted);
-    //setSelectedCustomerDueAmount(parseInt(formatted));
-  }, [selectedCustomerDueAmount]);
+  // useEffect(() => {
+  //   const formatted = Number(selectedCustomerDueAmount).toLocaleString("en-US", {
+  //     minimumFractionDigits: 2,
+  //     maximumFractionDigits: 2,
+  //   });
+  //   setFormattedAmount(formatted);
+  //   //setSelectedCustomerDueAmount(parseInt(formatted));
+  // }, [selectedCustomerDueAmount]);
 
   useEffect(() => {
     const pendingOrderList = sessionStorage.getItem("notificationsData");
@@ -499,17 +496,17 @@ const CreateOrderPage: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log("Fetched data:", data);
+      //console.log("Fetched data:", data);
       const transformedData: CustomerOutstandingData[] = data.map(
         (invoice: Invoice) => ({
           customerName: selectedCustomer.customerName,
           invoiceNumber: invoice.invoiceNumber,
           invoiceDate: invoice.invoiceDate
             ? new Date(invoice.invoiceDate).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "2-digit",
-              })
+              year: "numeric",
+              month: "short",
+              day: "2-digit",
+            })
             : "N/A",
           invoicedAmount: parseFloat(invoice.totalAmount?.toString() || "0"),
           pdcAmount: parseFloat(invoice.pdcAmount?.toString() || "0"),
@@ -519,7 +516,7 @@ const CreateOrderPage: React.FC = () => {
 
       setOutstandingData(transformedData);
       setSelectedCustomerDueAmount(data.totalDueAmount);
-      setFormattedAmount(selectedCustomerDueAmount.toString());
+      //setFormattedAmount(data.totalDueAmount);
       handleShowAlert(
         "success",
         `Loaded ${transformedData.length} invoice record(s)`
@@ -568,8 +565,8 @@ const CreateOrderPage: React.FC = () => {
       setSelectedItemSelectedLocationStock(
         selected.locationWiseInventory
           ? selected.locationWiseInventory.find(
-              (loc) => loc.locationCode === location
-            )?.inventory || 0
+            (loc) => loc.locationCode === location
+          )?.inventory || 0
           : 0
       );
       // Fix: Handle both single object and array cases
@@ -802,18 +799,17 @@ const CreateOrderPage: React.FC = () => {
                     //   minimumFractionDigits: 2,
                     //   maximumFractionDigits: 2
                     // })}
-                    value={formattedAmount}
+                    value={selectedCustomerDueAmount}
                     readOnly
                   />
                   <div className="flex justify-start mt-2">
                     <button
                       disabled={isLoading}
                       onClick={handleViewDetails}
-                      className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${
-                        isLoading
+                      className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${isLoading
                           ? "bg-gray-400 cursor-not-allowed"
                           : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
-                      } text-white`}
+                        } text-white`}
                     >
                       {isLoading ? "Loading..." : "View Details"}
                     </button>
@@ -987,8 +983,8 @@ const CreateOrderPage: React.FC = () => {
                     {location == ""
                       ? "(Please select a location)"
                       : selectedItemSelectedLocationStock > 0
-                      ? `(${selectedItemSelectedLocationStock} in stock)`
-                      : "(Out of stock)"}
+                        ? `(${selectedItemSelectedLocationStock} in stock)`
+                        : "(Out of stock)"}
                   </label>
                 </div>
 
@@ -999,8 +995,8 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                      // value={currentItem.itemName}
-                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
+                    // value={currentItem.itemName}
+                    // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
                       {substitutedItemsList?.length === 0 ? (
                         <option value="" disabled>
@@ -1038,11 +1034,11 @@ const CreateOrderPage: React.FC = () => {
                     Unit Price:
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     className="block w-full p-2 border border-gray-300 rounded"
                     //  value={parseFloat(selectedItemUnitPrice)}
                     value={Number(
-                      parseFloat(selectedItemUnitPrice)
+                      selectedItemUnitPrice
                     ).toLocaleString("en-US", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
@@ -1265,11 +1261,10 @@ const CreateOrderPage: React.FC = () => {
                   <button
                     disabled={isSaving}
                     onClick={handleSave}
-                    className={`px-6 py-2 rounded font-medium transition duration-300 ${
-                      isSaving
+                    className={`px-6 py-2 rounded font-medium transition duration-300 ${isSaving
                         ? "bg-gray-400 cursor-not-allowed"
                         : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                    } text-white`}
+                      } text-white`}
                   >
                     {isSaving ? "Saving..." : "Save"}
                   </button>
