@@ -13,7 +13,14 @@ type OrderType = {
   orderDate: string;
   paymentMethodType: string;
   totalAmount: number;
-  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  orderedItems: {
+    itemCode: string;
+    description: string;
+    unitPrice: number;
+    quantity: string;
+    discountPercent: number;
+    total: number;
+  }[];
   specialNote: string;
   rejectReason: string | null;
   status: string;
@@ -45,14 +52,21 @@ interface AppBarProps {
   notificationData?: OrderType[]; // Updated to use the correct type
 }
 
-const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole, userName, notificationData }) => {
+const AppBar: React.FC<AppBarProps> = ({
+  toggleSideNav,
+  userRole,
+  userName,
+  notificationData,
+}) => {
   const router = useRouter();
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [alertDropdownOpen, setAlertDropdownOpen] = useState(false);
   const alertDropdownRef = useRef<HTMLDivElement>(null);
   const profileDropdownRef = useRef<HTMLDivElement>(null);
   const [openNotificationPopup, setOpenNotificationPopup] = useState(false);
-  const [notificationDataState, setNotificationDataState] = useState<OrderType[]>([]);
+  const [notificationDataState, setNotificationDataState] = useState<
+    OrderType[]
+  >([]);
 
   //console.log(userName);
 
@@ -101,30 +115,36 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole, userName, noti
 
   const handleNotificationPopupOpen = () => {
     setOpenNotificationPopup(true);
-  }
+  };
 
   const handleLogoutClick = async () => {
     setProfileDropdownOpen(false);
     try {
-      await fetch('/api/logout');
+      await fetch("/api/logout");
       // Optionally clear any local/session storage
       sessionStorage.clear();
       localStorage.clear();
-      router.push('/');
+      router.push("/");
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     }
-  }
+  };
 
   const handleReserPasswordClicked = () => {
     setProfileDropdownOpen(false);
     router.push("/user/ResetPassword");
-  }
+  };
 
   // Format date for display
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
-    return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    return date.toLocaleString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
   };
 
   // Get notification count
@@ -173,10 +193,7 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole, userName, noti
         {/* <div className="hidden lg:block lg:ml-4 font-bold">B & C DIVISION</div> */}
         {/* Notification bell */}
         <div className="relative" ref={alertDropdownRef}>
-          <div
-            className="cursor-pointer"
-            onClick={toggleAlertDropdown}
-          >
+          <div className="cursor-pointer" onClick={toggleAlertDropdown}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"
@@ -194,7 +211,7 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole, userName, noti
             {/* Dynamic Notification Count Badge */}
             {notificationCount > 0 && (
               <span className="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-green-500 text-white text-xs font-bold rounded-sm w-4 h-4 flex items-center justify-center">
-                {notificationCount > 99 ? '99+' : notificationCount}
+                {notificationCount > 99 ? "99+" : notificationCount}
               </span>
             )}
           </div>
@@ -215,9 +232,13 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole, userName, noti
                 ) : (
                   <ul className="space-y-2">
                     {getDisplayNotifications().map((notification, index) => (
-                      <li key={`${notification.orderNumber}-${index}`} className="text-gray-800 text-sm hover:bg-gray-200 p-3 border-b border-gray-100">
+                      <li
+                        key={`${notification.orderNumber}-${index}`}
+                        className="text-gray-800 text-sm hover:bg-gray-200 p-3 border-b border-gray-100"
+                      >
                         <div className="font-medium text-blue-800">
-                          Order #{notification.orderNumber} - {notification.status}
+                          Order #{notification.orderNumber} -{" "}
+                          {notification.status}
                         </div>
                         {/* <div className="text-gray-600 text-xs mt-1">
                           Customer: {notification.customerName}
@@ -257,7 +278,9 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole, userName, noti
           <div className="font-bold text-xl">{userName ? userName : ""}</div>
 
           {/* User role as subtitle */}
-          <div className="text-xs text-gray-300 font-medium mt-[-5]">{userRole ? userRole : ""}</div>
+          <div className="text-xs text-gray-300 font-medium mt-[-5]">
+            {userRole ? userRole : ""}
+          </div>
         </div>
 
         {/* User profile icon with dropdown */}
@@ -286,9 +309,7 @@ const AppBar: React.FC<AppBarProps> = ({ toggleSideNav, userRole, userName, noti
           {profileDropdownOpen && (
             <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg z-50">
               <div className="border-b border-gray-200 bg-gray-700">
-                <div className="px-4 py-2 text-white font-medium">
-                  Welcome
-                </div>
+                <div className="px-4 py-2 text-white font-medium">Welcome</div>
               </div>
               <div className="py-1">
                 <button
