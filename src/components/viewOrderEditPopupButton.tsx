@@ -74,7 +74,10 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
       return [
         item.itemCode, // Item Code
         item.description, // Item Code/Description
-        Number(item.unitPrice).toFixed(2), // Unit Price
+        Number(item.unitPrice).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }), // Unit Price
         item.quantity, // Quantity
         `${item.discountPercent}%`, // Discount Percent
         total.toFixed(2), // Total
