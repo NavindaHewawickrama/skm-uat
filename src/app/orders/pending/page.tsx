@@ -23,8 +23,24 @@ type OrderType = {
   orderDate: string;
   paymentMethodType: string;
   totalAmount: number;
-  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
-  items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  orderedItems: {
+    itemCode: string;
+    description: string;
+    unitPrice: number;
+    quantity: string;
+    discountPercent: number;
+    total: number;
+  }[];
+  items:
+    | string
+    | {
+        itemCode: string;
+        description: string;
+        unitPrice: number;
+        quantity: string;
+        discountPercent: number;
+        total: number;
+      }[];
   specialNote: string;
   rejectReason: string | null;
   status: string;
@@ -36,8 +52,14 @@ type OrderType = {
   description?: string;
 };
 
-type ItemsType = { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }
-
+type ItemsType = {
+  itemCode: string;
+  description: string;
+  unitPrice: number;
+  quantity: string;
+  discountPercent: number;
+  total: number;
+};
 
 const PendingOrdersPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
@@ -47,7 +69,8 @@ const PendingOrdersPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [listViewOpen, setListViewOpen] = useState(false);
   const [selectedOrderItems, setSelectedOrderItems] = useState<ItemsType[]>([]);
-  const [selectedOrderForStatus, setSelectedOrderForStatus] = useState<OrderforStatus | null>(null);
+  const [selectedOrderForStatus, setSelectedOrderForStatus] =
+    useState<OrderforStatus | null>(null);
   // const [status, setStatus] = useState("");
   const [statusViewOpen, setStatusViewOpen] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -55,12 +78,24 @@ const PendingOrdersPage: React.FC = () => {
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [notificationOrders, setNotificationOrders] = useState<OrderType[]>([]);
-  const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(null);
-  const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<string | null>(null);
+  const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(
+    null
+  );
+  const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<
+    string | null
+  >(null);
 
   useEffect(() => {
-    setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
-    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
+    setUserName(
+      sessionStorage.getItem("userName")
+        ? sessionStorage.getItem("userName")
+        : ""
+    );
+    setUserRoleType(
+      sessionStorage.getItem("userRoleName")
+        ? sessionStorage.getItem("userRoleName")
+        : ""
+    );
     const pendingOrderList = sessionStorage.getItem("notificationsData");
     setNotificationOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
@@ -207,7 +242,12 @@ const PendingOrdersPage: React.FC = () => {
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={notificationOrders} />
+        <AppBar
+          toggleSideNav={toggleSideNav}
+          userRole={userRoleType}
+          userName={userName}
+          notificationData={notificationOrders}
+        />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -227,7 +267,12 @@ const PendingOrdersPage: React.FC = () => {
   if (error) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={notificationOrders} />
+        <AppBar
+          toggleSideNav={toggleSideNav}
+          userRole={userRoleType}
+          userName={userName}
+          notificationData={notificationOrders}
+        />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -248,7 +293,12 @@ const PendingOrdersPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={notificationOrders} />
+      <AppBar
+        toggleSideNav={toggleSideNav}
+        userRole={userRoleType}
+        userName={userName}
+        notificationData={notificationOrders}
+      />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
@@ -341,17 +391,27 @@ const PendingOrdersPage: React.FC = () => {
                           {order.salesPersonName}
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.orderDate.split("T")[0]}
+                          {new Date(order.orderDate).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "2-digit",
+                            }
+                          )}
                         </td>
                         <td className="px-4 py-3 border text-sm">
                           {order.paymentMethodType}
                         </td>
                         <td className="px-4 py-3 border text-sm text-right">
                           {/* {order.totalAmount.toFixed(2)} */}
-                          {Number(order.totalAmount.toFixed(2)).toLocaleString('en-US', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                          })}
+                          {Number(order.totalAmount.toFixed(2)).toLocaleString(
+                            "en-US",
+                            {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            }
+                          )}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
                           <button
@@ -365,7 +425,13 @@ const PendingOrdersPage: React.FC = () => {
                           {order.specialNote}
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          <span className={`px-2 py-1 ${order.status.toLowerCase() === "processing" ? "bg-red-300" : "bg-yellow-200"} text-yellow-800 rounded-full text-xs font-medium`}>
+                          <span
+                            className={`px-2 py-1 ${
+                              order.status.toLowerCase() === "processing"
+                                ? "bg-red-300"
+                                : "bg-yellow-200"
+                            } text-yellow-800 rounded-full text-xs font-medium`}
+                          >
                             {order.status}
                           </span>
                         </td>
@@ -411,8 +477,9 @@ const PendingOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
-                      }`}
+                    className={`px-3 py-1 border rounded cursor-pointer ${
+                      currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
+                    }`}
                   >
                     Previous
                   </button>
@@ -421,12 +488,13 @@ const PendingOrdersPage: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => typeof page === "number" && goToPage(page)}
-                      className={`px-3 py-1 border rounded ${page === currentPage
-                        ? "bg-blue-500 text-white"
-                        : page === "..."
+                      className={`px-3 py-1 border rounded ${
+                        page === currentPage
+                          ? "bg-blue-500 text-white"
+                          : page === "..."
                           ? ""
                           : "hover:bg-gray-100"
-                        }`}
+                      }`}
                       disabled={page === "..."}
                     >
                       {page}
@@ -436,10 +504,11 @@ const PendingOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages || totalPages === 0}
-                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === totalPages || totalPages === 0
-                      ? "text-gray-400"
-                      : "hover:bg-gray-100"
-                      }`}
+                    className={`px-3 py-1 border rounded cursor-pointer ${
+                      currentPage === totalPages || totalPages === 0
+                        ? "text-gray-400"
+                        : "hover:bg-gray-100"
+                    }`}
                   >
                     Next
                   </button>

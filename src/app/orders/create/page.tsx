@@ -136,7 +136,10 @@ const CreateOrderPage: React.FC = () => {
   const [substitutedItemsList, setSubstitutedItemsList] = useState<
     SubstituteItem[]
   >([]);
-  const [selectedItemSelectedLocationStock, setSelectedItemSelectedLocationStock] = useState<number>(0);
+  const [
+    selectedItemSelectedLocationStock,
+    setSelectedItemSelectedLocationStock,
+  ] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -150,11 +153,12 @@ const CreateOrderPage: React.FC = () => {
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
   const locationOptions = locations
-    .filter((loc) =>
-      loc.locationCode &&
-      loc.locationName &&
-      loc.locationCode.toString().trim() !== '' &&
-      loc.locationName.toString().trim() !== ''
+    .filter(
+      (loc) =>
+        loc.locationCode &&
+        loc.locationName &&
+        loc.locationCode.toString().trim() !== "" &&
+        loc.locationName.toString().trim() !== ""
     )
     .map((loc) => ({
       value: loc.locationCode,
@@ -162,13 +166,14 @@ const CreateOrderPage: React.FC = () => {
     }));
 
   const customerOptions = customers
-    .filter((customer) =>
-      customer.customerCode &&
-      customer.customerName &&
-      customer.customerCode.toString().trim() !== '' &&
-      customer.customerName.toString().trim() !== ''
-    ).
-    map((customer) => ({
+    .filter(
+      (customer) =>
+        customer.customerCode &&
+        customer.customerName &&
+        customer.customerCode.toString().trim() !== "" &&
+        customer.customerName.toString().trim() !== ""
+    )
+    .map((customer) => ({
       value: customer.customerCode,
       label: customer.customerName,
     }));
@@ -367,9 +372,18 @@ const CreateOrderPage: React.FC = () => {
       item.customerName,
       item.invoiceNumber,
       item.invoiceDate,
-      `${item.invoicedAmount.toFixed(2)}`,
-      `${item.pdcAmount.toFixed(2)}`,
-      `${item.dueAmount.toFixed(2)}`,
+      `${Number(item.invoicedAmount.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      `${Number(item.pdcAmount.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      `${Number(item.dueAmount.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
     ]);
 
     autoTable(pdf, {
@@ -498,9 +512,12 @@ const CreateOrderPage: React.FC = () => {
     if (selected) {
       setSelectedItemUnitPrice(selected.unitprice);
       setSelectedItemName(name);
-      setSelectedItemSelectedLocationStock(selected.locationWiseInventory
-        ? selected.locationWiseInventory.find((loc) => loc.locationCode === location)?.inventory || 0
-        : 0
+      setSelectedItemSelectedLocationStock(
+        selected.locationWiseInventory
+          ? selected.locationWiseInventory.find(
+              (loc) => loc.locationCode === location
+            )?.inventory || 0
+          : 0
       );
       // Fix: Handle both single object and array cases
       if (selected.substituteItems) {
@@ -670,43 +687,7 @@ const CreateOrderPage: React.FC = () => {
             <div className="bg-white p-6 rounded-md shadow-sm mb-4">
               <h2 className="text-lg font-bold mb-4">Order</h2>
               {/*Location*/}
-              {/* <div className="mb-4 w-[250px]">
-                <label className="block text-gray-700 font-medium mb-2">
-                  Location:
-                </label>
-                <div className="relative">
-                  <select
-                    className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                  >
-                    <option value="" disabled>
-                      Select a Location
-                    </option>
-                    {locations.map((loc, index) => (
-                      <option key={index} value={loc.locationCode}>
-                        {loc.locationName}
-                      </option>
-                    ))}
-                  </select>
 
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div> */}
               <div className="mb-4 w-[250px]">
                 <label className="block text-gray-700 font-medium mb-1.5">
                   Location:
@@ -734,35 +715,7 @@ const CreateOrderPage: React.FC = () => {
                   <label className="block text-gray-700 font-medium mb-2">
                     Customer:
                   </label>
-                  {/* <div className="relative">
-                    <select
-                      className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                      value={customer}
-                      onChange={(e) => handleCustomerChange(e.target.value)} // pass the code
-                    >
-                      <option value="">Select a customer</option>
-                      {customers.map((customer, index) => (
-                        <option value={customer.customerCode} key={index}>
-                          {customer.customerName}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div> */}
+
                   <Select
                     className="w-full text-sm"
                     styles={{
@@ -796,7 +749,12 @@ const CreateOrderPage: React.FC = () => {
                     //   minimumFractionDigits: 2,
                     //   maximumFractionDigits: 2
                     // })}
-                    value={selectedCustomerDueAmount}
+                    value={Number(
+                      selectedCustomerDueAmount.toFixed(2)
+                    ).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                     readOnly
                   />
                   <div className="flex justify-start mt-2">
@@ -818,10 +776,13 @@ const CreateOrderPage: React.FC = () => {
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
                     //value={selectedCustomerTotal}
                     //value={orderTotal.toFixed(2)}
-                    value={Number(orderTotal.toFixed(2)).toLocaleString('en-US', {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
-                    })}
+                    value={Number(orderTotal.toFixed(2)).toLocaleString(
+                      "en-US",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}
                     readOnly
                   />
                 </div>
@@ -937,8 +898,14 @@ const CreateOrderPage: React.FC = () => {
                           height: "42px",
                         }),
                       }}
-                      value={itemsList.find((item) => item.itemCode === selectedItem) || null}
-                      onChange={(e) => updateCurrentItem(e?.itemName || "", e?.itemCode || "")}
+                      value={
+                        itemsList.find(
+                          (item) => item.itemCode === selectedItem
+                        ) || null
+                      }
+                      onChange={(e) =>
+                        updateCurrentItem(e?.itemName || "", e?.itemCode || "")
+                      }
                       getOptionLabel={(option) => option.itemCode}
                       getOptionValue={(option) => option.itemCode}
                       placeholder="Select item code"
@@ -961,7 +928,14 @@ const CreateOrderPage: React.FC = () => {
                     </div> */}
                   </div>
                   <label className="block text-blue-500 text-xs mt-2">
-                    Item: {selectedItemName || "Select an item code to see the item name"} {location == "" ? "(Please select a location)" : selectedItemSelectedLocationStock > 0 ? `(${selectedItemSelectedLocationStock} in stock)` : "(Out of stock)"}
+                    Item:{" "}
+                    {selectedItemName ||
+                      "Select an item code to see the item name"}{" "}
+                    {location == ""
+                      ? "(Please select a location)"
+                      : selectedItemSelectedLocationStock > 0
+                      ? `(${selectedItemSelectedLocationStock} in stock)`
+                      : "(Out of stock)"}
                   </label>
                 </div>
 
@@ -972,8 +946,8 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                    // value={currentItem.itemName}
-                    // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
+                      // value={currentItem.itemName}
+                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
                       {substitutedItemsList?.length === 0 ? (
                         <option value="" disabled>
@@ -1014,9 +988,11 @@ const CreateOrderPage: React.FC = () => {
                     type="number"
                     className="block w-full p-2 border border-gray-300 rounded"
                     //  value={parseFloat(selectedItemUnitPrice)}
-                    value={Number(parseFloat(selectedItemUnitPrice)).toLocaleString('en-US', {
+                    value={Number(
+                      parseFloat(selectedItemUnitPrice)
+                    ).toLocaleString("en-US", {
                       minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
+                      maximumFractionDigits: 2,
                     })}
                     disabled
                   />
@@ -1046,7 +1022,9 @@ const CreateOrderPage: React.FC = () => {
                     //     setSelectedItemQuantity(value);
                     //   }
                     // }}
-                    onChange={(e) => { setSelectedItemQuantity(parseInt(e.target.value)) }}
+                    onChange={(e) => {
+                      setSelectedItemQuantity(parseInt(e.target.value));
+                    }}
                   />
                 </div>
 
@@ -1075,9 +1053,11 @@ const CreateOrderPage: React.FC = () => {
                     // value={
                     //   calculateItemTotal() ? calculateItemTotal().toFixed(2) : 0
                     // }
-                    value={Number(calculateItemTotal() ? calculateItemTotal().toFixed(2) : 0).toLocaleString('en-US', {
+                    value={Number(
+                      calculateItemTotal() ? calculateItemTotal().toFixed(2) : 0
+                    ).toLocaleString("en-US", {
                       minimumFractionDigits: 2,
-                      maximumFractionDigits: 2
+                      maximumFractionDigits: 2,
                     })}
                     readOnly
                   />
@@ -1135,10 +1115,13 @@ const CreateOrderPage: React.FC = () => {
                             </td>
                             <td className="py-2 px-4 border-b text-right">
                               {/* {item.unitPrice.toFixed(2)} */}
-                              {Number(item.unitPrice.toFixed(2)).toLocaleString('en-US', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                              })}
+                              {Number(item.unitPrice.toFixed(2)).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
                             </td>
                             <td className="py-2 px-4 border-b text-right">
                               {item.quantity}
@@ -1148,10 +1131,13 @@ const CreateOrderPage: React.FC = () => {
                             </td>
                             <td className="py-2 px-4 border-b text-right">
                               {/* {item.total.toFixed(2)} */}
-                              {Number(item.total.toFixed(2)).toLocaleString('en-US', {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2
-                              })}
+                              {Number(item.total.toFixed(2)).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
                             </td>
                             <td className="py-2 px-4 border-b text-center">
                               <button
@@ -1205,10 +1191,13 @@ const CreateOrderPage: React.FC = () => {
                             className="py-2 px-4 border-b text-right"
                           >
                             {/* {orderTotal.toFixed(2)} */}
-                            {Number(orderTotal.toFixed(2)).toLocaleString('en-US', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2
-                            })}
+                            {Number(orderTotal.toFixed(2)).toLocaleString(
+                              "en-US",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }
+                            )}
                           </td>
                         </tr>
                       </tbody>
@@ -1223,10 +1212,11 @@ const CreateOrderPage: React.FC = () => {
                   <button
                     disabled={isSaving}
                     onClick={handleSave}
-                    className={`px-6 py-2 rounded font-medium transition duration-300 ${isSaving
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                      } text-white`}
+                    className={`px-6 py-2 rounded font-medium transition duration-300 ${
+                      isSaving
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                    } text-white`}
                   >
                     {isSaving ? "Saving..." : "Save"}
                   </button>
