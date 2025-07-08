@@ -530,7 +530,7 @@ const CreateUserPage: React.FC = () => {
 
         {/* Content Area */}
         <div
-          className="flex-1 overflow-auto p-6"
+          className="flex-1 overflow-auto p-6 h-screen"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           <div className="bg-white p-6 rounded shadow lg:w-[75%]">
