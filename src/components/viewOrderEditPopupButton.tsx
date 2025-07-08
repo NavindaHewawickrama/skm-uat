@@ -36,9 +36,18 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
     pdf.setFontSize(18);
     pdf.text("Order Items Details Report", 105, 15, { align: "center" });
     pdf.setFontSize(10);
-    pdf.text(`${customerName} : Order Number ${orderNumber.toString()}`, 105, 21, { align: "center" });
+    pdf.text(
+      `${customerName} : Order Number ${orderNumber.toString()}`,
+      105,
+      21,
+      { align: "center" }
+    );
     //pdf.text({}, 105, 15, { align: "center" });
-    const currentDate = new Date().toLocaleDateString("en-US");
+    const currentDate = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+    });
     pdf.setFontSize(10);
     pdf.text(currentDate, 195, 15, { align: "right" });
 
@@ -74,13 +83,16 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
       return [
         item.itemCode, // Item Code
         item.description, // Item Code/Description
-        Number(item.unitPrice).toLocaleString("en-US", {
+        Number(unitPrice.toFixed(2)).toLocaleString("en-US", {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }), // Unit Price
         item.quantity, // Quantity
         `${item.discountPercent}%`, // Discount Percent
-        total.toFixed(2), // Total
+        Number(total.toFixed(2)).toLocaleString("en-US", {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }), // Total
       ];
     });
 
@@ -112,9 +124,17 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
 
     const finalY = pdf.lastAutoTable?.finalY || 60;
     pdf.setFontSize(12);
-    pdf.text(`Grand Total: ${grandTotal.toFixed(2)}`, 195, finalY + 10, {
-      align: "right",
-    });
+    pdf.text(
+      `Grand Total: ${Number(grandTotal.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      195,
+      finalY + 10,
+      {
+        align: "right",
+      }
+    );
 
     const blob = pdf.output("blob");
     const url = URL.createObjectURL(blob);
@@ -172,7 +192,6 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
               <table className="min-w-full rounded-sm">
                 <thead className="bg-gray-200">
                   <tr>
-
                     <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
                       Item Code
                     </th>
@@ -188,7 +207,6 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
                     <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
                       Discount
                     </th>
-
                   </tr>
                 </thead>
                 <tbody className="text-center">
@@ -201,7 +219,15 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
                         {item.description}
                       </td>
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
-                        {Number(item.unitPrice).toFixed(2)}
+                        {typeof item.unitPrice === "number"
+                          ? Number(item.unitPrice.toFixed(2)).toLocaleString(
+                              "en-US",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }
+                            )
+                          : item.unitPrice}
                       </td>
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
                         {item.quantity}
@@ -209,7 +235,6 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
                         {item.discountPercent} %
                       </td>
-
                     </tr>
                   ))}
                 </tbody>
