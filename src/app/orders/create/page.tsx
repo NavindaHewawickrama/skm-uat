@@ -129,6 +129,7 @@ const CreateOrderPage: React.FC = () => {
   const [customer, setCustomer] = useState<string>("");
   //const [paymentTypes, setPaymentTypes] = useState<Payment[]>([]);
   const [itemsList, setItemsList] = useState<Item[]>([]);
+  const [locationWiseItems, setLocationWiseItems] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState("");
   const [selectedItemName, setSelectedItemName] = useState("");
   const [selectedItemUnitPrice, setSelectedItemUnitPrice] = useState("");
@@ -179,10 +180,20 @@ const CreateOrderPage: React.FC = () => {
       value: customer.customerCode,
       label: customer.customerName,
     }));
-  // const customerOptions = customers.map((customer) => ({
-  //   value: customer.customerCode,
-  //   label: customer.customerName
-  // }));
+
+  useEffect(() => {
+    if (!location) {
+      setLocationWiseItems([]);
+      return;
+    }
+    setLocationWiseItems(
+      itemsList.filter(
+        (item) =>
+          Array.isArray(item.locationWiseInventory) &&
+          item.locationWiseInventory.some((inv) => inv.locationCode === location)
+      )
+    );
+  }, [location, itemsList]);
 
   useEffect(() => {
     const formatted = Number(selectedCustomerDueAmount).toLocaleString(
@@ -206,7 +217,6 @@ const CreateOrderPage: React.FC = () => {
     );
   }, []);
 
-  // Add this in your component
   useEffect(() => {
     if (outstandingData.length > 0) {
       generatePDF();
@@ -289,7 +299,7 @@ const CreateOrderPage: React.FC = () => {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
-        console.log(data);
+        //console.log(data);
         setItemsList(data);
       }
       setLoading(false);
@@ -932,7 +942,7 @@ const CreateOrderPage: React.FC = () => {
                       ))}
                     </select> */}
                     <Select<Item>
-                      options={itemsList}
+                      options={location ? locationWiseItems : itemsList}
                       className="w-full text-sm"
                       styles={{
                         control: (provided) => ({
