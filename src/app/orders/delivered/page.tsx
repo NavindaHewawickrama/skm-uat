@@ -62,6 +62,7 @@ const DeliveredOrdersPage: React.FC = () => {
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
   const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(null);
+  const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<string | null>(null);
 
   useEffect(() => {
     setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
@@ -70,134 +71,6 @@ const DeliveredOrdersPage: React.FC = () => {
     setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
 
-  // Sample delivered orders data based on the screenshot
-  // const deliveredOrders = [
-  //   {
-  //     orderNo: "4821",
-  //     customer: "ROYAL MOTORS(G)",
-  //     salesRef: "manjula",
-  //     orderDate: "9/15/2020, 8:58:38 PM",
-  //     type: "credit",
-  //     total: 327225,
-  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
-  //     note: "",
-  //     status: "Delivered",
-  //     courierService: "prompt",
-  //     trackingNo: "mct12859799",
-  //     deliveredDate: "9/16/2020",
-  //     description: "Delivered on time"
-  //   },
-  //   {
-  //     orderNo: "6476",
-  //     customer: "GUNASEKARA BATTERY SHOP",
-  //     salesRef: "mahesh",
-  //     orderDate: "9/15/2020, 9:34:08 PM",
-  //     type: "credit",
-  //     total: 7290,
-  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
-  //     note: "",
-  //     status: "Delivered",
-  //     courierService: "prompt",
-  //     trackingNo: "mct12859799",
-  //     deliveredDate: "9/16/2020",
-  //     description: "Delivered on time"
-  //   },
-  //   {
-  //     orderNo: "7327",
-  //     customer: "NAMOMARIYANI AUTO SPARES",
-  //     salesRef: "mahesh",
-  //     orderDate: "9/15/2020, 9:40:42 PM",
-  //     type: "credit",
-  //     total: 17572.5,
-  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
-  //     note: "",
-  //     status: "Delivered",
-  //     courierService: "prompt",
-  //     trackingNo: "mct12859799",
-  //     deliveredDate: "9/16/2020",
-  //     description: "Delivered on time"
-  //   },
-  //   {
-  //     orderNo: "9577",
-  //     customer: "PERERA MOTORS (MAKANDURA)",
-  //     salesRef: "mahesh",
-  //     orderDate: "9/15/2020, 9:54:32 PM",
-  //     type: "credit",
-  //     total: 25950,
-  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
-  //     note: "aluthiun b...",
-  //     status: "Delivered",
-  //     courierService: "prompt",
-  //     trackingNo: "mct12859799",
-  //     deliveredDate: "9/16/2020",
-  //     description: "Delivered on time"
-  //   },
-  //   {
-  //     orderNo: "10264",
-  //     customer: "PERERA MOTORS (MAKANDURA)",
-  //     salesRef: "mahesh",
-  //     orderDate: "9/15/2020, 9:58:37 PM",
-  //     type: "credit",
-  //     total: 17295,
-  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
-  //     note: "meka adama danna hadissi",
-  //     status: "Delivered",
-  //     courierService: "prompt",
-  //     trackingNo: "mct12859799",
-  //     deliveredDate: "9/16/2020",
-  //     description: "Delivered on time"
-  //   },
-  //   {
-  //     orderNo: "12329",
-  //     customer: "JAYAN MOTORS",
-  //     salesRef: "manjula",
-  //     orderDate: "9/15/2020, 11:37:23 PM",
-  //     type: "credit",
-  //     total: 44175,
-  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
-  //     note: "",
-  //     status: "Delivered",
-  //     courierService: "DHL",
-  //     trackingNo: "dhl4529871",
-  //     deliveredDate: "9/16/2020",
-  //     description: "Left at reception"
-  //   },
-  //   {
-  //     orderNo: "13820",
-  //     customer: "JAYAN MOTORS",
-  //     salesRef: "manjula",
-  //     orderDate: "9/15/2020, 11:52:03 PM",
-  //     type: "credit",
-  //     total: 36795,
-  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
-  //     note: "",
-  //     status: "Delivered",
-  //     courierService: "prompt",
-  //     trackingNo: "mct12859799",
-  //     deliveredDate: "9/16/2020",
-  //     description: "Delivered on time"
-  //   },
-  //   // Additional dummy data to demonstrate pagination
-  //   ...Array(30)
-  //     .fill(0)
-  //     .map((_, i) => ({
-  //       orderNo: `${20000 + i}`,
-  //       customer: [
-  //         "SUPREME AUTO PARTS",
-  //         "LATHIKA MOTORS",
-  //         "NEW VISION SPARES",
-  //         "AUTO WORLD",
-  //         "SRI LANKA MOTORS",
-  //       ][i % 5],
-  //       salesRef: ["manjula", "mahesh", "danushka"][i % 3],
-  //       orderDate: "9/16/2020, 10:30:00 AM",
-  //       type: "credit",
-  //       total: 15000 + i * 1000,
-  //       itemDetails: "",
-  //       note: i % 5 === 0 ? "Urgent delivery completed" : "",
-  //       status: "Delivered",
-  //     })),
-  // ];
 
   useEffect(() => {
     fetchDeliveredOrders();
@@ -216,7 +89,7 @@ const DeliveredOrdersPage: React.FC = () => {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
-        // console.log(data);
+         console.log(data);
         setDeliveredOrders(data);
       }
     } catch (err) {
@@ -310,6 +183,7 @@ const DeliveredOrdersPage: React.FC = () => {
     if (Array.isArray(order.orderedItems)) {
       setSelectedOrderItems(order.orderedItems);
       setSelectedOrderNumber(order.orderNumber);
+      setSelectedOrderCustomerName(order.customerName);
     } else {
       setSelectedOrderItems([]);
     }
@@ -322,6 +196,7 @@ const DeliveredOrdersPage: React.FC = () => {
     if (Array.isArray(order.invoicedItems)) {
       setSelectedOrderItems(order.invoicedItems);
       setSelectedOrderNumber(order.orderNumber);
+      setSelectedOrderCustomerName(order.customerName);
     } else {
       setSelectedOrderItems([]);
     }
@@ -598,6 +473,7 @@ const DeliveredOrdersPage: React.FC = () => {
             onClose={() => setListViewOpen(false)}
             orderDetails={selectedOrderItems}
             orderNumber={selectedOrderNumber ?? 0}
+            customerName={selectedOrderCustomerName ?? ""}
           />
 
           <ViewOrderDeliveryStatus

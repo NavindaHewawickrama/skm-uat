@@ -45,7 +45,7 @@ interface OrderItem {
   description: string;
   unitPrice: number;
   quantity: number;
-  discount: number;
+  discountPercent: number;
   total: number;
 }
 
@@ -311,7 +311,7 @@ const CreateOrderPage: React.FC = () => {
         description: selectedItemName,
         unitPrice: parseFloat(selectedItemUnitPrice),
         quantity: selectedItemQuantity,
-        discount: selectedItemDiscount,
+        discountPercent: selectedItemDiscount,
         total: calculateItemTotal(),
       };
 
@@ -519,6 +519,14 @@ const CreateOrderPage: React.FC = () => {
   };
 
   const handleSave = async () => {
+    // const newData = {
+    //   customerCode: selectedCustomer?.customerCode,
+    //   locationCode: location,
+    //   paymentMethodCode: selectedCustomer?.paymentTermCode,
+    //   totalAmount: orderTotal,
+    //   items: orderItems,
+    // };
+    // console.log("Saving order data:", newData);
     try {
       setIsSaving(true);
 
@@ -784,6 +792,10 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
+                    // value={Number(selectedCustomerDueAmount).toLocaleString('en-US', {
+                    //   minimumFractionDigits: 2,
+                    //   maximumFractionDigits: 2
+                    // })}
                     value={selectedCustomerDueAmount}
                     readOnly
                   />
@@ -805,7 +817,11 @@ const CreateOrderPage: React.FC = () => {
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
                     //value={selectedCustomerTotal}
-                    value={orderTotal.toFixed(2)}
+                    //value={orderTotal.toFixed(2)}
+                    value={Number(orderTotal.toFixed(2)).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })}
                     readOnly
                   />
                 </div>
@@ -956,8 +972,8 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                      // value={currentItem.itemName}
-                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
+                    // value={currentItem.itemName}
+                    // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
                       {substitutedItemsList?.length === 0 ? (
                         <option value="" disabled>
@@ -997,7 +1013,11 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="number"
                     className="block w-full p-2 border border-gray-300 rounded"
-                    value={parseFloat(selectedItemUnitPrice)}
+                    //  value={parseFloat(selectedItemUnitPrice)}
+                    value={Number(parseFloat(selectedItemUnitPrice)).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })}
                     disabled
                   />
                 </div>
@@ -1011,17 +1031,22 @@ const CreateOrderPage: React.FC = () => {
                   </label>
                   <input
                     type="number"
-                    min={0}
+                    //min={0}
                     className="block w-full p-2 border border-gray-300 rounded"
                     value={selectedItemQuantity}
-                    onChange={(e) => {
-                      const value = parseInt(e.target.value);
-                      if (value > selectedItemSelectedLocationStock) {
-                        handleShowAlert("error", "Please select a Quantity amout lower than stock amount");
-                      } else {
-                        setSelectedItemQuantity(value);
-                      }
-                    }}
+                    // value={Number(selectedItemQuantity).toLocaleString('en-US', {
+                    //   minimumFractionDigits: 2,
+                    //   maximumFractionDigits: 2
+                    // })}
+                    // onChange={(e) => {
+                    //   const value = parseInt(e.target.value);
+                    //   if (value > selectedItemSelectedLocationStock) {
+                    //     handleShowAlert("error", "Please select a Quantity amout lower than stock amount");
+                    //   } else {
+                    //     setSelectedItemQuantity(value);
+                    //   }
+                    // }}
+                    onChange={(e) => { setSelectedItemQuantity(parseInt(e.target.value)) }}
                   />
                 </div>
 
@@ -1047,9 +1072,13 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
-                    value={
-                      calculateItemTotal() ? calculateItemTotal().toFixed(2) : 0
-                    }
+                    // value={
+                    //   calculateItemTotal() ? calculateItemTotal().toFixed(2) : 0
+                    // }
+                    value={Number(calculateItemTotal() ? calculateItemTotal().toFixed(2) : 0).toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2
+                    })}
                     readOnly
                   />
                 </div>
@@ -1105,16 +1134,24 @@ const CreateOrderPage: React.FC = () => {
                               {item.description}
                             </td>
                             <td className="py-2 px-4 border-b text-right">
-                              {item.unitPrice.toFixed(2)}
+                              {/* {item.unitPrice.toFixed(2)} */}
+                              {Number(item.unitPrice.toFixed(2)).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                              })}
                             </td>
                             <td className="py-2 px-4 border-b text-right">
                               {item.quantity}
                             </td>
                             <td className="py-2 px-4 border-b text-right">
-                              {item.discount.toFixed(2)}
+                              {item.discountPercent.toFixed(2)}
                             </td>
                             <td className="py-2 px-4 border-b text-right">
-                              {item.total.toFixed(2)}
+                              {/* {item.total.toFixed(2)} */}
+                              {Number(item.total.toFixed(2)).toLocaleString('en-US', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                              })}
                             </td>
                             <td className="py-2 px-4 border-b text-center">
                               <button
@@ -1167,7 +1204,11 @@ const CreateOrderPage: React.FC = () => {
                             colSpan={2}
                             className="py-2 px-4 border-b text-right"
                           >
-                            {orderTotal.toFixed(2)}
+                            {/* {orderTotal.toFixed(2)} */}
+                            {Number(orderTotal.toFixed(2)).toLocaleString('en-US', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2
+                            })}
                           </td>
                         </tr>
                       </tbody>
@@ -1182,11 +1223,10 @@ const CreateOrderPage: React.FC = () => {
                   <button
                     disabled={isSaving}
                     onClick={handleSave}
-                    className={`px-6 py-2 rounded font-medium transition duration-300 ${
-                      isSaving
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                    } text-white`}
+                    className={`px-6 py-2 rounded font-medium transition duration-300 ${isSaving
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                      } text-white`}
                   >
                     {isSaving ? "Saving..." : "Save"}
                   </button>

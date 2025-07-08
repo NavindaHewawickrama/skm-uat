@@ -45,6 +45,7 @@ const RejectedOrdersPage: React.FC = () => {
   const [userName, setUserName] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(null);
+  const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<string | null>(null);
 
   useEffect(() => {
     setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
@@ -171,6 +172,7 @@ const RejectedOrdersPage: React.FC = () => {
     if (Array.isArray(order.orderedItems)) {
       setSelectedOrder(order.orderedItems);
       setSelectedOrderNumber(order.orderNumber);
+      setSelectedOrderCustomerName(order.customerName);
     } else {
       setSelectedOrder([]);
     }
@@ -394,7 +396,7 @@ const RejectedOrdersPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <ViewOrderEditPopupButton open={listViewOpen} onClose={() => setListViewOpen(false)} orderDetails={selectedOrder} orderNumber={selectedOrderNumber ?? 0} />
+          <ViewOrderEditPopupButton open={listViewOpen} onClose={() => setListViewOpen(false)} orderDetails={selectedOrder} orderNumber={selectedOrderNumber ?? 0} customerName={selectedOrderCustomerName ?? ""} />
           {/* Footer Component */}
           <Footer />
         </div>

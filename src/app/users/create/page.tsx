@@ -78,15 +78,15 @@ type OrderType = {
     total: number;
   }[];
   items:
-    | string
-    | {
-        itemCode: string;
-        description: string;
-        unitPrice: number;
-        quantity: string;
-        discountPercent: number;
-        total: number;
-      }[];
+  | string
+  | {
+    itemCode: string;
+    description: string;
+    unitPrice: number;
+    quantity: string;
+    discountPercent: number;
+    total: number;
+  }[];
   specialNote: string;
   rejectReason: string | null;
   status: string;
@@ -251,56 +251,6 @@ const CreateUserPage: React.FC = () => {
     setEditingUser(false);
   };
 
-  // const handleInputChange = (
-  //   field: keyof UserData,
-  //   value: string | boolean | string[]
-  // ) => {
-  //   // Clear error when field is modified
-  //   if (field in errors) {
-  //     setErrors(prev => {
-  //       const newErrors = { ...prev };
-  //       delete newErrors[field as keyof FormErrors];
-  //       return newErrors;
-  //     });
-  //   }
-
-  //   // setUserData((prev) => ({
-  //   //   ...prev,
-  //   //   [field]: value,
-  //   // }));
-  // };
-
-  // const handleSalesPersonChange = (salesPersonCode: string) => {
-  //   const selectedSalesPerson = userCreationDetails.salesPersons.find(
-  //     sp => sp.salesPersonCode === salesPersonCode
-  //   );
-
-  //   if (selectedSalesPerson) {
-  //     // Clear errors related to posName, email, and telephone as they are now being auto-filled
-  //     setErrors(prev => {
-  //       const newErrors = { ...prev };
-  //       delete newErrors.posName;
-  //       delete newErrors.email;
-  //       delete newErrors.telephone;
-  //       return newErrors;
-  //     });
-
-  //     // setUserData(prev => ({
-  //     //   ...prev,
-  //     //   posName: selectedSalesPerson.salesPersonName,
-  //     //   email: selectedSalesPerson.email || prev.email,
-  //     //   telephone: selectedSalesPerson.phone || prev.telephone
-  //     // }));
-  //   } else {
-  //     // If no sales person is selected (e.g., "Select Sales Person" is chosen)
-  //     // setUserData(prev => ({
-  //     //   ...prev,
-  //     //   posName: "",
-  //     //   email: "",
-  //     //   telephone: ""
-  //     // }));
-  //   }
-  // };
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -607,9 +557,8 @@ const CreateUserPage: React.FC = () => {
               </label>
               <input
                 type="text"
-                className={`w-full p-2 border ${
-                  errors.username ? "border-red-500" : "border-gray-300"
-                } rounded`}
+                className={`w-full p-2 border ${errors.username ? "border-red-500" : "border-gray-300"
+                  } rounded`}
                 placeholder="Username"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
@@ -656,9 +605,8 @@ const CreateUserPage: React.FC = () => {
                 <input
                   disabled={editingUser ? true : false}
                   type={viewpw1 ? "text" : "password"}
-                  className={`w-full p-2 border ${
-                    errors.password ? "border-red-500" : "border-gray-300"
-                  } ${editingUser ? "bg-gray-300" : "bg-white"} rounded`}
+                  className={`w-full p-2 border ${errors.password ? "border-red-500" : "border-gray-300"
+                    } ${editingUser ? "bg-gray-300" : "bg-white"} rounded`}
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -721,11 +669,10 @@ const CreateUserPage: React.FC = () => {
                 <input
                   disabled={editingUser ? true : false}
                   type={viewpw ? "text" : "password"}
-                  className={`w-full p-2 border ${
-                    errors.confirmPassword
+                  className={`w-full p-2 border ${errors.confirmPassword
                       ? "border-red-500"
                       : "border-gray-300"
-                  } ${editingUser ? "bg-gray-300" : "bg-white"} rounded`}
+                    } ${editingUser ? "bg-gray-300" : "bg-white"} rounded`}
                   placeholder="Re-Type Password"
                   value={reTypePassword}
                   onChange={(e) => setReTypePassword(e.target.value)}
@@ -788,9 +735,8 @@ const CreateUserPage: React.FC = () => {
               </label>
               <input
                 type="text"
-                className={`w-full p-2 border ${
-                  errors.firstName ? "border-red-500" : "border-gray-300"
-                } rounded`}
+                className={`w-full p-2 border ${errors.firstName ? "border-red-500" : "border-gray-300"
+                  } rounded`}
                 placeholder="First Name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
@@ -807,9 +753,8 @@ const CreateUserPage: React.FC = () => {
               </label>
               <input
                 type="text"
-                className={`w-full p-2 border ${
-                  errors.lastName ? "border-red-500" : "border-gray-300"
-                } rounded`}
+                className={`w-full p-2 border ${errors.lastName ? "border-red-500" : "border-gray-300"
+                  } rounded`}
                 placeholder="Last Name"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
@@ -826,9 +771,8 @@ const CreateUserPage: React.FC = () => {
               </label>
               <div className="relative">
                 <select
-                  className={`w-full p-2 border ${
-                    errors.posName ? "border-red-500" : "border-gray-300"
-                  } rounded appearance-none`}
+                  className={`w-full p-2 border ${errors.posName ? "border-red-500" : "border-gray-300"
+                    } rounded appearance-none`}
                   // The value here needs to be the salesPersonCode that matches userData.posName (salesPersonName)
                   // value={userCreationDetails.salesPersons.find(sp => sp.salesPersonName === userData.posName)?.salesPersonCode || ""}
                   value={selectedSalesPerson}
@@ -875,9 +819,8 @@ const CreateUserPage: React.FC = () => {
               </label>
               <input
                 type="email"
-                className={`w-full p-2 border ${
-                  errors.email ? "border-red-500" : "border-gray-300"
-                } rounded`}
+                className={`w-full p-2 border ${errors.email ? "border-red-500" : "border-gray-300"
+                  } rounded`}
                 placeholder="Enter a valid e-mail"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -894,9 +837,8 @@ const CreateUserPage: React.FC = () => {
               </label>
               <input
                 type="text"
-                className={`w-full p-2 border ${
-                  errors.telephone ? "border-red-500" : "border-gray-300"
-                } rounded`}
+                className={`w-full p-2 border ${errors.telephone ? "border-red-500" : "border-gray-300"
+                  } rounded`}
                 placeholder="Enter a valid Number"
                 value={telephone}
                 onChange={(e) => setTelephone(e.target.value)}
@@ -913,9 +855,8 @@ const CreateUserPage: React.FC = () => {
               </label>
               <div className="relative">
                 <select
-                  className={`w-full p-2 border ${
-                    errors.role ? "border-red-500" : "border-gray-300"
-                  } rounded appearance-none`}
+                  className={`w-full p-2 border ${errors.role ? "border-red-500" : "border-gray-300"
+                    } rounded appearance-none`}
                   value={role}
                   onChange={(e) => setRole(parseInt(e.target.value))}
                 >
@@ -1012,11 +953,10 @@ const CreateUserPage: React.FC = () => {
             <div className="flex flex-wrap gap-2">
               <button
                 disabled={isSaving}
-                className={`px-4 py-2 rounded font-medium transition duration-300 ${
-                  isSaving
+                className={`px-4 py-2 rounded font-medium transition duration-300 ${isSaving
                     ? "bg-gray-400 cursor-not-allowed"
                     : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
-                } text-white`}
+                  } text-white`}
                 onClick={editingUser ? handleUpdateUser : handleCreateUser}
               >
                 {isSaving ? "Processing..." : "Create / Update User"}

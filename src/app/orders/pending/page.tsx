@@ -56,6 +56,7 @@ const PendingOrdersPage: React.FC = () => {
   const [userName, setUserName] = useState<string | null>(null);
   const [notificationOrders, setNotificationOrders] = useState<OrderType[]>([]);
   const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(null);
+  const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<string | null>(null);
 
   useEffect(() => {
     setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
@@ -178,12 +179,13 @@ const PendingOrdersPage: React.FC = () => {
   };
 
   const handleItemDetailsView = (order: OrderType) => {
-    // console.log(order);
+    console.log(order);
 
     // Changed from order.items to order.orderedItems
     if (Array.isArray(order.orderedItems)) {
       setSelectedOrderItems(order.orderedItems);
       setSelectedOrderNumber(order.orderNumber);
+      setSelectedOrderCustomerName(order.customerName);
     } else {
       setSelectedOrderItems([]);
     }
@@ -345,7 +347,11 @@ const PendingOrdersPage: React.FC = () => {
                           {order.paymentMethodType}
                         </td>
                         <td className="px-4 py-3 border text-sm text-right">
-                          {order.totalAmount.toFixed(2)}
+                          {/* {order.totalAmount.toFixed(2)} */}
+                          {Number(order.totalAmount.toFixed(2)).toLocaleString('en-US', {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                          })}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
                           <button
@@ -359,7 +365,7 @@ const PendingOrdersPage: React.FC = () => {
                           {order.specialNote}
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          <span className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                          <span className={`px-2 py-1 ${order.status.toLowerCase() === "processing" ? "bg-red-300" : "bg-yellow-200"} text-yellow-800 rounded-full text-xs font-medium`}>
                             {order.status}
                           </span>
                         </td>
@@ -446,6 +452,7 @@ const PendingOrdersPage: React.FC = () => {
             onClose={() => setListViewOpen(false)}
             orderDetails={selectedOrderItems}
             orderNumber={selectedOrderNumber ?? 0}
+            customerName={selectedOrderCustomerName ?? ""}
           />
           <ViewStatusPopup
             open={statusViewOpen}
