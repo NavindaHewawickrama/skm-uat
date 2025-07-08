@@ -140,7 +140,7 @@ const CreateOrderPage: React.FC = () => {
     selectedItemSelectedLocationStock,
     setSelectedItemSelectedLocationStock,
   ] = useState<number>(0);
-  const [formattedAmount, setFormattedAmount] = useState("");
+  // const [formattedAmount, setFormattedAmount] = useState("");
   const [loading, setLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -193,14 +193,14 @@ const CreateOrderPage: React.FC = () => {
     );
   }, [location, itemsList]);
 
-  useEffect(() => {
-    const formatted = Number(selectedCustomerDueAmount).toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
-    setFormattedAmount(formatted);
-    //setSelectedCustomerDueAmount(parseInt(formatted));
-  }, [selectedCustomerDueAmount]);
+  // useEffect(() => {
+  //   const formatted = Number(selectedCustomerDueAmount).toLocaleString("en-US", {
+  //     minimumFractionDigits: 2,
+  //     maximumFractionDigits: 2,
+  //   });
+  //   setFormattedAmount(formatted);
+  //   //setSelectedCustomerDueAmount(parseInt(formatted));
+  // }, [selectedCustomerDueAmount]);
 
   useEffect(() => {
     const pendingOrderList = sessionStorage.getItem("notificationsData");
@@ -480,7 +480,7 @@ const CreateOrderPage: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log("Fetched data:", data);
+      //console.log("Fetched data:", data);
       const transformedData: CustomerOutstandingData[] = data.map(
         (invoice: Invoice) => ({
           customerName: selectedCustomer.customerName,
@@ -496,7 +496,7 @@ const CreateOrderPage: React.FC = () => {
 
       setOutstandingData(transformedData);
       setSelectedCustomerDueAmount(data.totalDueAmount);
-      setFormattedAmount(selectedCustomerDueAmount.toString());
+      //setFormattedAmount(data.totalDueAmount);
       handleShowAlert(
         "success",
         `Loaded ${transformedData.length} invoice record(s)`
@@ -778,7 +778,7 @@ const CreateOrderPage: React.FC = () => {
                     //   minimumFractionDigits: 2,
                     //   maximumFractionDigits: 2
                     // })}
-                    value={formattedAmount}
+                    value={selectedCustomerDueAmount}
                     readOnly
                   />
                   <div className="flex justify-start mt-2">
@@ -1009,11 +1009,11 @@ const CreateOrderPage: React.FC = () => {
                     Unit Price:
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     className="block w-full p-2 border border-gray-300 rounded"
                     //  value={parseFloat(selectedItemUnitPrice)}
                     value={Number(
-                      parseFloat(selectedItemUnitPrice)
+                      selectedItemUnitPrice
                     ).toLocaleString("en-US", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
