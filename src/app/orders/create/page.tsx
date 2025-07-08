@@ -218,6 +218,7 @@ const CreateOrderPage: React.FC = () => {
     if (outstandingData.length > 0) {
       generatePDF();
     }
+    console.log(outstandingData);
   }, [outstandingData]);
 
   useEffect(() => {
@@ -384,6 +385,7 @@ const CreateOrderPage: React.FC = () => {
     });
     pdf.setFontSize(10);
     pdf.text(currentDate, 195, 15, { align: "right" });
+
 
     const tableColumn = [
       "Customer Name",
@@ -799,7 +801,13 @@ const CreateOrderPage: React.FC = () => {
                     //   minimumFractionDigits: 2,
                     //   maximumFractionDigits: 2
                     // })}
-                    value={selectedCustomerDueAmount}
+                    value={Number(selectedCustomerDueAmount).toLocaleString(
+                      "en-US",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}
                     readOnly
                   />
                   <div className="flex justify-start mt-2">
@@ -807,8 +815,8 @@ const CreateOrderPage: React.FC = () => {
                       disabled={isLoading}
                       onClick={handleViewDetails}
                       className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${isLoading
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
                         } text-white`}
                     >
                       {isLoading ? "Loading..." : "View Details"}
@@ -1262,8 +1270,8 @@ const CreateOrderPage: React.FC = () => {
                     disabled={isSaving}
                     onClick={handleSave}
                     className={`px-6 py-2 rounded font-medium transition duration-300 ${isSaving
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
                       } text-white`}
                   >
                     {isSaving ? "Saving..." : "Save"}
