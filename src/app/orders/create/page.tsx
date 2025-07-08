@@ -115,6 +115,8 @@ const CreateOrderPage: React.FC = () => {
   const [paymentType, setPaymentType] = useState("");
   const [notes, setNotes] = useState("");
   const [total, setTotal] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [orderTotal, setOrderTotal] = useState(0);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
@@ -183,10 +185,13 @@ const CreateOrderPage: React.FC = () => {
   // }));
 
   useEffect(() => {
-    const formatted = Number(selectedCustomerDueAmount).toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    });
+    const formatted = Number(selectedCustomerDueAmount).toLocaleString(
+      "en-US",
+      {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }
+    );
     setFormattedAmount(formatted);
     //setSelectedCustomerDueAmount(parseInt(formatted));
   }, [selectedCustomerDueAmount]);
@@ -429,19 +434,32 @@ const CreateOrderPage: React.FC = () => {
 
     const finalY = pdf.lastAutoTable?.finalY || 60;
     pdf.setFontSize(12);
-    pdf.text(`Total Outstanding: ${Number(totalDue.toFixed(2)).toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`, 195, finalY + 10, {
-      align: "right",
-    });
+    pdf.text(
+      `Total Outstanding: ${Number(totalDue.toFixed(2)).toLocaleString(
+        "en-US",
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }
+      )}`,
+      195,
+      finalY + 10,
+      {
+        align: "right",
+      }
+    );
     pdf.setFontSize(12);
-    pdf.text(`PDC Total: ${Number(totalPDC.toFixed(2)).toLocaleString("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    })}`, 195, finalY + 20, {
-      align: "right",
-    });
+    pdf.text(
+      `PDC Total: ${Number(totalPDC.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      195,
+      finalY + 20,
+      {
+        align: "right",
+      }
+    );
 
     const blob = pdf.output("blob");
     const url = URL.createObjectURL(blob);
@@ -449,6 +467,7 @@ const CreateOrderPage: React.FC = () => {
   };
 
   const handleViewDetails = async () => {
+    setIsLoading(true);
     if (!selectedCustomer) {
       handleShowAlert("error", "Please select a customer first");
       return;
@@ -476,8 +495,12 @@ const CreateOrderPage: React.FC = () => {
           customerName: selectedCustomer.customerName,
           invoiceNumber: invoice.invoiceNumber,
           invoiceDate: invoice.invoiceDate
-            ? new Date(invoice.invoiceDate).toLocaleDateString("en-US")
-            : "",
+            ? new Date(invoice.invoiceDate).toLocaleDateString("en-US", {
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+              })
+            : "N/A",
           invoicedAmount: parseFloat(invoice.totalAmount?.toString() || "0"),
           pdcAmount: parseFloat(invoice.pdcAmount?.toString() || "0"),
           dueAmount: parseFloat(invoice.dueAmount?.toString() || "0"),
@@ -499,6 +522,7 @@ const CreateOrderPage: React.FC = () => {
       );
       setOutstandingData([]);
     } finally {
+      setIsLoading(false);
       setIsLoadingInvoices(false);
     }
   };
@@ -534,8 +558,8 @@ const CreateOrderPage: React.FC = () => {
       setSelectedItemSelectedLocationStock(
         selected.locationWiseInventory
           ? selected.locationWiseInventory.find(
-            (loc) => loc.locationCode === location
-          )?.inventory || 0
+              (loc) => loc.locationCode === location
+            )?.inventory || 0
           : 0
       );
       // Fix: Handle both single object and array cases
@@ -773,10 +797,15 @@ const CreateOrderPage: React.FC = () => {
                   />
                   <div className="flex justify-start mt-2">
                     <button
+                      disabled={isLoading}
                       onClick={handleViewDetails}
-                      className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-950 focus:outline-none cursor-pointer"
+                      className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${
+                        isLoading
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
+                      } text-white`}
                     >
-                      View Details
+                      {isLoading ? "Loading..." : "View Details"}
                     </button>
                   </div>
                 </div>
@@ -948,8 +977,8 @@ const CreateOrderPage: React.FC = () => {
                     {location == ""
                       ? "(Please select a location)"
                       : selectedItemSelectedLocationStock > 0
-                        ? `(${selectedItemSelectedLocationStock} in stock)`
-                        : "(Out of stock)"}
+                      ? `(${selectedItemSelectedLocationStock} in stock)`
+                      : "(Out of stock)"}
                   </label>
                 </div>
 
@@ -960,8 +989,8 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                    // value={currentItem.itemName}
-                    // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
+                      // value={currentItem.itemName}
+                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
                       {substitutedItemsList?.length === 0 ? (
                         <option value="" disabled>
@@ -1226,10 +1255,11 @@ const CreateOrderPage: React.FC = () => {
                   <button
                     disabled={isSaving}
                     onClick={handleSave}
-                    className={`px-6 py-2 rounded font-medium transition duration-300 ${isSaving
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                      } text-white`}
+                    className={`px-6 py-2 rounded font-medium transition duration-300 ${
+                      isSaving
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                    } text-white`}
                   >
                     {isSaving ? "Saving..." : "Save"}
                   </button>

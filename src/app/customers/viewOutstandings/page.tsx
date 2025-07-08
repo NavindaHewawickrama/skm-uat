@@ -202,7 +202,11 @@ const OutstandingsPage: React.FC = () => {
               customerName: customerName,
               invoiceNumber: invoice.invoiceNumber,
               invoiceDate: invoice.invoiceDate
-                ? new Date(invoice.invoiceDate).toLocaleDateString("en-US")
+                ? new Date(invoice.invoiceDate).toLocaleDateString("en-US", {
+                    year: "numeric",
+                    month: "short",
+                    day: "2-digit",
+                  })
                 : "",
               invoicedAmount: parseFloat(
                 invoice.totalAmount?.toString() || "0"
@@ -299,21 +303,20 @@ const OutstandingsPage: React.FC = () => {
     const tableRows = outstandingInvoices.map((item) => [
       item.customerName,
       item.invoiceNumber,
-      item.invoiceDate,
-      `${Number(item.invoicedAmount.toFixed(2)).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })}`,
-      `${Number(item.pdcAmount.toFixed(2)).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })}`,
+      item.invoiceDate || "N/A",
+      `${Number(item.invoicedAmount.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      `${Number(item.pdcAmount.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
 
-    `${Number(item.dueAmount.toFixed(2)).toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2
-  })}`,
-
+      `${Number(item.dueAmount.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
     ]);
 
     autoTable(pdf, {
@@ -572,14 +575,6 @@ const OutstandingsPage: React.FC = () => {
                             </td>
                             <td className="px-4 py-3 border text-sm">
                               {invoice.invoiceDate}
-                              {/* {new Date(invoice.invoiceDate).toLocaleDateString(
-                            "en-US",
-                            {
-                              year: "numeric",
-                              month: "short",
-                              day: "2-digit",
-                            }
-                          )} */}
                             </td>
                             <td className="px-4 py-3 border text-sm text-right">
                               {Number(
