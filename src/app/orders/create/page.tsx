@@ -356,7 +356,11 @@ const CreateOrderPage: React.FC = () => {
     // pdf.setFontSize(12);
     // pdf.text(selectedCustomer?.customerName || "", 105, 22, { align: "center" });
 
-    const currentDate = new Date().toLocaleDateString("en-US");
+    const currentDate = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+    });
     pdf.setFontSize(10);
     pdf.text(currentDate, 195, 15, { align: "right" });
 
