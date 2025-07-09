@@ -6,7 +6,6 @@ import baseUrl from '../../../config';
 export async function GET(request: Request) {
     try {
         const result = await getValidAccessToken();
-
         const { userId, token, status, message } = result;
 
         if (status !== 200 || !token || !userId) {
@@ -16,7 +15,6 @@ export async function GET(request: Request) {
         const { searchParams } = new URL(request.url);
         const itemNo = searchParams.get('itemNo');
 
-        // Include userId as query param in API URL
         const response = await fetch(`${baseUrl.apiBaseUrl}/api/Business/item-image?itemNo=${itemNo}`, {
             method: 'GET',
             headers: {
@@ -28,18 +26,37 @@ export async function GET(request: Request) {
         if (!response.ok) {
             const errorText = await response.text();
             return NextResponse.json(
-                { error: 'Failed to fetch imge', details: errorText },
+                { error: 'Failed to fetch image', details: errorText },
                 { status: response.status }
             );
         }
 
-        const data = await response.json();
-        return NextResponse.json(data, { status: response.status });
+        const text = await response.text();
+
+        if (!text) {
+            return NextResponse.json(
+                { error: 'Empty response from downstream service' },
+                { status: 502 }
+            );
+        }
+
+        let data;
+        try {
+            data = JSON.parse(text);
+        } catch (parseError) {
+            console.error('Error parsing JSON:', parseError);
+            return NextResponse.json(
+                { error: 'Invalid JSON in response', raw: text },
+                { status: 502 }
+            );
+        }
+
+        return NextResponse.json(data, { status: 200 });
 
     } catch (error) {
-        console.error('Error fetching orders count:', error);
+        console.error('Error fetching image:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch image' },
+            { error: 'Internal Server Error' },
             { status: 500 }
         );
     }

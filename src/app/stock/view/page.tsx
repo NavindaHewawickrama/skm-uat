@@ -86,6 +86,8 @@ const StockView = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
+  const [loadingItemCode, setLoadingItemCode] = useState<string | null>(null);
+
 
   // Fetch pending order data from API
   useEffect(() => {
@@ -419,39 +421,49 @@ const StockView = () => {
     //   });
     // }
     //console.log(itemCode);
+
+    setLoadingItemCode(itemNo);
+
     try {
-      const response = await fetch(
-        `/api/stock/viewImage?itemNo=${itemNo}`,
-        {
-          method: "GET",
-          credentials: "include",
-        }
-      );
+      const response = await fetch(`/api/stock/viewImage?itemNo=${itemNo}`, {
+        method: "GET",
+        credentials: "include",
+      });
+
       if (!response.ok) {
         handleShowAlert("error", "Failed to fetch product image");
         throw new Error("Failed to fetch product image");
-      } else {
-        const data = await response.json();
-        if (typeof data === "string") {
-          const base64Image = `data:image/jpeg;base64,${data}`;
-          setSelectedProductImage({
-            src: base64Image,
-            width: 400,
-            height: 300,
-          });
-        } else if (data && typeof data === "object") {
-          // Handle StaticImageData - convert to Image format
-          setSelectedProductImage({
-            src: data.src,
-            width: data.width || 400,
-            height: data.height || 300,
-          });
-        }
       }
 
+      const text = await response.text();
+
+      if (!text) {
+        throw new Error("Empty response from server");
+      }
+
+      const data = JSON.parse(text);
+
+      setOpenImagePopup(true); // Only open popup on successful parse
+
+      if (typeof data === "string") {
+        const base64Image = `data:image/jpeg;base64,${data}`;
+        setSelectedProductImage({
+          src: base64Image,
+          width: 400,
+          height: 300,
+        });
+      } else if (data && typeof data === "object") {
+        setSelectedProductImage({
+          src: data.src,
+          width: data.width || 400,
+          height: data.height || 300,
+        });
+      }
     } catch (error) {
       console.error("Error fetching product image:", error);
       handleShowAlert("error", "Failed to fetch product image");
+    } finally {
+      setLoadingItemCode(null);
     }
   }
 
@@ -619,11 +631,12 @@ const StockView = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         <button
-                          className="bg-blue-900 hover:bg-blue-950 text-white py-1 px-4 rounded focus:outline-none cursor-pointer"
-                          onClick={() =>
-                            handleViewImage(item.itemCode)
-                          }
+                          className="bg-blue-900 hover:bg-blue-950 text-white py-1 px-4 rounded focus:outline-none cursor-pointer flex items-center justify-center gap-2"
+                          onClick={() => handleViewImage(item.itemCode)}
                         >
+                          {loadingItemCode === item.itemCode && (
+                            <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                          )}
                           View
                         </button>
                       </td>
