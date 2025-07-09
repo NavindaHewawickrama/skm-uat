@@ -45,7 +45,7 @@ const Dashboard = () => {
     rejectedCount: 0,
     pendingCount: 0,
   });
-  
+
 
 
   useEffect(() => {
@@ -112,7 +112,7 @@ const Dashboard = () => {
       } else {
         const data = await response.json();
         //    console.log("Welcome to SKM Sales App...", data.firstName);
-        console.log(data);
+        //console.log(data);
         switch (data.userRoleId) {
           case 1:
             setUser("ADMIN");
@@ -231,7 +231,7 @@ const Dashboard = () => {
           <div className="flex-1 p-4 lg:p-6 md:flex gap-4">
             {/* Sales Order Card */}
             <div className="bg-white rounded-lg shadow-sm p-6 mb-6 w-full md:w-1/2 sm:w-full">
-              <h2 className="text-xl font-semibold mb-2">Total Sales Order &apos; s</h2>
+              <h2 className="text-xl font-semibold mb-2">Total Sales Orders&apos;</h2>
               <SalesChart pieChartData={dataPieChart} />
             </div>
 

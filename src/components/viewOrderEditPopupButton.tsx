@@ -26,7 +26,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
   orderNumber = 0,
   customerName = "",
 }) => {
-  console.log(orderDetails);
+ // console.log(orderDetails);
 
   if (!open) return null;
 

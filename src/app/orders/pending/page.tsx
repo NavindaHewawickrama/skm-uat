@@ -32,15 +32,15 @@ type OrderType = {
     total: number;
   }[];
   items:
-    | string
-    | {
-        itemCode: string;
-        description: string;
-        unitPrice: number;
-        quantity: string;
-        discountPercent: number;
-        total: number;
-      }[];
+  | string
+  | {
+    itemCode: string;
+    description: string;
+    unitPrice: number;
+    quantity: string;
+    discountPercent: number;
+    total: number;
+  }[];
   specialNote: string;
   rejectReason: string | null;
   status: string;
@@ -214,7 +214,7 @@ const PendingOrdersPage: React.FC = () => {
   };
 
   const handleItemDetailsView = (order: OrderType) => {
-    console.log(order);
+    //console.log(order);
 
     // Changed from order.items to order.orderedItems
     if (Array.isArray(order.orderedItems)) {
@@ -426,11 +426,10 @@ const PendingOrdersPage: React.FC = () => {
                         </td>
                         <td className="px-4 py-3 border text-sm">
                           <span
-                            className={`px-2 py-1 ${
-                              order.status.toLowerCase() === "processing"
+                            className={`px-2 py-1 ${order.status.toLowerCase() === "processing"
                                 ? "bg-red-300"
                                 : "bg-yellow-200"
-                            } text-yellow-800 rounded-full text-xs font-medium`}
+                              } text-yellow-800 rounded-full text-xs font-medium`}
                           >
                             {order.status}
                           </span>
@@ -477,9 +476,8 @@ const PendingOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`px-3 py-1 border rounded cursor-pointer ${
-                      currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
-                    }`}
+                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
+                      }`}
                   >
                     Previous
                   </button>
@@ -488,13 +486,12 @@ const PendingOrdersPage: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => typeof page === "number" && goToPage(page)}
-                      className={`px-3 py-1 border rounded ${
-                        page === currentPage
+                      className={`px-3 py-1 border rounded ${page === currentPage
                           ? "bg-blue-500 text-white"
                           : page === "..."
-                          ? ""
-                          : "hover:bg-gray-100"
-                      }`}
+                            ? ""
+                            : "hover:bg-gray-100"
+                        }`}
                       disabled={page === "..."}
                     >
                       {page}
@@ -504,11 +501,10 @@ const PendingOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages || totalPages === 0}
-                    className={`px-3 py-1 border rounded cursor-pointer ${
-                      currentPage === totalPages || totalPages === 0
+                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === totalPages || totalPages === 0
                         ? "text-gray-400"
                         : "hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     Next
                   </button>

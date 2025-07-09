@@ -7,6 +7,7 @@ import productImage from "../../../../public/images/products/pro1.png";
 import ImagePopup from "@/components/ImagePopup";
 import producctImage2 from "../../../../public/images/products/pro2.png";
 import { StaticImageData } from 'next/image';
+import Alert from "../../../components/Alert";
 
 interface Image {
   src: string;
@@ -82,6 +83,9 @@ const StockView = () => {
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
 
   useEffect(() => {
     setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
@@ -100,6 +104,16 @@ const StockView = () => {
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
+  };
+  const handleShowAlert = (type: string, message: string) => {
+    setAlertType(type);
+    setAlertMessage(message);
+    setShowAlert(true);
+
+    // Auto hide alert after 5 seconds
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 5000);
   };
 
   // Fetch stock data from API
@@ -361,25 +375,59 @@ const StockView = () => {
     setEntriesPerPage(e.target.value);
   };
 
-  function handleViewImage(img: string | StaticImageData | undefined): void {
-    setOpenImagePopup(true);
+  const handleViewImage = async (itemNo: string) => {
+    // setOpenImagePopup(true);
 
-    if (typeof img === "string") {
-      const base64Image = `data:image/jpeg;base64,${img}`;
-      setSelectedProductImage({
-        src: base64Image,
-        width: 400,
-        height: 300,
-      });
-    } else if (img && typeof img === "object") {
-      // Handle StaticImageData - convert to Image format
-      setSelectedProductImage({
-        src: img.src,
-        width: img.width || 400,
-        height: img.height || 300,
-      });
+    // if (typeof img === "string") {
+    //   const base64Image = `data:image/jpeg;base64,${img}`;
+    //   setSelectedProductImage({
+    //     src: base64Image,
+    //     width: 400,
+    //     height: 300,
+    //   });
+    // } else if (img && typeof img === "object") {
+    //   // Handle StaticImageData - convert to Image format
+    //   setSelectedProductImage({
+    //     src: img.src,
+    //     width: img.width || 400,
+    //     height: img.height || 300,
+    //   });
+    // }
+    //console.log(itemCode);
+    try {
+      const response = await fetch(
+        `/api/stock/viewImage?itemNo=${itemNo}`,
+        {
+          method: "GET",
+          credentials: "include",
+        }
+      );
+      if (!response.ok) {
+        handleShowAlert("error", "Failed to fetch product image");
+        throw new Error("Failed to fetch customer invoices");
+      } else {
+        const data = await response.json();
+        if (typeof data === "string") {
+          const base64Image = `data:image/jpeg;base64,${data}`;
+          setSelectedProductImage({
+            src: base64Image,
+            width: 400,
+            height: 300,
+          });
+        } else if (data && typeof data === "object") {
+          // Handle StaticImageData - convert to Image format
+          setSelectedProductImage({
+            src: data.src,
+            width: data.width || 400,
+            height: data.height || 300,
+          });
+        }
+      }
+
+    } catch (error) {
+      console.error("Error fetching product image:", error);
+      handleShowAlert("error", "Failed to fetch product image");
     }
-    //console.log(img);
   }
 
   if (loading) {
@@ -429,7 +477,9 @@ const StockView = () => {
 
       <div className="flex flex-1 overflow-hidden">
         <SideNav isOpen={sideNavOpen} />
-
+        {showAlert && (
+          <Alert message={alertMessage} type={alertType} duration={5000} />
+        )}
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 p-4 overflow-auto">
             {/* Table Controls */}
@@ -546,7 +596,7 @@ const StockView = () => {
                         <button
                           className="bg-blue-900 hover:bg-blue-950 text-white py-1 px-4 rounded focus:outline-none cursor-pointer"
                           onClick={() =>
-                            handleViewImage(item.img || item.image)
+                            handleViewImage(item.itemCode)
                           }
                         >
                           View
