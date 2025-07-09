@@ -72,6 +72,30 @@ const DeliveredOrdersPage: React.FC = () => {
   const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<
     string | null
   >(null);
+  // Fetch pending order data from API
+  useEffect(() => {
+    const fetchPendingOrderData = async () => {
+      try {
+        const response = await fetch(`/api/orders/pending`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw Error("Failed to fetch pending order data");
+        } else {
+          const data = await response.json();
+          //console.log(data);
+          setPendingOrders(data);
+          sessionStorage.setItem("notificationsData", JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+      }
+    };
+
+    fetchPendingOrderData();
+  }, []);
 
   useEffect(() => {
     setUserName(
@@ -84,8 +108,8 @@ const DeliveredOrdersPage: React.FC = () => {
         ? sessionStorage.getItem("userRoleName")
         : ""
     );
-    const pendingOrderList = sessionStorage.getItem("notificationsData");
-    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+    // const pendingOrderList = sessionStorage.getItem("notificationsData");
+    // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
 
   useEffect(() => {
@@ -493,10 +517,10 @@ const DeliveredOrdersPage: React.FC = () => {
                       key={index}
                       onClick={() => typeof page === "number" && goToPage(page)}
                       className={`px-3 py-1 border rounded ${page === currentPage
-                          ? "bg-blue-500 text-white"
-                          : page === "..."
-                            ? ""
-                            : "hover:bg-gray-100"
+                        ? "bg-blue-500 text-white"
+                        : page === "..."
+                          ? ""
+                          : "hover:bg-gray-100"
                         }`}
                       disabled={page === "..."}
                     >
@@ -508,8 +532,8 @@ const DeliveredOrdersPage: React.FC = () => {
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages || totalPages === 0}
                     className={`px-3 py-1 border rounded cursor-pointer ${currentPage === totalPages || totalPages === 0
-                        ? "text-gray-400"
-                        : "hover:bg-gray-100"
+                      ? "text-gray-400"
+                      : "hover:bg-gray-100"
                       }`}
                   >
                     Next

@@ -21,15 +21,15 @@ type OrderType = {
     total: number;
   }[];
   items:
-    | string
-    | {
-        itemCode: string;
-        description: string;
-        unitPrice: number;
-        quantity: string;
-        discountPercent: number;
-        total: number;
-      }[];
+  | string
+  | {
+    itemCode: string;
+    description: string;
+    unitPrice: number;
+    quantity: string;
+    discountPercent: number;
+    total: number;
+  }[];
   specialNote: string;
   rejectReason: string | null;
   status: string;
@@ -69,6 +69,30 @@ const RejectedOrdersPage: React.FC = () => {
   const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<
     string | null
   >(null);
+  // Fetch pending order data from API
+  useEffect(() => {
+    const fetchPendingOrderData = async () => {
+      try {
+        const response = await fetch(`/api/orders/pending`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw Error("Failed to fetch pending order data");
+        } else {
+          const data = await response.json();
+          //console.log(data);
+          setPendingOrders(data);
+          sessionStorage.setItem("notificationsData", JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+      }
+    };
+
+    fetchPendingOrderData();
+  }, []);
 
   useEffect(() => {
     setUserName(
@@ -81,8 +105,8 @@ const RejectedOrdersPage: React.FC = () => {
         ? sessionStorage.getItem("userRoleName")
         : ""
     );
-    const pendingOrderList = sessionStorage.getItem("notificationsData");
-    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+    // const pendingOrderList = sessionStorage.getItem("notificationsData");
+    // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
 
   // Fetch rejected order data from API
@@ -416,9 +440,8 @@ const RejectedOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`px-3 py-1 border rounded cursor-pointer ${
-                      currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
-                    }`}
+                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
+                      }`}
                   >
                     Previous
                   </button>
@@ -427,13 +450,12 @@ const RejectedOrdersPage: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => typeof page === "number" && goToPage(page)}
-                      className={`px-3 py-1 border rounded ${
-                        page === currentPage
+                      className={`px-3 py-1 border rounded ${page === currentPage
                           ? "bg-blue-500 text-white"
                           : page === "..."
-                          ? ""
-                          : "hover:bg-gray-100"
-                      }`}
+                            ? ""
+                            : "hover:bg-gray-100"
+                        }`}
                       disabled={page === "..."}
                     >
                       {page}
@@ -443,11 +465,10 @@ const RejectedOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages || totalPages === 0}
-                    className={`px-3 py-1 border rounded cursor-pointer ${
-                      currentPage === totalPages || totalPages === 0
+                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === totalPages || totalPages === 0
                         ? "text-gray-400"
                         : "hover:bg-gray-100"
-                    }`}
+                      }`}
                   >
                     Next
                   </button>

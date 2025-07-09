@@ -73,7 +73,7 @@ const AppBar: React.FC<AppBarProps> = ({
   useEffect(() => {
     // Initialize notification data state if provided
     if (notificationData) {
-      setNotificationDataState(notificationData);
+      setNotificationDataState(notificationData.filter((item) => item.status === "Pending"));
     }
   }, [notificationData]);
 

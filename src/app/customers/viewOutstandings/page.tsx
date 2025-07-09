@@ -76,6 +76,31 @@ const OutstandingsPage: React.FC = () => {
   const [userName, setUserName] = useState<string | null>(null);
   //const [loading, setLoading] = useState(true);
 
+  // Fetch pending order data from API
+  useEffect(() => {
+    const fetchPendingOrderData = async () => {
+      try {
+        const response = await fetch(`/api/orders/pending`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw Error("Failed to fetch pending order data");
+        } else {
+          const data = await response.json();
+          //console.log(data);
+          setPendingOrders(data);
+          sessionStorage.setItem("notificationsData", JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+      }
+    };
+
+    fetchPendingOrderData();
+  }, []);
+
   useEffect(() => {
     setUserName(
       sessionStorage.getItem("userName")
@@ -87,8 +112,8 @@ const OutstandingsPage: React.FC = () => {
         ? sessionStorage.getItem("userRoleName")
         : ""
     );
-    const pendingOrderList = sessionStorage.getItem("notificationsData");
-    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+    // const pendingOrderList = sessionStorage.getItem("notificationsData");
+    // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
     fetchUserCustomerDetails();
   }, []);
 
@@ -203,10 +228,10 @@ const OutstandingsPage: React.FC = () => {
               invoiceNumber: invoice.invoiceNumber,
               invoiceDate: invoice.invoiceDate
                 ? new Date(invoice.invoiceDate).toLocaleDateString("en-US", {
-                    year: "numeric",
-                    month: "short",
-                    day: "2-digit",
-                  })
+                  year: "numeric",
+                  month: "short",
+                  day: "2-digit",
+                })
                 : "",
               invoicedAmount: parseFloat(
                 invoice.totalAmount?.toString() || "0"
@@ -416,9 +441,8 @@ const OutstandingsPage: React.FC = () => {
                 </h2>
                 <div className="flex justify-start mb-6">
                   <button
-                    className={`bg-green-500 w-[50%] md:w-[50%] sm:w-full text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none cursor-pointer ${
-                      isLoading ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    className={`bg-green-500 w-[50%] md:w-[50%] sm:w-full text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none cursor-pointer ${isLoading ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                     onClick={handleOpenCustomerPopup}
                     disabled={isLoading}
                   >
@@ -620,11 +644,10 @@ const OutstandingsPage: React.FC = () => {
                             setCurrentPage(Math.max(1, currentPage - 1))
                           }
                           disabled={currentPage === 1}
-                          className={`px-3 py-1 rounded ${
-                            currentPage === 1
+                          className={`px-3 py-1 rounded ${currentPage === 1
                               ? "bg-gray-200 cursor-not-allowed"
                               : "bg-blue-600 text-white hover:bg-blue-700"
-                          }`}
+                            }`}
                         >
                           Previous
                         </button>
@@ -635,11 +658,10 @@ const OutstandingsPage: React.FC = () => {
                           <button
                             key={pageNumber}
                             onClick={() => setCurrentPage(pageNumber)}
-                            className={`px-3 py-1 rounded ${
-                              currentPage === pageNumber
+                            className={`px-3 py-1 rounded ${currentPage === pageNumber
                                 ? "bg-blue-700 text-white"
                                 : "bg-blue-600 text-white hover:bg-blue-700"
-                            }`}
+                              }`}
                           >
                             {pageNumber}
                           </button>
@@ -651,11 +673,10 @@ const OutstandingsPage: React.FC = () => {
                             )
                           }
                           disabled={currentPage === totalPages}
-                          className={`px-3 py-1 rounded ${
-                            currentPage === totalPages
+                          className={`px-3 py-1 rounded ${currentPage === totalPages
                               ? "bg-gray-200 cursor-not-allowed"
                               : "bg-blue-600 text-white hover:bg-blue-700"
-                          }`}
+                            }`}
                         >
                           Next
                         </button>

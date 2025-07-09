@@ -145,6 +145,31 @@ const CreateUserPage: React.FC = () => {
   const [userNameAppbar, setUserNameAppbar] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
 
+  // Fetch pending order data from API
+  useEffect(() => {
+    const fetchPendingOrderData = async () => {
+      try {
+        const response = await fetch(`/api/orders/pending`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw Error("Failed to fetch pending order data");
+        } else {
+          const data = await response.json();
+          //console.log(data);
+          setPendingOrders(data);
+          sessionStorage.setItem("notificationsData", JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+      }
+    };
+
+    fetchPendingOrderData();
+  }, []);
+
   useEffect(() => {
     setUserNameAppbar(
       sessionStorage.getItem("userName")
@@ -156,8 +181,8 @@ const CreateUserPage: React.FC = () => {
         ? sessionStorage.getItem("userRoleName")
         : ""
     );
-    const pendingOrderList = sessionStorage.getItem("notificationsData");
-    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+    // const pendingOrderList = sessionStorage.getItem("notificationsData");
+    // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
   const handleShowAlert = (
     type: React.SetStateAction<string>,
@@ -670,8 +695,8 @@ const CreateUserPage: React.FC = () => {
                   disabled={editingUser ? true : false}
                   type={viewpw ? "text" : "password"}
                   className={`w-full p-2 border ${errors.confirmPassword
-                      ? "border-red-500"
-                      : "border-gray-300"
+                    ? "border-red-500"
+                    : "border-gray-300"
                     } ${editingUser ? "bg-gray-300" : "bg-white"} rounded`}
                   placeholder="Re-Type Password"
                   value={reTypePassword}
@@ -954,8 +979,8 @@ const CreateUserPage: React.FC = () => {
               <button
                 disabled={isSaving}
                 className={`px-4 py-2 rounded font-medium transition duration-300 ${isSaving
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
                   } text-white`}
                 onClick={editingUser ? handleUpdateUser : handleCreateUser}
               >

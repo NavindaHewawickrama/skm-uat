@@ -28,7 +28,7 @@ export async function GET(request: Request) {
         if (!response.ok) {
             const errorText = await response.text();
             return NextResponse.json(
-                { error: 'Failed to fetch orders count', details: errorText },
+                { error: 'Failed to fetch imge', details: errorText },
                 { status: response.status }
             );
         }
@@ -39,7 +39,7 @@ export async function GET(request: Request) {
     } catch (error) {
         console.error('Error fetching orders count:', error);
         return NextResponse.json(
-            { error: 'Failed to fetch orders count' },
+            { error: 'Failed to fetch image' },
             { status: 500 }
         );
     }

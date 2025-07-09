@@ -84,6 +84,30 @@ const PendingOrdersPage: React.FC = () => {
   const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<
     string | null
   >(null);
+  // Fetch pending order data from API
+  useEffect(() => {
+    const fetchPendingOrderData = async () => {
+      try {
+        const response = await fetch(`/api/orders/pending`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw Error("Failed to fetch pending order data");
+        } else {
+          const data = await response.json();
+          //console.log(data);
+          setPendingOrders(data);
+          sessionStorage.setItem("notificationsData", JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+      }
+    };
+
+    fetchPendingOrderData();
+  }, []);
 
   useEffect(() => {
     setUserName(
@@ -96,8 +120,8 @@ const PendingOrdersPage: React.FC = () => {
         ? sessionStorage.getItem("userRoleName")
         : ""
     );
-    const pendingOrderList = sessionStorage.getItem("notificationsData");
-    setNotificationOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+    // const pendingOrderList = sessionStorage.getItem("notificationsData");
+    // setNotificationOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
 
   // Fetch pending order data from API
@@ -116,7 +140,7 @@ const PendingOrdersPage: React.FC = () => {
         } else {
           const data = await response.json();
           //console.log(data);
-          setPendingOrders(data);
+          setNotificationOrders(data);
         }
       } catch (err) {
         console.error("Error fetching pending order data:", err);
@@ -427,8 +451,8 @@ const PendingOrdersPage: React.FC = () => {
                         <td className="px-4 py-3 border text-sm">
                           <span
                             className={`px-2 py-1 ${order.status.toLowerCase() === "processing"
-                                ? "bg-red-300"
-                                : "bg-yellow-200"
+                              ? "bg-red-300"
+                              : "bg-yellow-200"
                               } text-yellow-800 rounded-full text-xs font-medium`}
                           >
                             {order.status}
@@ -487,10 +511,10 @@ const PendingOrdersPage: React.FC = () => {
                       key={index}
                       onClick={() => typeof page === "number" && goToPage(page)}
                       className={`px-3 py-1 border rounded ${page === currentPage
-                          ? "bg-blue-500 text-white"
-                          : page === "..."
-                            ? ""
-                            : "hover:bg-gray-100"
+                        ? "bg-blue-500 text-white"
+                        : page === "..."
+                          ? ""
+                          : "hover:bg-gray-100"
                         }`}
                       disabled={page === "..."}
                     >
@@ -502,8 +526,8 @@ const PendingOrdersPage: React.FC = () => {
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages || totalPages === 0}
                     className={`px-3 py-1 border rounded cursor-pointer ${currentPage === totalPages || totalPages === 0
-                        ? "text-gray-400"
-                        : "hover:bg-gray-100"
+                      ? "text-gray-400"
+                      : "hover:bg-gray-100"
                       }`}
                   >
                     Next
