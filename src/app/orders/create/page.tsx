@@ -203,7 +203,7 @@ const CreateOrderPage: React.FC = () => {
   //   setFormattedAmount(formatted);
   //   //setSelectedCustomerDueAmount(parseInt(formatted));
   // }, [selectedCustomerDueAmount]);
-  
+
   // Fetch pending order data from API
   useEffect(() => {
     const fetchPendingOrderData = async () => {
@@ -504,6 +504,7 @@ const CreateOrderPage: React.FC = () => {
     setIsLoading(true);
     if (!selectedCustomer) {
       handleShowAlert("error", "Please select a customer first");
+      setIsLoading(false);
       return;
     }
 

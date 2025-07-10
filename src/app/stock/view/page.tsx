@@ -87,7 +87,7 @@ const StockView = () => {
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
   const [loadingItemCode, setLoadingItemCode] = useState<string | null>(null);
-
+  const [loadingLocationCode, setLoadingLocationCode] = useState<string | null>(null);
 
   // Fetch pending order data from API
   useEffect(() => {
@@ -402,7 +402,7 @@ const StockView = () => {
     setEntriesPerPage(e.target.value);
   };
 
-  const handleViewImage = async (itemNo: string) => {
+  const handleViewImage = async (itemNo: string, location: string) => {
     // setOpenImagePopup(true);
 
     // if (typeof img === "string") {
@@ -423,7 +423,7 @@ const StockView = () => {
     //console.log(itemCode);
 
     setLoadingItemCode(itemNo);
-
+    setLoadingLocationCode(location);
     try {
       const response = await fetch(`/api/stock/viewImage?itemNo=${itemNo}`, {
         method: "GET",
@@ -464,6 +464,7 @@ const StockView = () => {
       handleShowAlert("error", "Failed to fetch product image");
     } finally {
       setLoadingItemCode(null);
+      setLoadingLocationCode(null);
     }
   }
 
@@ -602,7 +603,9 @@ const StockView = () => {
                   {displayedItems.map((item, index) => (
                     <tr
                       key={`${item.itemCode}-${item.location}-${index}`}
-                      className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-01-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-02-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH-01-SKM" ? "bg-[#f2fa84]" : item.location === "WELISARA-WH-01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
+                      // className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-01-SKM" || "COLOMBO-RETAIL-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-02-SNS" || "COLOMBO-RETAIL-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH-01-SKM" || "WELISARA-WH01-SKM"? "bg-[#f2fa84]" : item.location === "WELISARA-WH-01-SNS" || "WELISARA-WH01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
+                      //   }`}
+                      className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH01-SKM" ? "bg-[#f2fa84]" : item.location === "WELISARA-WH01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
                         }`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 text-center">
@@ -632,9 +635,9 @@ const StockView = () => {
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         <button
                           className="bg-blue-900 hover:bg-blue-950 text-white py-1 px-4 rounded focus:outline-none cursor-pointer flex items-center justify-center gap-2"
-                          onClick={() => handleViewImage(item.itemCode)}
+                          onClick={() => handleViewImage(item.itemCode, item.location)}
                         >
-                          {loadingItemCode === item.itemCode && (
+                          {((loadingItemCode === item.itemCode) && (loadingLocationCode === item.location)) && (
                             <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
                           )}
                           View
