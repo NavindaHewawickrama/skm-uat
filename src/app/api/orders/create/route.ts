@@ -13,11 +13,11 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { customerCode, locationCode, paymentMethodCode, totalAmount, items } = body;
+        const { customerCode, locationCode, paymentMethodCode, specialNote, totalAmount, items } = body;
 
         const response = await fetch(`${baseUrl.apiBaseUrl}/api/Business/CreateOrder?userId=${userId}`, {
             method: 'POST',
-            body: JSON.stringify({ customerCode, locationCode, paymentMethodCode, totalAmount, items }),
+            body: JSON.stringify({ customerCode, locationCode, paymentMethodCode, specialNote, totalAmount, items }),
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',

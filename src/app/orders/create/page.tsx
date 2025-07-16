@@ -14,6 +14,7 @@ type OrderType = {
   salesPersonName: string;
   orderDate: string;
   paymentMethodType: string;
+  specialNote: string;
   totalAmount: number;
   orderedItems: {
     itemCode: string;
@@ -23,7 +24,6 @@ type OrderType = {
     discountPercent: number;
     total: number;
   }[];
-  specialNote: string;
   rejectReason: string | null;
   status: string;
   delivertPersonName: string | null;
@@ -121,6 +121,7 @@ const CreateOrderPage: React.FC = () => {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
+  
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
   );
@@ -132,6 +133,7 @@ const CreateOrderPage: React.FC = () => {
   const [locationWiseItems, setLocationWiseItems] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState("");
   const [selectedItemName, setSelectedItemName] = useState("");
+  const [specialNote, setSpecialNote] = useState("");
   const [selectedItemUnitPrice, setSelectedItemUnitPrice] = useState("");
   const [selectedItemQuantity, setSelectedItemQuantity] = useState(0);
   const [selectedItemDiscount, setSelectedItemDiscount] = useState(0);
@@ -388,6 +390,7 @@ const CreateOrderPage: React.FC = () => {
       setSelectedItemQuantity(0);
       setSelectedItemDiscount(0);
       setSelectedItemSelectedLocationStock(0);
+      setSpecialNote("");
     }
   };
 
@@ -630,6 +633,7 @@ const CreateOrderPage: React.FC = () => {
           customerCode: selectedCustomer?.customerCode,
           locationCode: location,
           paymentMethodCode: selectedCustomer?.paymentTermCode,
+          specialNote: specialNote,
           totalAmount: orderTotal,
           items: orderItems,
         }),
@@ -650,6 +654,7 @@ const CreateOrderPage: React.FC = () => {
         setCustomer("");
         setLocation("");
         setPaymentType("");
+        setSpecialNote("");
         setOrderItems([]);
         setOrderTotal(0);
         setTotal(0);
@@ -938,8 +943,8 @@ const CreateOrderPage: React.FC = () => {
                   <textarea
                     className="block w-full p-2 border border-gray-300 rounded"
                     rows={3}
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
+                    value={specialNote}
+                    onChange={(e) => setSpecialNote(e.target.value)}
                   ></textarea>
                 </div>
               </div>
