@@ -121,7 +121,7 @@ const CreateOrderPage: React.FC = () => {
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
-  
+
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
   );
@@ -621,6 +621,7 @@ const CreateOrderPage: React.FC = () => {
     //   customerCode: selectedCustomer?.customerCode,
     //   locationCode: location,
     //   paymentMethodCode: selectedCustomer?.paymentTermCode,
+    //   specialNote: specialNote,
     //   totalAmount: orderTotal,
     //   items: orderItems,
     // };
