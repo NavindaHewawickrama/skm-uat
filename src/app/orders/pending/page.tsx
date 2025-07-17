@@ -5,6 +5,7 @@ import SideNav from "@/components/Sidenav";
 import Footer from "@/components/Footer";
 import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 import ViewStatusPopup from "@/components/ViewStatusPopup";
+import { MessageCircle, X } from 'lucide-react';
 
 type OrderforStatus = {
   orderNumber: string;
@@ -84,6 +85,8 @@ const PendingOrdersPage: React.FC = () => {
   const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<
     string | null
   >(null);
+  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+
   // Fetch pending order data from API
   useEffect(() => {
     const fetchPendingOrderData = async () => {
@@ -446,7 +449,40 @@ const PendingOrdersPage: React.FC = () => {
                           </button>
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.specialNote}
+                          {/* {order.specialNote} */}
+
+                          {order.specialNote && order.specialNote.trim() !== '' ? (
+                            <div className="flex items-center justify-center">
+                              <button
+                                onClick={() => setSelectedOrderId(order.orderNumber)}
+                                className="text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
+                                title="View special note"
+                              >
+                                <MessageCircle size={18} />
+                              </button>
+
+                            </div>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+
+                          {selectedOrderId === order.orderNumber && (
+                            <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-brightness-50 overflow-auto">
+                              <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 relative">
+                                <button
+                                  onClick={() => setSelectedOrderId(null)}
+                                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 cursor-pointer"
+                                >
+                                  <X size={20} />
+                                </button>
+                                <h3 className="text-lg font-semibold mb-3">Special Note</h3>
+                                <p className="text-gray-700 text-sm leading-relaxed">
+                                  {order.specialNote}
+                                </p>
+                              </div>
+                            </div>
+                          )}
+
                         </td>
                         <td className="px-4 py-3 border text-sm">
                           <span
