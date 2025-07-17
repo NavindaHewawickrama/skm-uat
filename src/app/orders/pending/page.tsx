@@ -100,7 +100,7 @@ const PendingOrdersPage: React.FC = () => {
           throw Error("Failed to fetch pending order data");
         } else {
           const data = await response.json();
-          console.log(data);
+          //console.log(data);
           setPendingOrders(data);
           sessionStorage.setItem("notificationsData", JSON.stringify(data));
         }

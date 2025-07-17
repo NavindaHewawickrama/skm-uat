@@ -435,7 +435,7 @@ const StockView = () => {
         });
         return acc;
       }, []);
-
+      console.log(transformedData);
       setStockItems(transformedData);
     } catch (err) {
       console.error("Error fetching stock data:", err);
@@ -453,7 +453,9 @@ const StockView = () => {
         item.itemName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.subCategory.toLowerCase().includes(searchQuery.toLowerCase())
+        item.subCategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.itemCategory.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase())
     );
   }, [stockItems, searchQuery]);
 
