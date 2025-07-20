@@ -435,7 +435,7 @@ const StockView = () => {
         });
         return acc;
       }, []);
-      console.log(transformedData);
+     // console.log(transformedData);
       setStockItems(transformedData);
     } catch (err) {
       console.error("Error fetching stock data:", err);
