@@ -113,7 +113,7 @@ const CreateOrderPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [location, setLocation] = useState("");
   const [paymentType, setPaymentType] = useState("");
-  const [notes, setNotes] = useState("");
+  //const [notes, setNotes] = useState("");
   const [total, setTotal] = useState(0);
   const [isLoading, setIsLoading] = useState(false);
 
