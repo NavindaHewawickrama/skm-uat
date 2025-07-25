@@ -51,6 +51,7 @@ type OrderType = {
   trackingNumber: string | null;
   rejectedReason: string;
   description?: string;
+  location: string | null;
 };
 
 type ItemsType = {
@@ -376,6 +377,10 @@ const PendingOrdersPage: React.FC = () => {
                       <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                         Order No
                       </th>
+                      {userRoleType?.toLowerCase() === "admin" && (
+                        <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                          Order Location
+                        </th>)}
                       <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                         Customer
                       </th>
@@ -411,6 +416,11 @@ const PendingOrdersPage: React.FC = () => {
                         <td className="px-4 py-3 border text-sm">
                           {order.orderNumber}
                         </td>
+                        {userRoleType?.toLowerCase() === "admin" && (
+                          <td className="px-4 py-3 border text-sm">
+                            {order.location ? order.location : "N/A"}
+                          </td>
+                        )}
                         <td className="px-4 py-3 border text-sm">
                           {order.customerName}
                         </td>

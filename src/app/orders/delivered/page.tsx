@@ -40,6 +40,7 @@ type OrderType = {
   invoicedItems: string | null;
   trackingNumber: string | null;
   invoiceNumber: string | null;
+  location: string | null; // Optional field for order location
 };
 
 type ItemsType = {
@@ -376,6 +377,10 @@ const DeliveredOrdersPage: React.FC = () => {
                       <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                         Order No
                       </th>
+                      {userRoleType?.toLowerCase() === "admin" && (
+                        <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                          Order Location
+                        </th>)}
                       <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                         Customer
                       </th>
@@ -414,6 +419,11 @@ const DeliveredOrdersPage: React.FC = () => {
                         <td className="px-4 py-3 border text-sm">
                           {order.orderNumber}
                         </td>
+                        {userRoleType?.toLowerCase() === "admin" && (
+                          <td className="px-4 py-3 border text-sm">
+                            {order.location ? order.location : "N/A"}
+                          </td>
+                        )}
                         <td className="px-4 py-3 border text-sm">
                           {order.customerName}
                         </td>
