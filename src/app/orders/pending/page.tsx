@@ -428,7 +428,8 @@ const PendingOrdersPage: React.FC = () => {
                           )}
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.paymentMethodType}
+                          {/* {order.paymentMethodType} */}
+                          Default
                         </td>
                         <td className="px-4 py-3 border text-sm text-right">
                           {/* {order.totalAmount.toFixed(2)} */}

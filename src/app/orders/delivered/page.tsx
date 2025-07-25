@@ -39,6 +39,7 @@ type OrderType = {
   deliveryDate: string | null;
   invoicedItems: string | null;
   trackingNumber: string | null;
+  invoiceNumber: string | null;
 };
 
 type ItemsType = {
@@ -70,6 +71,7 @@ const DeliveredOrdersPage: React.FC = () => {
   const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(
     null
   );
+  const [selectedOrderInvoiceNumber, setSelectedOrderInvoiceNumber] = useState<string | null>(null);
   const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<
     string | null
   >(null);
@@ -131,7 +133,7 @@ const DeliveredOrdersPage: React.FC = () => {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
-        //console.log(data);
+        console.log(data);
         setDeliveredOrders(data);
       }
     } catch (err) {
@@ -239,6 +241,7 @@ const DeliveredOrdersPage: React.FC = () => {
       setSelectedOrderItems(order.invoicedItems);
       setSelectedOrderNumber(order.orderNumber);
       setSelectedOrderCustomerName(order.customerName);
+      setSelectedOrderInvoiceNumber(order.invoiceNumber);
     } else {
       setSelectedOrderItems([]);
     }
@@ -428,7 +431,8 @@ const DeliveredOrdersPage: React.FC = () => {
                           )}
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.paymentMethodType}
+                          {/* {order.paymentMethodType} */}
+                          Default
                         </td>
                         <td className="px-4 py-3 border text-sm text-right">
                           {typeof order.totalAmount === "number"
@@ -571,10 +575,14 @@ const DeliveredOrdersPage: React.FC = () => {
           {/* Footer Component */}
           <ViewOrderEditPopupButton
             open={listViewOpen}
-            onClose={() => setListViewOpen(false)}
+            onClose={() => {
+              setListViewOpen(false),
+                setSelectedOrderInvoiceNumber("")
+            }}
             orderDetails={selectedOrderItems}
             orderNumber={selectedOrderNumber ?? 0}
             customerName={selectedOrderCustomerName ?? ""}
+            invoiceNumber={selectedOrderInvoiceNumber ?? ""}
           />
 
           <ViewOrderDeliveryStatus

@@ -17,6 +17,7 @@ interface ModalProps {
   orderDetails: OrderItem[];
   orderNumber: number;
   customerName: string;
+  invoiceNumber?: string | null;
 }
 
 const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
@@ -25,8 +26,9 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
   orderDetails,
   orderNumber = 0,
   customerName = "",
+  invoiceNumber = "",
 }) => {
- // console.log(orderDetails);
+  // console.log(orderDetails);
 
   if (!open) return null;
 
@@ -42,6 +44,16 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
       21,
       { align: "center" }
     );
+    {
+      invoiceNumber && (
+        pdf.text(
+          `Invoice Number: ${invoiceNumber}`,
+          15,
+          27,
+          { align: "left" }
+        )
+      )
+    }
     //pdf.text({}, 105, 15, { align: "center" });
     const currentDate = new Date().toLocaleDateString("en-US", {
       year: "numeric",
@@ -99,7 +111,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
     autoTable(pdf, {
       head: [tableColumn],
       body: tableRows,
-      startY: 25,
+      startY: invoiceNumber ? 30 : 25,
       theme: "grid",
       styles: { fontSize: 10, cellPadding: 3 },
       headStyles: {
@@ -157,7 +169,6 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
             <h4 className="capitalize font-medium text-lg sm:text-xl md:text-2xl truncate">
               Item Details
             </h4>
-
             <p
               className="font-medium cursor-pointer transition-transform duration-300 ease-in-out transform hover:scale-[1.3] hover:text-red-600"
               onClick={onClose}
@@ -184,6 +195,15 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
               </button>
             </p>
           </div>
+          <h2 className="capitalize font-medium truncate">
+            {invoiceNumber ? (
+              <span className="text-sm sm:text-base">
+                Invoice Number: {invoiceNumber}
+              </span>
+            ) : (
+              <span className="text-sm sm:text-base"></span>
+            )}
+          </h2>
           <hr className="border-t-2 border-gray-300 my-3 sm:my-4" />
 
           {/* Items Table */}
@@ -221,12 +241,12 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
                         {typeof item.unitPrice === "number"
                           ? Number(item.unitPrice.toFixed(2)).toLocaleString(
-                              "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              }
-                            )
+                            "en-US",
+                            {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            }
+                          )
                           : item.unitPrice}
                       </td>
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
