@@ -88,30 +88,6 @@ const PendingOrdersPage: React.FC = () => {
   >(null);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
 
-  // Fetch pending order data from API
-  useEffect(() => {
-    const fetchPendingOrderData = async () => {
-      try {
-        const response = await fetch(`/api/orders/pending`, {
-          method: "GET",
-          credentials: "include",
-        });
-
-        if (!response.ok) {
-          throw Error("Failed to fetch pending order data");
-        } else {
-          const data = await response.json();
-          //console.log(data);
-          setPendingOrders(data);
-          sessionStorage.setItem("notificationsData", JSON.stringify(data));
-        }
-      } catch (err) {
-        console.error("Error fetching pending order data:", err);
-      }
-    };
-
-    fetchPendingOrderData();
-  }, []);
 
   useEffect(() => {
     setUserName(
@@ -145,6 +121,8 @@ const PendingOrdersPage: React.FC = () => {
           const data = await response.json();
           //console.log(data);
           setNotificationOrders(data);
+          setPendingOrders(data);
+          sessionStorage.setItem("notificationsData", JSON.stringify(data));
         }
       } catch (err) {
         console.error("Error fetching pending order data:", err);

@@ -44,15 +44,18 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
       21,
       { align: "center" }
     );
-    {
-      invoiceNumber && (
-        pdf.text(
-          `Invoice Number: ${invoiceNumber}`,
-          15,
-          27,
-          { align: "left" }
-        )
-      )
+    // {
+    //   invoiceNumber && (
+    //     pdf.text(
+    //       `Invoice Number: ${invoiceNumber}`,
+    //       15,
+    //       27,
+    //       { align: "left" }
+    //     )
+    //   )
+    // }
+    if (invoiceNumber) {
+      pdf.text(`Invoice Number: ${invoiceNumber}`, 15, 27, { align: "left" });
     }
     //pdf.text({}, 105, 15, { align: "center" });
     const currentDate = new Date().toLocaleDateString("en-US", {

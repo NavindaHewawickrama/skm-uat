@@ -121,6 +121,8 @@ const DeliveredOrdersPage: React.FC = () => {
     fetchDeliveredOrders();
   }, []);
 
+
+
   const fetchDeliveredOrders = async () => {
     try {
       setLoading(true);
@@ -585,9 +587,13 @@ const DeliveredOrdersPage: React.FC = () => {
           {/* Footer Component */}
           <ViewOrderEditPopupButton
             open={listViewOpen}
+            // onClose={() => {
+            //   setListViewOpen(false),
+            //     setSelectedOrderInvoiceNumber("")
+            // }}
             onClose={() => {
-              setListViewOpen(false),
-                setSelectedOrderInvoiceNumber("")
+              setListViewOpen(false);
+              setSelectedOrderInvoiceNumber("");
             }}
             orderDetails={selectedOrderItems}
             orderNumber={selectedOrderNumber ?? 0}

@@ -44,6 +44,7 @@ const SideNav: React.FC<SideNavProps> = ({ isOpen }) => {
       subItems: [
         { label: "Create Order", href: "/orders/create", active: false },
         { label: "Pending Orders", href: "/orders/pending", active: false },
+        { label: "Processing Orders", href: "/orders/processing", active: false },
         { label: "Delivered Orders", href: "/orders/delivered", active: false },
         { label: "Rejected Orders", href: "/orders/rejected", active: false },
       ],
