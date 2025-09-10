@@ -219,9 +219,9 @@ const PendingOrdersPage: React.FC = () => {
     setSideNavOpen(!sideNavOpen);
   };
 
-  const handleItemDetailsView = (order: OrderType) => {
+  const handleItemDetailsView = (order: OrderType, index: number) => {
     //console.log(order);
-
+   // setSelectedRowIndex(index);
     // Changed from order.items to order.orderedItems
     if (Array.isArray(order.orderedItems)) {
       setSelectedOrderItems(order.orderedItems);
@@ -239,7 +239,8 @@ const PendingOrdersPage: React.FC = () => {
     setCurrentPage(1); // Reset to first page when changing entries per page
   };
 
-  const handleStatus = (order: OrderforStatus) => {
+  const handleStatus = (order: OrderforStatus, index: number) => {
+   // setSelectedRowIndex(index);
     setSelectedOrderForStatus(order);
     setStatusViewOpen(true);
     // console.log(order);
@@ -390,7 +391,12 @@ const PendingOrdersPage: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {currentOrders.map((order, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
+                      <tr key={index}
+                        // className={`${selectedRowIndex === index
+                        //   ? "bg-blue-100 border-blue-300"
+                        //   : "hover:bg-gray-200"
+                        //   }`}
+                      >
                         <td className="px-4 py-3 border text-sm">
                           {order.orderNumber}
                         </td>
@@ -432,7 +438,7 @@ const PendingOrdersPage: React.FC = () => {
                         <td className="px-4 py-3 border text-sm text-center">
                           <button
                             className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer"
-                            onClick={() => handleItemDetailsView(order)}
+                            onClick={() => handleItemDetailsView(order, index)}
                           >
                             View
                           </button>
@@ -495,7 +501,7 @@ const PendingOrdersPage: React.FC = () => {
                                 paymentMethodType: order.paymentMethodType,
                                 totalAmount: order.totalAmount,
                                 status: order.status,
-                              })
+                              }, index)
                             }
                           >
                             Edit

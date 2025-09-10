@@ -56,6 +56,12 @@ interface CustomerOutstandingData {
   invoicedAmount: number;
   pdcAmount: number;
   dueAmount: number;
+  originalAmount: number,
+  orderNo: string,
+  balanceBeforePDCs: number,
+  releasedPDCs: number,
+  balanceAfterPDCs: number,
+
 }
 
 interface Customer {
@@ -107,6 +113,11 @@ interface Invoice {
   dueAmount: number;
   totalAmount: number;
   remainingAmount: number;
+  invoiceNo: string;
+  originalAmount: number;
+  balanceBeforePDCs: number;
+  releasePDCs: number;
+  balanceAfterPDCs: number;
 }
 
 const CreateOrderPage: React.FC = () => {
@@ -197,14 +208,6 @@ const CreateOrderPage: React.FC = () => {
     );
   }, [location, itemsList]);
 
-  // useEffect(() => {
-  //   const formatted = Number(selectedCustomerDueAmount).toLocaleString("en-US", {
-  //     minimumFractionDigits: 2,
-  //     maximumFractionDigits: 2,
-  //   });
-  //   setFormattedAmount(formatted);
-  //   //setSelectedCustomerDueAmount(parseInt(formatted));
-  // }, [selectedCustomerDueAmount]);
 
   // Fetch pending order data from API
   useEffect(() => {
@@ -411,31 +414,41 @@ const CreateOrderPage: React.FC = () => {
       month: "short",
       day: "2-digit",
     });
-    pdf.setFontSize(10);
+    pdf.setFontSize(9);
     pdf.text(currentDate, 195, 15, { align: "right" });
 
 
     const tableColumn = [
+      "Posting Date",
       "Customer Name",
       "Invoice Number",
-      "Order Date",
       "Invoiced Amount",
-      "PDC Amount",
-      "Due Amount",
+      "Original Amount",
+      "Balance Before PDCs",
+      "Released PDCs",
+      "Balance After PDCs",
     ];
     const tableRows = outstandingData.map((item) => [
+      item.invoiceDate,
       item.customerName,
       item.invoiceNumber,
-      item.invoiceDate,
       `${Number(item.invoicedAmount.toFixed(2)).toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
-      `${Number(item.pdcAmount.toFixed(2)).toLocaleString("en-US", {
+      `${Number(item.originalAmount.toFixed(2)).toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
-      `${Number(item.dueAmount.toFixed(2)).toLocaleString("en-US", {
+      `${Number(item.balanceBeforePDCs.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      `${Number(item.releasedPDCs.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      `${Number(item.balanceAfterPDCs.toFixed(2)).toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
@@ -446,7 +459,7 @@ const CreateOrderPage: React.FC = () => {
       body: tableRows,
       startY: 25,
       theme: "grid",
-      styles: { fontSize: 10, cellPadding: 3 },
+      styles: { fontSize: 9, cellPadding: 2 },
       headStyles: {
         fillColor: [200, 200, 200],
         textColor: [0, 0, 0],
@@ -461,7 +474,7 @@ const CreateOrderPage: React.FC = () => {
     );
 
     const totalPDC = outstandingData.reduce(
-      (sum, item) => sum + item.pdcAmount,
+      (sum, item) => sum + item.releasedPDCs,
       0
     );
     // const totalInvoiced = outstandingData.reduce(
@@ -522,6 +535,7 @@ const CreateOrderPage: React.FC = () => {
         }
       );
 
+
       if (!response.ok) {
         throw new Error("Failed to fetch customer invoices");
       }
@@ -542,6 +556,11 @@ const CreateOrderPage: React.FC = () => {
           invoicedAmount: parseFloat(invoice.totalAmount?.toString() || "0"),
           pdcAmount: parseFloat(invoice.pdcAmount?.toString() || "0"),
           dueAmount: parseFloat(invoice.dueAmount?.toString() || "0"),
+          orderNo: invoice.orderNo,
+          originalAmount: parseFloat(invoice.originalAmount?.toString() || "0"),
+          balanceBeforePDCs: parseFloat(invoice.balanceBeforePDCs?.toString() || "0"),
+          releasedPDCs: parseFloat(invoice.releasePDCs?.toString() || "0"),
+          balanceAfterPDCs: parseFloat(invoice.balanceAfterPDCs?.toString() || "0")
         })
       );
 

@@ -77,6 +77,7 @@ const DeliveredOrdersPage: React.FC = () => {
     string | null
   >(null);
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
   // Fetch pending order data from API
   useEffect(() => {
     const fetchPendingOrderData = async () => {
@@ -224,9 +225,9 @@ const DeliveredOrdersPage: React.FC = () => {
     setSideNavOpen(!sideNavOpen);
   };
 
-  const handleItemDetailsView = (order: OrderType) => {
+  const handleItemDetailsView = (order: OrderType, index: number) => {
     //  console.log(order);
-
+    setSelectedRowIndex(index);
     if (Array.isArray(order.orderedItems)) {
       setSelectedOrderItems(order.orderedItems);
       setSelectedOrderNumber(order.orderNumber);
@@ -237,9 +238,9 @@ const DeliveredOrdersPage: React.FC = () => {
     setListViewOpen(true);
   };
 
-  const handleInvoicedItemDetailsView = (order: OrderType) => {
+  const handleInvoicedItemDetailsView = (order: OrderType, index: number) => {
     //console.log(order.invoicedItems);
-
+    setSelectedRowIndex(index);
     if (Array.isArray(order.invoicedItems)) {
       setSelectedOrderItems(order.invoicedItems);
       setSelectedOrderNumber(order.orderNumber);
@@ -251,11 +252,12 @@ const DeliveredOrdersPage: React.FC = () => {
     setListViewOpen(true);
   };
 
-  const handleDeliveryDetailsView = (order: OrderType) => {
+  const handleDeliveryDetailsView = (order: OrderType, index: number) => {
     // setSelectedDeliveryOrder(order);
     // setDeliveryDetailsOpen(true);
 
     //  console.log(order);
+    setSelectedRowIndex(index);
     setOrderTrackingNumber(order.trackingNumber ? order.trackingNumber : "");
     setOrderDeliverPersonName(
       order.delivertPersonName ? order.delivertPersonName : ""
@@ -417,7 +419,12 @@ const DeliveredOrdersPage: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {deliveredOrders.map((order, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
+                      <tr key={index}
+                        className={`${selectedRowIndex === index
+                          ? "bg-blue-100 border-blue-300"
+                          : "hover:bg-gray-200"
+                          }`}
+                      >
                         <td className="px-4 py-3 border text-sm">
                           {order.orderNumber}
                         </td>
@@ -459,7 +466,7 @@ const DeliveredOrdersPage: React.FC = () => {
                         <td className="px-4 py-3 border text-sm text-center">
                           <button
                             className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer"
-                            onClick={() => handleItemDetailsView(order)}
+                            onClick={() => handleItemDetailsView(order, index)}
                           >
                             View
                           </button>
@@ -467,7 +474,7 @@ const DeliveredOrdersPage: React.FC = () => {
                         <td className="px-4 py-3 border text-sm text-center">
                           <button
                             className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer"
-                            onClick={() => handleInvoicedItemDetailsView(order)}
+                            onClick={() => handleInvoicedItemDetailsView(order, index)}
                           >
                             View
                           </button>
@@ -513,7 +520,7 @@ const DeliveredOrdersPage: React.FC = () => {
                         <td className="px-4 py-3 border text-sm text-center">
                           <button
                             className="bg-blue-900 hover:bg-blue-950 text-white py-1 px-4 rounded focus:outline-none cursor-pointer"
-                            onClick={() => handleDeliveryDetailsView(order)}
+                            onClick={() => handleDeliveryDetailsView(order, index)}
                           >
                             View
                           </button>
