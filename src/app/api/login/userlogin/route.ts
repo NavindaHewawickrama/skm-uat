@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     const cookieStore = cookies();
     (await cookieStore).set({
       name: 'acctoken',
-      value: data.acctoken, // adjust according to actual token field in API response
+      value: data.acctoken, 
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
     (await cookieStore).set({
       name: 'refreshtoken',
-      value: data.refreshToken, // adjust according to actual token field in API response
+      value: data.refToken, 
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
