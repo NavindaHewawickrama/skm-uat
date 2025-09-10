@@ -9,6 +9,10 @@ interface Invoice {
     pdcAmount: number;
     dueAmount: number;
     totalAmount: number;
+    originalAmount: number;
+    balanceBeforePDCs: number;
+    releasePDCs: number;
+    balanceAfterPDCs: number;
 }
 
 
@@ -57,7 +61,7 @@ export async function GET(request: Request) {
         }
 
         const data = await response.json();
-        console.log('External API response:', data);
+        //console.log('External API response:', data);
 
         // Transform the response to match your frontend expectations
         const transformedInvoices = data.invoices?.map((invoice: Invoice) => ({
@@ -66,6 +70,11 @@ export async function GET(request: Request) {
             totalAmount: invoice.totalAmount,
             pdcAmount: invoice.pdcAmount,
             dueAmount: invoice.dueAmount,
+            orderNo: invoice.orderNo,
+            originalAmount: invoice.originalAmount,
+            balanceBeforePDCs: invoice.balanceBeforePDCs,
+            releasedPDCs: invoice.releasePDCs,
+            balanceAfterPDCs: invoice.balanceAfterPDCs
         })) || [];
 
         //console.log('Transformed invoices:', transformedInvoices);
