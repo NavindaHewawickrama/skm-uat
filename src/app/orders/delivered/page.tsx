@@ -5,24 +5,7 @@ import SideNav from "@/components/Sidenav";
 import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 import Footer from "@/components/Footer";
 import ViewOrderDeliveryStatus from "@/components/ViewOrderDeliveryStatus";
-// import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
-// import DeliveryDetailsPopup from "@/components/DeliveryDetailsPopup";
 
-// type OrderType = {
-//   orderNumber: string;
-//   customerName: string;
-//   salesPersonName: string;
-//   orderDate: string;
-//   paymentMethodType: string;
-//   totalAmount: number;
-//   specialNote: string;
-//   rejectedReason: string;
-//   status: string;
-//   description?: string
-//   trackingNumber: string,
-//   delivertPersonName: string,
-//   deliveryDate: string,
-// };
 type OrderType = {
   orderNumber: number;
   customerName: string;
@@ -30,8 +13,24 @@ type OrderType = {
   orderDate: string;
   paymentMethodType: string;
   totalAmount: number;
-  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
-  items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  orderedItems: {
+    itemCode: string;
+    description: string;
+    unitPrice: number;
+    quantity: string;
+    discountPercent: number;
+    total: number;
+  }[];
+  items:
+  | string
+  | {
+    itemCode: string;
+    description: string;
+    unitPrice: number;
+    quantity: string;
+    discountPercent: number;
+    total: number;
+  }[];
   specialNote: string;
   rejectReason: string | null;
   status: string;
@@ -41,8 +40,14 @@ type OrderType = {
   trackingNumber: string | null;
 };
 
-type ItemsType = { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }
-
+type ItemsType = {
+  itemCode: string;
+  description: string;
+  unitPrice: number;
+  quantity: string;
+  discountPercent: number;
+  total: number;
+};
 
 const DeliveredOrdersPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
@@ -61,143 +66,52 @@ const DeliveredOrdersPage: React.FC = () => {
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
-  const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(null);
-
+  const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(
+    null
+  );
+  const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<
+    string | null
+  >(null);
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
+  // Fetch pending order data from API
   useEffect(() => {
-    setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
-    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
-    const pendingOrderList = sessionStorage.getItem("notificationsData");
-    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+    const fetchPendingOrderData = async () => {
+      try {
+        const response = await fetch(`/api/orders/pending`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw Error("Failed to fetch pending order data");
+        } else {
+          const data = await response.json();
+          //console.log(data);
+          setPendingOrders(data);
+          sessionStorage.setItem("notificationsData", JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+      }
+    };
+
+    fetchPendingOrderData();
   }, []);
 
-  // Sample delivered orders data based on the screenshot
-  // const deliveredOrders = [
-  //   {
-  //     orderNo: "4821",
-  //     customer: "ROYAL MOTORS(G)",
-  //     salesRef: "manjula",
-  //     orderDate: "9/15/2020, 8:58:38 PM",
-  //     type: "credit",
-  //     total: 327225,
-  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
-  //     note: "",
-  //     status: "Delivered",
-  //     courierService: "prompt",
-  //     trackingNo: "mct12859799",
-  //     deliveredDate: "9/16/2020",
-  //     description: "Delivered on time"
-  //   },
-  //   {
-  //     orderNo: "6476",
-  //     customer: "GUNASEKARA BATTERY SHOP",
-  //     salesRef: "mahesh",
-  //     orderDate: "9/15/2020, 9:34:08 PM",
-  //     type: "credit",
-  //     total: 7290,
-  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
-  //     note: "",
-  //     status: "Delivered",
-  //     courierService: "prompt",
-  //     trackingNo: "mct12859799",
-  //     deliveredDate: "9/16/2020",
-  //     description: "Delivered on time"
-  //   },
-  //   {
-  //     orderNo: "7327",
-  //     customer: "NAMOMARIYANI AUTO SPARES",
-  //     salesRef: "mahesh",
-  //     orderDate: "9/15/2020, 9:40:42 PM",
-  //     type: "credit",
-  //     total: 17572.5,
-  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
-  //     note: "",
-  //     status: "Delivered",
-  //     courierService: "prompt",
-  //     trackingNo: "mct12859799",
-  //     deliveredDate: "9/16/2020",
-  //     description: "Delivered on time"
-  //   },
-  //   {
-  //     orderNo: "9577",
-  //     customer: "PERERA MOTORS (MAKANDURA)",
-  //     salesRef: "mahesh",
-  //     orderDate: "9/15/2020, 9:54:32 PM",
-  //     type: "credit",
-  //     total: 25950,
-  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
-  //     note: "aluthiun b...",
-  //     status: "Delivered",
-  //     courierService: "prompt",
-  //     trackingNo: "mct12859799",
-  //     deliveredDate: "9/16/2020",
-  //     description: "Delivered on time"
-  //   },
-  //   {
-  //     orderNo: "10264",
-  //     customer: "PERERA MOTORS (MAKANDURA)",
-  //     salesRef: "mahesh",
-  //     orderDate: "9/15/2020, 9:58:37 PM",
-  //     type: "credit",
-  //     total: 17295,
-  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
-  //     note: "meka adama danna hadissi",
-  //     status: "Delivered",
-  //     courierService: "prompt",
-  //     trackingNo: "mct12859799",
-  //     deliveredDate: "9/16/2020",
-  //     description: "Delivered on time"
-  //   },
-  //   {
-  //     orderNo: "12329",
-  //     customer: "JAYAN MOTORS",
-  //     salesRef: "manjula",
-  //     orderDate: "9/15/2020, 11:37:23 PM",
-  //     type: "credit",
-  //     total: 44175,
-  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
-  //     note: "",
-  //     status: "Delivered",
-  //     courierService: "DHL",
-  //     trackingNo: "dhl4529871",
-  //     deliveredDate: "9/16/2020",
-  //     description: "Left at reception"
-  //   },
-  //   {
-  //     orderNo: "13820",
-  //     customer: "JAYAN MOTORS",
-  //     salesRef: "manjula",
-  //     orderDate: "9/15/2020, 11:52:03 PM",
-  //     type: "credit",
-  //     total: 36795,
-  //     itemDetails: [{ itemName: "Gel Pump", unitPrice: "500", quantity: "500", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "8", discount: "12", total: "250.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Tires", unitPrice: "100", quantity: "5", discount: "12", total: "2500.00" }, { itemName: "Oil Pump", unitPrice: "500", quantity: "5", discount: "12", total: "2500.00" }],
-  //     note: "",
-  //     status: "Delivered",
-  //     courierService: "prompt",
-  //     trackingNo: "mct12859799",
-  //     deliveredDate: "9/16/2020",
-  //     description: "Delivered on time"
-  //   },
-  //   // Additional dummy data to demonstrate pagination
-  //   ...Array(30)
-  //     .fill(0)
-  //     .map((_, i) => ({
-  //       orderNo: `${20000 + i}`,
-  //       customer: [
-  //         "SUPREME AUTO PARTS",
-  //         "LATHIKA MOTORS",
-  //         "NEW VISION SPARES",
-  //         "AUTO WORLD",
-  //         "SRI LANKA MOTORS",
-  //       ][i % 5],
-  //       salesRef: ["manjula", "mahesh", "danushka"][i % 3],
-  //       orderDate: "9/16/2020, 10:30:00 AM",
-  //       type: "credit",
-  //       total: 15000 + i * 1000,
-  //       itemDetails: "",
-  //       note: i % 5 === 0 ? "Urgent delivery completed" : "",
-  //       status: "Delivered",
-  //     })),
-  // ];
+  useEffect(() => {
+    setUserName(
+      sessionStorage.getItem("userName")
+        ? sessionStorage.getItem("userName")
+        : ""
+    );
+    setUserRoleType(
+      sessionStorage.getItem("userRoleName")
+        ? sessionStorage.getItem("userRoleName")
+        : ""
+    );
+    // const pendingOrderList = sessionStorage.getItem("notificationsData");
+    // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+  }, []);
 
   useEffect(() => {
     fetchDeliveredOrders();
@@ -216,7 +130,7 @@ const DeliveredOrdersPage: React.FC = () => {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
-        // console.log(data);
+        //console.log(data);
         setDeliveredOrders(data);
       }
     } catch (err) {
@@ -245,7 +159,7 @@ const DeliveredOrdersPage: React.FC = () => {
     return Math.ceil(filteredOrders.length / parseInt(entriesPerPage));
   }, [filteredOrders.length, entriesPerPage]);
 
-  // Generate page numbers for pagination 
+  // Generate page numbers for pagination
   const getPageNumbers = () => {
     const pages = [];
     const maxPagesToShow = 5;
@@ -304,37 +218,42 @@ const DeliveredOrdersPage: React.FC = () => {
     setSideNavOpen(!sideNavOpen);
   };
 
-  const handleItemDetailsView = (order: OrderType) => {
+  const handleItemDetailsView = (order: OrderType, index: number) => {
     //  console.log(order);
-
+    setSelectedRowIndex(index);
     if (Array.isArray(order.orderedItems)) {
       setSelectedOrderItems(order.orderedItems);
       setSelectedOrderNumber(order.orderNumber);
+      setSelectedOrderCustomerName(order.customerName);
     } else {
       setSelectedOrderItems([]);
     }
     setListViewOpen(true);
   };
 
-  const handleInvoicedItemDetailsView = (order: OrderType) => {
+  const handleInvoicedItemDetailsView = (order: OrderType, index: number) => {
     //console.log(order.invoicedItems);
-
+    setSelectedRowIndex(index);
     if (Array.isArray(order.invoicedItems)) {
       setSelectedOrderItems(order.invoicedItems);
       setSelectedOrderNumber(order.orderNumber);
+      setSelectedOrderCustomerName(order.customerName);
     } else {
       setSelectedOrderItems([]);
     }
     setListViewOpen(true);
   };
 
-  const handleDeliveryDetailsView = (order: OrderType) => {
+  const handleDeliveryDetailsView = (order: OrderType, index: number) => {
     // setSelectedDeliveryOrder(order);
     // setDeliveryDetailsOpen(true);
 
     //  console.log(order);
+    setSelectedRowIndex(index);
     setOrderTrackingNumber(order.trackingNumber ? order.trackingNumber : "");
-    setOrderDeliverPersonName(order.delivertPersonName ? order.delivertPersonName : "");
+    setOrderDeliverPersonName(
+      order.delivertPersonName ? order.delivertPersonName : ""
+    );
     setOrderDeliveryDate(order.deliveryDate ? order.deliveryDate : "");
     setDeliveryViewOpen(true);
   };
@@ -347,7 +266,12 @@ const DeliveredOrdersPage: React.FC = () => {
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
+        <AppBar
+          toggleSideNav={toggleSideNav}
+          userRole={userRoleType}
+          userName={userName}
+          notificationData={pendingOrders}
+        />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -367,7 +291,12 @@ const DeliveredOrdersPage: React.FC = () => {
   if (error) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
+        <AppBar
+          toggleSideNav={toggleSideNav}
+          userRole={userRoleType}
+          userName={userName}
+          notificationData={pendingOrders}
+        />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -388,7 +317,12 @@ const DeliveredOrdersPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
+      <AppBar
+        toggleSideNav={toggleSideNav}
+        userRole={userRoleType}
+        userName={userName}
+        notificationData={pendingOrders}
+      />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
@@ -473,7 +407,12 @@ const DeliveredOrdersPage: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {deliveredOrders.map((order, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
+                      <tr key={index}
+                        className={`${selectedRowIndex === index
+                          ? "bg-blue-100 border-blue-300"
+                          : "hover:bg-gray-200"
+                          }`}
+                      >
                         <td className="px-4 py-3 border text-sm">
                           {order.orderNumber}
                         </td>
@@ -484,30 +423,51 @@ const DeliveredOrdersPage: React.FC = () => {
                           {order.salesPersonName}
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.orderDate.split("T")[0]}
+                          {new Date(order.orderDate).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "2-digit",
+                            }
+                          )}
                         </td>
                         <td className="px-4 py-3 border text-sm">
                           {order.paymentMethodType}
                         </td>
                         <td className="px-4 py-3 border text-sm text-right">
                           {typeof order.totalAmount === "number"
-                            ? order.totalAmount.toFixed(2)
+                            ? Number(
+                              order.totalAmount.toFixed(2)
+                            ).toLocaleString("en-US", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })
                             : order.totalAmount}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer" onClick={() => handleItemDetailsView(order)}>
+                          <button
+                            className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer"
+                            onClick={() => handleItemDetailsView(order, index)}
+                          >
                             View
                           </button>
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer" onClick={() => handleInvoicedItemDetailsView(order)}>
+                          <button
+                            className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer"
+                            onClick={() => handleInvoicedItemDetailsView(order, index)}
+                          >
                             View
                           </button>
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.specialNote && order.specialNote.length > 15 ? (
+                          {order.specialNote &&
+                            order.specialNote.length > 15 ? (
                             <div className="flex items-center">
-                              <span>{order.specialNote.substring(0, 15)}...</span>
+                              <span>
+                                {order.specialNote.substring(0, 15)}...
+                              </span>
                               <button className="ml-2 bg-gray-300 text-gray-700 px-2 py-1 rounded text-xs">
                                 See
                               </button>
@@ -522,7 +482,10 @@ const DeliveredOrdersPage: React.FC = () => {
                           </span>
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-blue-900 hover:bg-blue-950 text-white py-1 px-4 rounded focus:outline-none cursor-pointer" onClick={() => handleDeliveryDetailsView(order)}>
+                          <button
+                            className="bg-blue-900 hover:bg-blue-950 text-white py-1 px-4 rounded focus:outline-none cursor-pointer"
+                            onClick={() => handleDeliveryDetailsView(order, index)}
+                          >
                             View
                           </button>
                         </td>
@@ -598,6 +561,7 @@ const DeliveredOrdersPage: React.FC = () => {
             onClose={() => setListViewOpen(false)}
             orderDetails={selectedOrderItems}
             orderNumber={selectedOrderNumber ?? 0}
+            customerName={selectedOrderCustomerName ?? ""}
           />
 
           <ViewOrderDeliveryStatus
@@ -608,7 +572,6 @@ const DeliveredOrdersPage: React.FC = () => {
             deliveryPersonName={orderDeliveryPersonName}
             deliveryDate={orderDeliveryDate}
           />
-
 
           <Footer />
         </div>

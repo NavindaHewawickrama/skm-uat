@@ -12,8 +12,24 @@ type OrderType = {
   orderDate: string;
   paymentMethodType: string;
   totalAmount: number;
-  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
-  items: string | { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  orderedItems: {
+    itemCode: string;
+    description: string;
+    unitPrice: number;
+    quantity: string;
+    discountPercent: number;
+    total: number;
+  }[];
+  items:
+  | string
+  | {
+    itemCode: string;
+    description: string;
+    unitPrice: number;
+    quantity: string;
+    discountPercent: number;
+    total: number;
+  }[];
   specialNote: string;
   rejectReason: string | null;
   status: string;
@@ -25,11 +41,14 @@ type OrderType = {
   description?: string;
 };
 
-
-
-type ItemsType = { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }
-
-
+type ItemsType = {
+  itemCode: string;
+  description: string;
+  unitPrice: number;
+  quantity: string;
+  discountPercent: number;
+  total: number;
+};
 
 const RejectedOrdersPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
@@ -44,20 +63,57 @@ const RejectedOrdersPage: React.FC = () => {
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
   const [userName, setUserName] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
-  const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(null);
+  const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(
+    null
+  );
+  const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<
+    string | null
+  >(null);
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
+  // Fetch pending order data from API
+  useEffect(() => {
+    const fetchPendingOrderData = async () => {
+      try {
+        const response = await fetch(`/api/orders/pending`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw Error("Failed to fetch pending order data");
+        } else {
+          const data = await response.json();
+          //console.log(data);
+          setPendingOrders(data);
+          sessionStorage.setItem("notificationsData", JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+      }
+    };
+
+    fetchPendingOrderData();
+  }, []);
 
   useEffect(() => {
-    setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
-    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
-    const pendingOrderList = sessionStorage.getItem("notificationsData");
-    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+    setUserName(
+      sessionStorage.getItem("userName")
+        ? sessionStorage.getItem("userName")
+        : ""
+    );
+    setUserRoleType(
+      sessionStorage.getItem("userRoleName")
+        ? sessionStorage.getItem("userRoleName")
+        : ""
+    );
+    // const pendingOrderList = sessionStorage.getItem("notificationsData");
+    // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
 
   // Fetch rejected order data from API
   useEffect(() => {
     fetchRejectedOrdersData();
   }, []);
-
 
   const fetchRejectedOrdersData = async () => {
     try {
@@ -78,13 +134,14 @@ const RejectedOrdersPage: React.FC = () => {
     } catch (err) {
       console.error("Error fetching pending order data:", err);
       setError(
-        err instanceof Error ? err.message : "Failed to fetch pending order data"
+        err instanceof Error
+          ? err.message
+          : "Failed to fetch pending order data"
       );
     } finally {
       setLoading(false);
     }
   };
-
 
   // Filter orders based on search query
   const filteredOrders = useMemo(() => {
@@ -166,16 +223,18 @@ const RejectedOrdersPage: React.FC = () => {
     setSideNavOpen(!sideNavOpen);
   };
 
-  const handleItemDetailsView = (order: OrderType) => {
+  const handleItemDetailsView = (order: OrderType, index: number) => {
     //  console.log(order);
+    setSelectedRowIndex(index);
     if (Array.isArray(order.orderedItems)) {
       setSelectedOrder(order.orderedItems);
       setSelectedOrderNumber(order.orderNumber);
+      setSelectedOrderCustomerName(order.customerName);
     } else {
       setSelectedOrder([]);
     }
-    setListViewOpen(true)
-  }
+    setListViewOpen(true);
+  };
 
   // Handle entries per page change
   const handleEntriesChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -186,7 +245,12 @@ const RejectedOrdersPage: React.FC = () => {
   if (loading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
+        <AppBar
+          toggleSideNav={toggleSideNav}
+          userRole={userRoleType}
+          userName={userName}
+          notificationData={pendingOrders}
+        />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -206,7 +270,12 @@ const RejectedOrdersPage: React.FC = () => {
   if (error) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
+        <AppBar
+          toggleSideNav={toggleSideNav}
+          userRole={userRoleType}
+          userName={userName}
+          notificationData={pendingOrders}
+        />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
@@ -227,7 +296,12 @@ const RejectedOrdersPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
+      <AppBar
+        toggleSideNav={toggleSideNav}
+        userRole={userRoleType}
+        userName={userName}
+        notificationData={pendingOrders}
+      />
 
       {/* Main Content Area */}
       <div className="flex flex-1 overflow-hidden">
@@ -303,7 +377,12 @@ const RejectedOrdersPage: React.FC = () => {
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {currentOrders.map((order: OrderType, index) => (
-                      <tr key={index} className="hover:bg-gray-50">
+                      <tr key={index}
+                        className={`${selectedRowIndex === index
+                          ? "bg-blue-100 border-blue-300"
+                          : "hover:bg-gray-200"
+                          }`}
+                      >
                         <td className="px-4 py-3 border text-sm">
                           {order.orderNumber}
                         </td>
@@ -314,7 +393,14 @@ const RejectedOrdersPage: React.FC = () => {
                           {order.salesPersonName}
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.orderDate.split('T')[0]}
+                          {new Date(order.orderDate).toLocaleDateString(
+                            "en-US",
+                            {
+                              year: "numeric",
+                              month: "short",
+                              day: "2-digit",
+                            }
+                          )}
                         </td>
                         <td className="px-4 py-3 border text-sm text-right">
                           {typeof order.totalAmount === "number"
@@ -322,7 +408,10 @@ const RejectedOrdersPage: React.FC = () => {
                             : order.totalAmount}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
-                          <button className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer" onClick={() => handleItemDetailsView(order)}>
+                          <button
+                            className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer"
+                            onClick={() => handleItemDetailsView(order, index)}
+                          >
                             View
                           </button>
                         </td>
@@ -394,7 +483,13 @@ const RejectedOrdersPage: React.FC = () => {
               </div>
             </div>
           </div>
-          <ViewOrderEditPopupButton open={listViewOpen} onClose={() => setListViewOpen(false)} orderDetails={selectedOrder} orderNumber={selectedOrderNumber ?? 0} />
+          <ViewOrderEditPopupButton
+            open={listViewOpen}
+            onClose={() => setListViewOpen(false)}
+            orderDetails={selectedOrder}
+            orderNumber={selectedOrderNumber ?? 0}
+            customerName={selectedOrderCustomerName ?? ""}
+          />
           {/* Footer Component */}
           <Footer />
         </div>

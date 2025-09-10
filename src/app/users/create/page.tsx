@@ -78,15 +78,15 @@ type OrderType = {
     total: number;
   }[];
   items:
-    | string
-    | {
-        itemCode: string;
-        description: string;
-        unitPrice: number;
-        quantity: string;
-        discountPercent: number;
-        total: number;
-      }[];
+  | string
+  | {
+    itemCode: string;
+    description: string;
+    unitPrice: number;
+    quantity: string;
+    discountPercent: number;
+    total: number;
+  }[];
   specialNote: string;
   rejectReason: string | null;
   status: string;
@@ -129,6 +129,8 @@ const CreateUserPage: React.FC = () => {
   const [location, setLocation] = useState<string[]>([]);
   const [isActive, setIsActive] = useState(false);
   const [isMfaEnabled, setIsMfaEnabled] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+
   const [mfaType, setMfaType] = useState("");
   const [selectedForUpdatingUser, setSelectedForUpdatingUser] = useState(0);
   const [showAlert, setShowAlert] = useState(false);
@@ -138,12 +140,35 @@ const CreateUserPage: React.FC = () => {
   const [viewpw, setViewPw] = useState(false);
   const [viewpw1, setViewPw1] = useState(false);
   const [userRoleId, setUserRoleId] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
-
   // const userNameAppbar = sessionStorage.getItem("userName") || "Guest";
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
   const [userNameAppbar, setUserNameAppbar] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
+
+  // Fetch pending order data from API
+  useEffect(() => {
+    const fetchPendingOrderData = async () => {
+      try {
+        const response = await fetch(`/api/orders/pending`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw Error("Failed to fetch pending order data");
+        } else {
+          const data = await response.json();
+          //console.log(data);
+          setPendingOrders(data);
+          sessionStorage.setItem("notificationsData", JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+      }
+    };
+
+    fetchPendingOrderData();
+  }, []);
 
   useEffect(() => {
     setUserNameAppbar(
@@ -156,8 +181,8 @@ const CreateUserPage: React.FC = () => {
         ? sessionStorage.getItem("userRoleName")
         : ""
     );
-    const pendingOrderList = sessionStorage.getItem("notificationsData");
-    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+    // const pendingOrderList = sessionStorage.getItem("notificationsData");
+    // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
   const handleShowAlert = (
     type: React.SetStateAction<string>,
@@ -250,6 +275,7 @@ const CreateUserPage: React.FC = () => {
     setIsActive(false);
     setEditingUser(false);
   };
+
 
   const validateForm = (): boolean => {
     const newErrors: FormErrors = {};
@@ -529,7 +555,7 @@ const CreateUserPage: React.FC = () => {
 
         {/* Content Area */}
         <div
-          className="flex-1 overflow-auto p-6"
+          className="flex-1 overflow-auto p-6 h-screen"
           style={{ scrollbarWidth: "none", msOverflowStyle: "none" }}
         >
           <div className="bg-white p-6 rounded shadow lg:w-[75%]">
@@ -556,9 +582,8 @@ const CreateUserPage: React.FC = () => {
               </label>
               <input
                 type="text"
-                className={`w-full p-2 border ${
-                  errors.username ? "border-red-500" : "border-gray-300"
-                } rounded`}
+                className={`w-full p-2 border ${errors.username ? "border-red-500" : "border-gray-300"
+                  } rounded`}
                 placeholder="Username"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
@@ -605,9 +630,8 @@ const CreateUserPage: React.FC = () => {
                 <input
                   disabled={editingUser ? true : false}
                   type={viewpw1 ? "text" : "password"}
-                  className={`w-full p-2 border ${
-                    errors.password ? "border-red-500" : "border-gray-300"
-                  } ${editingUser ? "bg-gray-300" : "bg-white"} rounded`}
+                  className={`w-full p-2 border ${errors.password ? "border-red-500" : "border-gray-300"
+                    } ${editingUser ? "bg-gray-300" : "bg-white"} rounded`}
                   placeholder="Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -670,11 +694,10 @@ const CreateUserPage: React.FC = () => {
                 <input
                   disabled={editingUser ? true : false}
                   type={viewpw ? "text" : "password"}
-                  className={`w-full p-2 border ${
-                    errors.confirmPassword
-                      ? "border-red-500"
-                      : "border-gray-300"
-                  } ${editingUser ? "bg-gray-300" : "bg-white"} rounded`}
+                  className={`w-full p-2 border ${errors.confirmPassword
+                    ? "border-red-500"
+                    : "border-gray-300"
+                    } ${editingUser ? "bg-gray-300" : "bg-white"} rounded`}
                   placeholder="Re-Type Password"
                   value={reTypePassword}
                   onChange={(e) => setReTypePassword(e.target.value)}
@@ -737,9 +760,8 @@ const CreateUserPage: React.FC = () => {
               </label>
               <input
                 type="text"
-                className={`w-full p-2 border ${
-                  errors.firstName ? "border-red-500" : "border-gray-300"
-                } rounded`}
+                className={`w-full p-2 border ${errors.firstName ? "border-red-500" : "border-gray-300"
+                  } rounded`}
                 placeholder="First Name"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
@@ -756,9 +778,8 @@ const CreateUserPage: React.FC = () => {
               </label>
               <input
                 type="text"
-                className={`w-full p-2 border ${
-                  errors.lastName ? "border-red-500" : "border-gray-300"
-                } rounded`}
+                className={`w-full p-2 border ${errors.lastName ? "border-red-500" : "border-gray-300"
+                  } rounded`}
                 placeholder="Last Name"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
@@ -775,9 +796,8 @@ const CreateUserPage: React.FC = () => {
               </label>
               <div className="relative">
                 <select
-                  className={`w-full p-2 border ${
-                    errors.posName ? "border-red-500" : "border-gray-300"
-                  } rounded appearance-none`}
+                  className={`w-full p-2 border ${errors.posName ? "border-red-500" : "border-gray-300"
+                    } rounded appearance-none`}
                   // The value here needs to be the salesPersonCode that matches userData.posName (salesPersonName)
                   // value={userCreationDetails.salesPersons.find(sp => sp.salesPersonName === userData.posName)?.salesPersonCode || ""}
                   value={selectedSalesPerson}
@@ -824,9 +844,8 @@ const CreateUserPage: React.FC = () => {
               </label>
               <input
                 type="email"
-                className={`w-full p-2 border ${
-                  errors.email ? "border-red-500" : "border-gray-300"
-                } rounded`}
+                className={`w-full p-2 border ${errors.email ? "border-red-500" : "border-gray-300"
+                  } rounded`}
                 placeholder="Enter a valid e-mail"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -843,9 +862,8 @@ const CreateUserPage: React.FC = () => {
               </label>
               <input
                 type="text"
-                className={`w-full p-2 border ${
-                  errors.telephone ? "border-red-500" : "border-gray-300"
-                } rounded`}
+                className={`w-full p-2 border ${errors.telephone ? "border-red-500" : "border-gray-300"
+                  } rounded`}
                 placeholder="Enter a valid Number"
                 value={telephone}
                 onChange={(e) => setTelephone(e.target.value)}
@@ -862,9 +880,8 @@ const CreateUserPage: React.FC = () => {
               </label>
               <div className="relative">
                 <select
-                  className={`w-full p-2 border ${
-                    errors.role ? "border-red-500" : "border-gray-300"
-                  } rounded appearance-none`}
+                  className={`w-full p-2 border ${errors.role ? "border-red-500" : "border-gray-300"
+                    } rounded appearance-none`}
                   value={role}
                   onChange={(e) => setRole(parseInt(e.target.value))}
                 >
@@ -961,14 +978,13 @@ const CreateUserPage: React.FC = () => {
             <div className="flex flex-wrap gap-2">
               <button
                 disabled={isSaving}
-                className={`px-4 py-2 rounded font-medium transition duration-300 ${
-                  isSaving
-                    ? "bg-gray-400 cursor-not-allowed"
-                    : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
-                } text-white`}
+                className={`px-4 py-2 rounded font-medium transition duration-300 ${isSaving
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
+                  } text-white`}
                 onClick={editingUser ? handleUpdateUser : handleCreateUser}
               >
-                {isSaving ? "Saving..." : "Create / Update User"}
+                {isSaving ? "Processing..." : "Create / Update User"}
               </button>
               <button
                 className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600 cursor-pointer"

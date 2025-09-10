@@ -45,7 +45,7 @@ interface OrderItem {
   description: string;
   unitPrice: number;
   quantity: number;
-  discount: number;
+  discountPercent: number;
   total: number;
 }
 
@@ -76,11 +76,17 @@ interface SubstituteItem {
   unitPrice: number;
 }
 
+interface LocationWiseInventory {
+  locationCode: string;
+  inventory: number;
+}
+
 interface Item {
   itemCode: string;
   itemName: string;
   substituteItems: SubstituteItem[];
   unitprice: string;
+  locationWiseInventory?: LocationWiseInventory[];
 }
 
 interface Location {
@@ -109,20 +115,21 @@ const CreateOrderPage: React.FC = () => {
   const [paymentType, setPaymentType] = useState("");
   const [notes, setNotes] = useState("");
   const [total, setTotal] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
   const [orderTotal, setOrderTotal] = useState(0);
-  const [isSaving, setIsSaving] = useState(false);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
   const [locations, setLocations] = useState<Location[]>([]);
   const [customers, setCustomers] = useState<Customer[]>([]);
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null
   );
-  const [selectedCustomerDueAmount, setSelectedCustomerDueAmount] =
-    useState<number>(0);
+  const [selectedCustomerDueAmount, setSelectedCustomerDueAmount] = useState(0);
   //const [selectedCustomerTotal, setSelectedCustomerTotal] = useState<number>(0);
   const [customer, setCustomer] = useState<string>("");
   //const [paymentTypes, setPaymentTypes] = useState<Payment[]>([]);
   const [itemsList, setItemsList] = useState<Item[]>([]);
+  const [locationWiseItems, setLocationWiseItems] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState("");
   const [selectedItemName, setSelectedItemName] = useState("");
   const [selectedItemUnitPrice, setSelectedItemUnitPrice] = useState("");
@@ -131,6 +138,11 @@ const CreateOrderPage: React.FC = () => {
   const [substitutedItemsList, setSubstitutedItemsList] = useState<
     SubstituteItem[]
   >([]);
+  const [
+    selectedItemSelectedLocationStock,
+    setSelectedItemSelectedLocationStock,
+  ] = useState<number>(0);
+  // const [formattedAmount, setFormattedAmount] = useState("");
   const [loading, setLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
@@ -139,22 +151,87 @@ const CreateOrderPage: React.FC = () => {
   const [outstandingData, setOutstandingData] = useState<
     CustomerOutstandingData[]
   >([]);
+  const [isSaving, setIsSaving] = useState(false);
   const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
-  const locationOptions = locations.map((loc) => ({
-    value: loc.locationCode,
-    label: loc.locationName,
-  }));
+  const locationOptions = locations
+    .filter(
+      (loc) =>
+        loc.locationCode &&
+        loc.locationName &&
+        loc.locationCode.toString().trim() !== "" &&
+        loc.locationName.toString().trim() !== ""
+    )
+    .map((loc) => ({
+      value: loc.locationCode,
+      label: loc.locationName,
+    }));
 
-  const customerOptions = customers.map((customer) => ({
-    value: customer.customerCode,
-    label: customer.customerName,
-  }));
+  const customerOptions = customers
+    .filter(
+      (customer) =>
+        customer.customerCode &&
+        customer.customerName &&
+        customer.customerCode.toString().trim() !== "" &&
+        customer.customerName.toString().trim() !== ""
+    )
+    .map((customer) => ({
+      value: customer.customerCode,
+      label: customer.customerName,
+    }));
 
   useEffect(() => {
-    const pendingOrderList = sessionStorage.getItem("notificationsData");
-    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+    if (!location) {
+      setLocationWiseItems([]);
+      return;
+    }
+    setLocationWiseItems(
+      itemsList.filter(
+        (item) =>
+          Array.isArray(item.locationWiseInventory) &&
+          item.locationWiseInventory.some((inv) => inv.locationCode === location)
+      )
+    );
+  }, [location, itemsList]);
+
+  // useEffect(() => {
+  //   const formatted = Number(selectedCustomerDueAmount).toLocaleString("en-US", {
+  //     minimumFractionDigits: 2,
+  //     maximumFractionDigits: 2,
+  //   });
+  //   setFormattedAmount(formatted);
+  //   //setSelectedCustomerDueAmount(parseInt(formatted));
+  // }, [selectedCustomerDueAmount]);
+
+  // Fetch pending order data from API
+  useEffect(() => {
+    const fetchPendingOrderData = async () => {
+      try {
+        const response = await fetch(`/api/orders/pending`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw Error("Failed to fetch pending order data");
+        } else {
+          const data = await response.json();
+          //console.log(data);
+          setPendingOrders(data);
+          sessionStorage.setItem("notificationsData", JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+      }
+    };
+
+    fetchPendingOrderData();
+  }, []);
+
+  useEffect(() => {
+    // const pendingOrderList = sessionStorage.getItem("notificationsData");
+    // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
     setUserName(
       sessionStorage.getItem("userName")
         ? sessionStorage.getItem("userName")
@@ -162,11 +239,11 @@ const CreateOrderPage: React.FC = () => {
     );
   }, []);
 
-  // Add this in your component
   useEffect(() => {
     if (outstandingData.length > 0) {
       generatePDF();
     }
+    console.log(outstandingData);
   }, [outstandingData]);
 
   useEffect(() => {
@@ -245,6 +322,7 @@ const CreateOrderPage: React.FC = () => {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
+        //console.log(data);
         setItemsList(data);
       }
       setLoading(false);
@@ -285,7 +363,7 @@ const CreateOrderPage: React.FC = () => {
         description: selectedItemName,
         unitPrice: parseFloat(selectedItemUnitPrice),
         quantity: selectedItemQuantity,
-        discount: selectedItemDiscount,
+        discountPercent: selectedItemDiscount,
         total: calculateItemTotal(),
       };
 
@@ -309,6 +387,7 @@ const CreateOrderPage: React.FC = () => {
       setSelectedItemUnitPrice("");
       setSelectedItemQuantity(0);
       setSelectedItemDiscount(0);
+      setSelectedItemSelectedLocationStock(0);
     }
   };
 
@@ -324,9 +403,14 @@ const CreateOrderPage: React.FC = () => {
     // pdf.setFontSize(12);
     // pdf.text(selectedCustomer?.customerName || "", 105, 22, { align: "center" });
 
-    const currentDate = new Date().toLocaleDateString("en-US");
+    const currentDate = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+    });
     pdf.setFontSize(10);
     pdf.text(currentDate, 195, 15, { align: "right" });
+
 
     const tableColumn = [
       "Customer Name",
@@ -340,9 +424,18 @@ const CreateOrderPage: React.FC = () => {
       item.customerName,
       item.invoiceNumber,
       item.invoiceDate,
-      `${item.invoicedAmount.toFixed(2)}`,
-      `${item.pdcAmount.toFixed(2)}`,
-      `${item.dueAmount.toFixed(2)}`,
+      `${Number(item.invoicedAmount.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      `${Number(item.pdcAmount.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      `${Number(item.dueAmount.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
     ]);
 
     autoTable(pdf, {
@@ -375,13 +468,32 @@ const CreateOrderPage: React.FC = () => {
 
     const finalY = pdf.lastAutoTable?.finalY || 60;
     pdf.setFontSize(12);
-    pdf.text(`Total Outstanding: ${totalDue.toFixed(2)}`, 195, finalY + 10, {
-      align: "right",
-    });
+    pdf.text(
+      `Total Outstanding: ${Number(totalDue.toFixed(2)).toLocaleString(
+        "en-US",
+        {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }
+      )}`,
+      195,
+      finalY + 10,
+      {
+        align: "right",
+      }
+    );
     pdf.setFontSize(12);
-    pdf.text(`PDC Total: ${totalPDC.toFixed(2)}`, 195, finalY + 20, {
-      align: "right",
-    });
+    pdf.text(
+      `PDC Total: ${Number(totalPDC.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      195,
+      finalY + 20,
+      {
+        align: "right",
+      }
+    );
 
     const blob = pdf.output("blob");
     const url = URL.createObjectURL(blob);
@@ -389,8 +501,10 @@ const CreateOrderPage: React.FC = () => {
   };
 
   const handleViewDetails = async () => {
+    setIsLoading(true);
     if (!selectedCustomer) {
       handleShowAlert("error", "Please select a customer first");
+      setIsLoading(false);
       return;
     }
 
@@ -410,14 +524,18 @@ const CreateOrderPage: React.FC = () => {
       }
 
       const data = await response.json();
-      console.log("Fetched data:", data);
+      //console.log("Fetched data:", data);
       const transformedData: CustomerOutstandingData[] = data.map(
         (invoice: Invoice) => ({
           customerName: selectedCustomer.customerName,
           invoiceNumber: invoice.invoiceNumber,
           invoiceDate: invoice.invoiceDate
-            ? new Date(invoice.invoiceDate).toLocaleDateString("en-US")
-            : "",
+            ? new Date(invoice.invoiceDate).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "2-digit",
+            })
+            : "N/A",
           invoicedAmount: parseFloat(invoice.totalAmount?.toString() || "0"),
           pdcAmount: parseFloat(invoice.pdcAmount?.toString() || "0"),
           dueAmount: parseFloat(invoice.dueAmount?.toString() || "0"),
@@ -426,7 +544,7 @@ const CreateOrderPage: React.FC = () => {
 
       setOutstandingData(transformedData);
       setSelectedCustomerDueAmount(data.totalDueAmount);
-
+      //setFormattedAmount(data.totalDueAmount);
       handleShowAlert(
         "success",
         `Loaded ${transformedData.length} invoice record(s)`
@@ -439,6 +557,7 @@ const CreateOrderPage: React.FC = () => {
       );
       setOutstandingData([]);
     } finally {
+      setIsLoading(false);
       setIsLoadingInvoices(false);
     }
   };
@@ -464,14 +583,20 @@ const CreateOrderPage: React.FC = () => {
   };
 
   // Update current item field
-  const updateCurrentItem = (field: keyof OrderItem, value: string) => {
+  const updateCurrentItem = (name: string, value: string) => {
+    console.log("Updating item:", value, name);
     setSelectedItem(value);
     const selected = itemsList.find((item) => item.itemCode === value);
     if (selected) {
       setSelectedItemUnitPrice(selected.unitprice);
-      setSelectedItemName(selected.itemName);
-      console.log(selected.substituteItems);
-
+      setSelectedItemName(name);
+      setSelectedItemSelectedLocationStock(
+        selected.locationWiseInventory
+          ? selected.locationWiseInventory.find(
+            (loc) => loc.locationCode === location
+          )?.inventory || 0
+          : 0
+      );
       // Fix: Handle both single object and array cases
       if (selected.substituteItems) {
         if (Array.isArray(selected.substituteItems)) {
@@ -489,6 +614,14 @@ const CreateOrderPage: React.FC = () => {
   };
 
   const handleSave = async () => {
+    // const newData = {
+    //   customerCode: selectedCustomer?.customerCode,
+    //   locationCode: location,
+    //   paymentMethodCode: selectedCustomer?.paymentTermCode,
+    //   totalAmount: orderTotal,
+    //   items: orderItems,
+    // };
+    // console.log("Saving order data:", newData);
     try {
       setIsSaving(true);
 
@@ -632,43 +765,7 @@ const CreateOrderPage: React.FC = () => {
             <div className="bg-white p-6 rounded-md shadow-sm mb-4">
               <h2 className="text-lg font-bold mb-4">Order</h2>
               {/*Location*/}
-              {/* <div className="mb-4 w-[250px]">
-                <label className="block text-gray-700 font-medium mb-2">
-                  Location:
-                </label>
-                <div className="relative">
-                  <select
-                    className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                  >
-                    <option value="" disabled>
-                      Select a Location
-                    </option>
-                    {locations.map((loc, index) => (
-                      <option key={index} value={loc.locationCode}>
-                        {loc.locationName}
-                      </option>
-                    ))}
-                  </select>
 
-                  <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                    <svg
-                      className="h-4 w-4"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M19 9l-7 7-7-7"
-                      />
-                    </svg>
-                  </div>
-                </div>
-              </div> */}
               <div className="mb-4 w-[250px]">
                 <label className="block text-gray-700 font-medium mb-1.5">
                   Location:
@@ -696,35 +793,7 @@ const CreateOrderPage: React.FC = () => {
                   <label className="block text-gray-700 font-medium mb-2">
                     Customer:
                   </label>
-                  {/* <div className="relative">
-                    <select
-                      className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                      value={customer}
-                      onChange={(e) => handleCustomerChange(e.target.value)} // pass the code
-                    >
-                      <option value="">Select a customer</option>
-                      {customers.map((customer, index) => (
-                        <option value={customer.customerCode} key={index}>
-                          {customer.customerName}
-                        </option>
-                      ))}
-                    </select>
-                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div>
-                  </div> */}
+
                   <Select
                     className="w-full text-sm"
                     styles={{
@@ -754,15 +823,29 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
-                    value={selectedCustomerDueAmount}
+                    // value={Number(selectedCustomerDueAmount).toLocaleString('en-US', {
+                    //   minimumFractionDigits: 2,
+                    //   maximumFractionDigits: 2
+                    // })}
+                    value={Number(selectedCustomerDueAmount).toLocaleString(
+                      "en-US",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}
                     readOnly
                   />
                   <div className="flex justify-start mt-2">
                     <button
+                      disabled={isLoading}
                       onClick={handleViewDetails}
-                      className="bg-blue-900 text-white px-4 py-2 rounded hover:bg-blue-950 focus:outline-none cursor-pointer"
+                      className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${isLoading
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
+                        } text-white`}
                     >
-                      View Details
+                      {isLoading ? "Loading..." : "View Details"}
                     </button>
                   </div>
                 </div>
@@ -775,7 +858,14 @@ const CreateOrderPage: React.FC = () => {
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
                     //value={selectedCustomerTotal}
-                    value={orderTotal.toFixed(2)}
+                    //value={orderTotal.toFixed(2)}
+                    value={Number(orderTotal.toFixed(2)).toLocaleString(
+                      "en-US",
+                      {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      }
+                    )}
                     readOnly
                   />
                 </div>
@@ -882,7 +972,7 @@ const CreateOrderPage: React.FC = () => {
                       ))}
                     </select> */}
                     <Select<Item>
-                      options={itemsList}
+                      options={location ? locationWiseItems : itemsList}
                       className="w-full text-sm"
                       styles={{
                         control: (provided) => ({
@@ -897,7 +987,7 @@ const CreateOrderPage: React.FC = () => {
                         ) || null
                       }
                       onChange={(e) =>
-                        updateCurrentItem("itemCode", e?.itemCode || "")
+                        updateCurrentItem(e?.itemName || "", e?.itemCode || "")
                       }
                       getOptionLabel={(option) => option.itemCode}
                       getOptionValue={(option) => option.itemCode}
@@ -920,6 +1010,16 @@ const CreateOrderPage: React.FC = () => {
                       </svg>
                     </div> */}
                   </div>
+                  <label className="block text-blue-500 text-xs mt-2">
+                    Item:{" "}
+                    {selectedItemName ||
+                      "Select an item code to see the item name"}{" "}
+                    {location == ""
+                      ? "(Please select a location)"
+                      : selectedItemSelectedLocationStock > 0
+                        ? `(${selectedItemSelectedLocationStock} in stock)`
+                        : "(Out of stock)"}
+                  </label>
                 </div>
 
                 <div>
@@ -929,8 +1029,8 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                      // value={currentItem.itemName}
-                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
+                    // value={currentItem.itemName}
+                    // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
                       {substitutedItemsList?.length === 0 ? (
                         <option value="" disabled>
@@ -968,9 +1068,15 @@ const CreateOrderPage: React.FC = () => {
                     Unit Price:
                   </label>
                   <input
-                    type="number"
+                    type="text"
                     className="block w-full p-2 border border-gray-300 rounded"
-                    value={selectedItemUnitPrice}
+                    //  value={parseFloat(selectedItemUnitPrice)}
+                    value={Number(
+                      selectedItemUnitPrice
+                    ).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                     disabled
                   />
                 </div>
@@ -984,12 +1090,24 @@ const CreateOrderPage: React.FC = () => {
                   </label>
                   <input
                     type="number"
-                    min={0}
+                    //min={0}
                     className="block w-full p-2 border border-gray-300 rounded"
                     value={selectedItemQuantity}
-                    onChange={(e) =>
-                      setSelectedItemQuantity(parseInt(e.target.value))
-                    }
+                    // value={Number(selectedItemQuantity).toLocaleString('en-US', {
+                    //   minimumFractionDigits: 2,
+                    //   maximumFractionDigits: 2
+                    // })}
+                    // onChange={(e) => {
+                    //   const value = parseInt(e.target.value);
+                    //   if (value > selectedItemSelectedLocationStock) {
+                    //     handleShowAlert("error", "Please select a Quantity amout lower than stock amount");
+                    //   } else {
+                    //     setSelectedItemQuantity(value);
+                    //   }
+                    // }}
+                    onChange={(e) => {
+                      setSelectedItemQuantity(parseInt(e.target.value));
+                    }}
                   />
                 </div>
 
@@ -1015,9 +1133,15 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
-                    value={
+                    // value={
+                    //   calculateItemTotal() ? calculateItemTotal().toFixed(2) : 0
+                    // }
+                    value={Number(
                       calculateItemTotal() ? calculateItemTotal().toFixed(2) : 0
-                    }
+                    ).toLocaleString("en-US", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
                     readOnly
                   />
                 </div>
@@ -1073,16 +1197,30 @@ const CreateOrderPage: React.FC = () => {
                               {item.description}
                             </td>
                             <td className="py-2 px-4 border-b text-right">
-                              {item.unitPrice.toFixed(2)}
+                              {/* {item.unitPrice.toFixed(2)} */}
+                              {Number(item.unitPrice.toFixed(2)).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
                             </td>
                             <td className="py-2 px-4 border-b text-right">
                               {item.quantity}
                             </td>
                             <td className="py-2 px-4 border-b text-right">
-                              {item.discount.toFixed(2)}
+                              {item.discountPercent.toFixed(2)}
                             </td>
                             <td className="py-2 px-4 border-b text-right">
-                              {item.total.toFixed(2)}
+                              {/* {item.total.toFixed(2)} */}
+                              {Number(item.total.toFixed(2)).toLocaleString(
+                                "en-US",
+                                {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                }
+                              )}
                             </td>
                             <td className="py-2 px-4 border-b text-center">
                               <button
@@ -1135,7 +1273,14 @@ const CreateOrderPage: React.FC = () => {
                             colSpan={2}
                             className="py-2 px-4 border-b text-right"
                           >
-                            {orderTotal.toFixed(2)}
+                            {/* {orderTotal.toFixed(2)} */}
+                            {Number(orderTotal.toFixed(2)).toLocaleString(
+                              "en-US",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              }
+                            )}
                           </td>
                         </tr>
                       </tbody>
@@ -1148,16 +1293,14 @@ const CreateOrderPage: React.FC = () => {
               {orderItems.length > 0 && (
                 <div className="mt-6 flex justify-end">
                   <button
-                    onClick={handleSave}
                     disabled={isSaving}
-                    className={`px-6 py-2 rounded font-medium transition duration-300 ${
-                      isSaving
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                    } text-white`}
+                    onClick={handleSave}
+                    className={`px-6 py-2 rounded font-medium transition duration-300 ${isSaving
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                      } text-white`}
                   >
-                      {isSaving ? 'Saving...' : 'Save'}
-
+                    {isSaving ? "Saving..." : "Save"}
                   </button>
                 </div>
               )}

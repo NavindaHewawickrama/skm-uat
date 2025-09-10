@@ -7,6 +7,7 @@ import productImage from "../../../../public/images/products/pro1.png";
 import ImagePopup from "@/components/ImagePopup";
 import producctImage2 from "../../../../public/images/products/pro2.png";
 import { StaticImageData } from 'next/image';
+import Alert from "../../../components/Alert";
 
 interface Image {
   src: string;
@@ -82,12 +83,42 @@ const StockView = () => {
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
+  const [showAlert, setShowAlert] = useState(false);
+  const [alertMessage, setAlertMessage] = useState("");
+  const [alertType, setAlertType] = useState("");
+  const [loadingItemCode, setLoadingItemCode] = useState<string | null>(null);
+  const [loadingLocationCode, setLoadingLocationCode] = useState<string | null>(null);
+
+  // Fetch pending order data from API
+  useEffect(() => {
+    const fetchPendingOrderData = async () => {
+      try {
+        const response = await fetch(`/api/orders/pending`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw Error("Failed to fetch pending order data");
+        } else {
+          const data = await response.json();
+          //console.log(data);
+          setPendingOrders(data);
+          sessionStorage.setItem("notificationsData", JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+      }
+    };
+
+    fetchPendingOrderData();
+  }, []);
 
   useEffect(() => {
     setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
-    const pendingOrderList = sessionStorage.getItem("notificationsData");
-    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+    // const pendingOrderList = sessionStorage.getItem("notificationsData");
+    // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
 
   const defaultImage: Image = {
@@ -100,6 +131,16 @@ const StockView = () => {
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
+  };
+  const handleShowAlert = (type: string, message: string) => {
+    setAlertType(type);
+    setAlertMessage(message);
+    setShowAlert(true);
+
+    // Auto hide alert after 5 seconds
+    setTimeout(() => {
+      setShowAlert(false);
+    }, 5000);
   };
 
   // Fetch stock data from API
@@ -361,25 +402,70 @@ const StockView = () => {
     setEntriesPerPage(e.target.value);
   };
 
-  function handleViewImage(img: string | StaticImageData | undefined): void {
-    setOpenImagePopup(true);
+  const handleViewImage = async (itemNo: string, location: string) => {
+    // setOpenImagePopup(true);
 
-    if (typeof img === "string") {
-      const base64Image = `data:image/jpeg;base64,${img}`;
-      setSelectedProductImage({
-        src: base64Image,
-        width: 400,
-        height: 300,
+    // if (typeof img === "string") {
+    //   const base64Image = `data:image/jpeg;base64,${img}`;
+    //   setSelectedProductImage({
+    //     src: base64Image,
+    //     width: 400,
+    //     height: 300,
+    //   });
+    // } else if (img && typeof img === "object") {
+    //   // Handle StaticImageData - convert to Image format
+    //   setSelectedProductImage({
+    //     src: img.src,
+    //     width: img.width || 400,
+    //     height: img.height || 300,
+    //   });
+    // }
+    //console.log(itemCode);
+
+    setLoadingItemCode(itemNo);
+    setLoadingLocationCode(location);
+    try {
+      const response = await fetch(`/api/stock/viewImage?itemNo=${itemNo}`, {
+        method: "GET",
+        credentials: "include",
       });
-    } else if (img && typeof img === "object") {
-      // Handle StaticImageData - convert to Image format
-      setSelectedProductImage({
-        src: img.src,
-        width: img.width || 400,
-        height: img.height || 300,
-      });
+
+      if (!response.ok) {
+        handleShowAlert("error", "Failed to fetch product image");
+        throw new Error("Failed to fetch product image");
+      }
+
+      const text = await response.text();
+
+      if (!text) {
+        throw new Error("Empty response from server");
+      }
+
+      const data = JSON.parse(text);
+
+      setOpenImagePopup(true); // Only open popup on successful parse
+
+      if (typeof data === "string") {
+        const base64Image = `data:image/jpeg;base64,${data}`;
+        setSelectedProductImage({
+          src: base64Image,
+          width: 400,
+          height: 300,
+        });
+      } else if (data && typeof data === "object") {
+        setSelectedProductImage({
+          src: data.src,
+          width: data.width || 400,
+          height: data.height || 300,
+        });
+      }
+    } catch (error) {
+      console.error("Error fetching product image:", error);
+      handleShowAlert("error", "Failed to fetch product image");
+    } finally {
+      setLoadingItemCode(null);
+      setLoadingLocationCode(null);
     }
-    //console.log(img);
   }
 
   if (loading) {
@@ -429,7 +515,9 @@ const StockView = () => {
 
       <div className="flex flex-1 overflow-hidden">
         <SideNav isOpen={sideNavOpen} />
-
+        {showAlert && (
+          <Alert message={alertMessage} type={alertType} duration={5000} />
+        )}
         <div className="flex-1 flex flex-col overflow-hidden">
           <div className="flex-1 p-4 overflow-auto">
             {/* Table Controls */}
@@ -515,7 +603,9 @@ const StockView = () => {
                   {displayedItems.map((item, index) => (
                     <tr
                       key={`${item.itemCode}-${item.location}-${index}`}
-                      className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-01-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-02-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH-01-SKM" ? "bg-[#f2fa84]" : item.location === "WELISARA-WH-01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
+                      // className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-01-SKM" || "COLOMBO-RETAIL-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-02-SNS" || "COLOMBO-RETAIL-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH-01-SKM" || "WELISARA-WH01-SKM"? "bg-[#f2fa84]" : item.location === "WELISARA-WH-01-SNS" || "WELISARA-WH01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
+                      //   }`}
+                      className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH01-SKM" ? "bg-[#f2fa84]" : item.location === "WELISARA-WH01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
                         }`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 text-center">
@@ -544,11 +634,12 @@ const StockView = () => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         <button
-                          className="bg-blue-900 hover:bg-blue-950 text-white py-1 px-4 rounded focus:outline-none cursor-pointer"
-                          onClick={() =>
-                            handleViewImage(item.img || item.image)
-                          }
+                          className="bg-blue-900 hover:bg-blue-950 text-white py-1 px-4 rounded focus:outline-none cursor-pointer flex items-center justify-center gap-2"
+                          onClick={() => handleViewImage(item.itemCode, item.location)}
                         >
+                          {((loadingItemCode === item.itemCode) && (loadingLocationCode === item.location)) && (
+                            <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+                          )}
                           View
                         </button>
                       </td>

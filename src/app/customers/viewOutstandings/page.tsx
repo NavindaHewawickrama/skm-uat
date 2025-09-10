@@ -15,7 +15,14 @@ type OrderType = {
   orderDate: string;
   paymentMethodType: string;
   totalAmount: number;
-  orderedItems: { itemCode: string; description: string; unitPrice: number; quantity: string; discountPercent: number; total: number; }[];
+  orderedItems: {
+    itemCode: string;
+    description: string;
+    unitPrice: number;
+    quantity: string;
+    discountPercent: number;
+    total: number;
+  }[];
   specialNote: string;
   rejectReason: string | null;
   status: string;
@@ -50,7 +57,6 @@ interface Invoice {
   remainingAmount: number;
 }
 
-
 const OutstandingsPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -63,20 +69,55 @@ const OutstandingsPage: React.FC = () => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
-  const [outstandingInvoices, setOutstandingInvoices] = useState<CustomerOutstandingData[]>([]);
+  const [outstandingInvoices, setOutstandingInvoices] = useState<
+    CustomerOutstandingData[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
   const [userName, setUserName] = useState<string | null>(null);
   //const [loading, setLoading] = useState(true);
 
+  // Fetch pending order data from API
   useEffect(() => {
-    setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
-    setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
-    const pendingOrderList = sessionStorage.getItem("notificationsData");
-    setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
-    fetchUserCustomerDetails(sessionStorage.getItem("userRoleName") || "");
+    const fetchPendingOrderData = async () => {
+      try {
+        const response = await fetch(`/api/orders/pending`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw Error("Failed to fetch pending order data");
+        } else {
+          const data = await response.json();
+          //console.log(data);
+          setPendingOrders(data);
+          sessionStorage.setItem("notificationsData", JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+      }
+    };
+
+    fetchPendingOrderData();
   }, []);
 
-  const fetchUserCustomerDetails = async (userRole: string) => {
+  useEffect(() => {
+    setUserName(
+      sessionStorage.getItem("userName")
+        ? sessionStorage.getItem("userName")
+        : ""
+    );
+    setUserRoleType(
+      sessionStorage.getItem("userRoleName")
+        ? sessionStorage.getItem("userRoleName")
+        : ""
+    );
+    // const pendingOrderList = sessionStorage.getItem("notificationsData");
+    // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
+    fetchUserCustomerDetails();
+  }, []);
+
+  const fetchUserCustomerDetails = async () => {
     try {
       setIsLoading(true);
       const response = await fetch(`/api/orders/getCustomers`, {
@@ -106,7 +147,10 @@ const OutstandingsPage: React.FC = () => {
   // Filter invoices based on search query
   const filteredInvoices = outstandingInvoices.filter(
     (invoice) =>
-      invoice.invoiceNumber.toString().toLowerCase().includes(searchQuery.toLowerCase()) ||
+      invoice.invoiceNumber
+        .toString()
+        .toLowerCase()
+        .includes(searchQuery.toLowerCase()) ||
       invoice.customerName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
@@ -150,43 +194,65 @@ const OutstandingsPage: React.FC = () => {
       for (const customerCode of selectedCustomerCodes) {
         try {
           // Find customer name from customers list
-          const customer = customers.find(c => c.customerCode === customerCode);
-          const customerName = customer?.customerName || `Customer ${customerCode}`;
+          const customer = customers.find(
+            (c) => c.customerCode === customerCode
+          );
+          const customerName =
+            customer?.customerName || `Customer ${customerCode}`;
 
-          console.log(`Fetching invoices for customer: ${customerCode} (${customerName})`);
+          console.log(
+            `Fetching invoices for customer: ${customerCode} (${customerName})`
+          );
 
-          const response = await fetch(`/api/customerInvoice?customerCode=${customerCode}`, {
-            method: 'GET',
-            credentials: 'include',
-          });
+          const response = await fetch(
+            `/api/customerInvoice?customerCode=${customerCode}`,
+            {
+              method: "GET",
+              credentials: "include",
+            }
+          );
 
           if (!response.ok) {
-            throw new Error(`Failed to fetch invoices for customer ${customerCode}`);
+            throw new Error(
+              `Failed to fetch invoices for customer ${customerCode}`
+            );
           }
 
           const data = await response.json();
           console.log(`Fetched data for ${customerCode}:`, data);
 
           // Transform the data for this customer - now accessing the nested invoices array
-          const transformedData: CustomerOutstandingData[] = data.map((invoice: Invoice) => ({
-            customerName: customerName,
-            invoiceNumber: invoice.invoiceNumber,
-            invoiceDate: invoice.invoiceDate
-              ? new Date(invoice.invoiceDate).toLocaleDateString("en-US")
-              : "",
-            invoicedAmount: parseFloat(invoice.totalAmount?.toString() || "0"),
-            pdcAmount: parseFloat(invoice.pdcAmount?.toString() || "0"),
-            dueAmount: parseFloat(invoice.dueAmount?.toString() || "0"),
-          }));
+          const transformedData: CustomerOutstandingData[] = data.map(
+            (invoice: Invoice) => ({
+              customerName: customerName,
+              invoiceNumber: invoice.invoiceNumber,
+              invoiceDate: invoice.invoiceDate
+                ? new Date(invoice.invoiceDate).toLocaleDateString("en-US", {
+                  year: "numeric",
+                  month: "short",
+                  day: "2-digit",
+                })
+                : "",
+              invoicedAmount: parseFloat(
+                invoice.totalAmount?.toString() || "0"
+              ),
+              pdcAmount: parseFloat(invoice.pdcAmount?.toString() || "0"),
+              dueAmount: parseFloat(invoice.dueAmount?.toString() || "0"),
+            })
+          );
 
           // Add to the accumulated data
           allInvoiceData = [...allInvoiceData, ...transformedData];
           successCount++;
 
-          console.log(`Successfully processed ${transformedData.length} invoices for ${customerName}`);
-
+          console.log(
+            `Successfully processed ${transformedData.length} invoices for ${customerName}`
+          );
         } catch (customerError) {
-          console.error(`Error fetching data for customer ${customerCode}:`, customerError);
+          console.error(
+            `Error fetching data for customer ${customerCode}:`,
+            customerError
+          );
           errorCount++;
         }
       }
@@ -197,15 +263,23 @@ const OutstandingsPage: React.FC = () => {
 
       // Show success/error message
       if (successCount > 0 && errorCount === 0) {
-        handleShowAlert("success", `Successfully loaded ${allInvoiceData.length} invoice records from ${successCount} customer(s)`);
+        handleShowAlert(
+          "success",
+          `Successfully loaded ${allInvoiceData.length} invoice records from ${successCount} customer(s)`
+        );
       } else if (successCount > 0 && errorCount > 0) {
-        handleShowAlert("warning", `Loaded ${allInvoiceData.length} invoice records from ${successCount} customer(s). Failed to load data for ${errorCount} customer(s)... This may be due to missing invoices for that customer`);
+        handleShowAlert(
+          "warning",
+          `Loaded ${allInvoiceData.length} invoice records from ${successCount} customer(s). Failed to load data for ${errorCount} customer(s)... This may be due to missing invoices for that customer`
+        );
       } else {
-        handleShowAlert("error", `Failed to load data for all ${errorCount} selected customer(s)... This may be due to missing invoices for that customer`);
+        handleShowAlert(
+          "error",
+          `Failed to load data for all ${errorCount} selected customer(s)... This may be due to missing invoices for that customer`
+        );
       }
-
     } catch (error) {
-      console.error('Error in handleAddCustomers:', error);
+      console.error("Error in handleAddCustomers:", error);
       handleShowAlert("error", "Failed to fetch customer invoice data");
     } finally {
       setIsLoading(false);
@@ -235,7 +309,11 @@ const OutstandingsPage: React.FC = () => {
     // pdf.setFontSize(12);
     // pdf.text(selectedCustomer?.customerName || "", 105, 22, { align: "center" });
 
-    const currentDate = new Date().toLocaleDateString("en-US");
+    const currentDate = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "2-digit",
+    });
     pdf.setFontSize(10);
     pdf.text(currentDate, 195, 15, { align: "right" });
 
@@ -250,10 +328,20 @@ const OutstandingsPage: React.FC = () => {
     const tableRows = outstandingInvoices.map((item) => [
       item.customerName,
       item.invoiceNumber,
-      item.invoiceDate,
-      `${item.invoicedAmount.toFixed(2)}`,
-      `${item.pdcAmount.toFixed(2)}`,
-      `${item.dueAmount.toFixed(2)}`,
+      item.invoiceDate || "N/A",
+      `${Number(item.invoicedAmount.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      `${Number(item.pdcAmount.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+
+      `${Number(item.dueAmount.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
     ]);
 
     autoTable(pdf, {
@@ -302,15 +390,18 @@ const OutstandingsPage: React.FC = () => {
   if (isLoading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
-        <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
+        <AppBar
+          toggleSideNav={toggleSideNav}
+          userRole={userRoleType}
+          userName={userName}
+          notificationData={pendingOrders}
+        />
         <div className="flex flex-1 overflow-hidden">
           <SideNav isOpen={sideNavOpen} />
           <div className="flex-1 flex items-center justify-center">
             <div className="text-center">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto"></div>
-              <p className="mt-4 text-lg text-gray-600">
-                Loading data...
-              </p>
+              <p className="mt-4 text-lg text-gray-600">Loading data...</p>
             </div>
           </div>
         </div>
@@ -322,7 +413,12 @@ const OutstandingsPage: React.FC = () => {
   return (
     <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
       {/* App Bar */}
-      <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
+      <AppBar
+        toggleSideNav={toggleSideNav}
+        userRole={userRoleType}
+        userName={userName}
+        notificationData={pendingOrders}
+      />
 
       {/* Alert Component */}
       {showAlert && (
@@ -340,14 +436,17 @@ const OutstandingsPage: React.FC = () => {
             {/* Outstandings Card */}
             <div className="bg-white p-6 rounded-md shadow-sm mb-4">
               <div className="bg-gray-100 rounded-lg shadow-sm p-6 mb-6 w-full md:w-1/2 sm:w-full h-[50%]">
-                <h2 className="text-xl font-bold mb-6">Get Customer Outstanding Invoices</h2>
+                <h2 className="text-xl font-bold mb-6">
+                  Get Customer Outstanding Invoices
+                </h2>
                 <div className="flex justify-start mb-6">
                   <button
-                    className={`bg-green-500 w-[50%] md:w-[50%] sm:w-full text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none cursor-pointer ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    className={`bg-green-500 w-[50%] md:w-[50%] sm:w-full text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none cursor-pointer ${isLoading ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                     onClick={handleOpenCustomerPopup}
                     disabled={isLoading}
                   >
-                    {isLoading ? 'Loading...' : '+ Select Customers'}
+                    {isLoading ? "Loading..." : "+ Select Customers"}
                   </button>
                 </div>
                 {isLoading && (
@@ -363,24 +462,42 @@ const OutstandingsPage: React.FC = () => {
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg border-2 border-blue-200 shadow-sm">
                     <div className="flex flex-col md:flex-row justify-between items-start md:items-center space-y-2 md:space-y-0">
                       <div className="flex flex-col">
-                        <span className="text-lg font-semibold text-gray-700">Outstanding Summary</span>
+                        <span className="text-lg font-semibold text-gray-700">
+                          Outstanding Summary
+                        </span>
                         <div className="flex flex-wrap gap-4 mt-2">
                           <div>
-                            <span className="text-sm text-gray-600">Total Due Amount: </span>
+                            <span className="text-sm text-gray-600">
+                              Total Due Amount:{" "}
+                            </span>
                             <span className="font-bold text-blue-700 text-lg">
-                              LKR {totalDueAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                              LKR{" "}
+                              {totalDueAmount.toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
                             </span>
                           </div>
                           <div>
-                            <span className="text-sm text-gray-600">Total Invoices: </span>
+                            <span className="text-sm text-gray-600">
+                              Total Invoices:{" "}
+                            </span>
                             <span className="font-semibold text-indigo-700">
                               {outstandingInvoices.length}
                             </span>
                           </div>
                           <div>
-                            <span className="text-sm text-gray-600">Unique Customers: </span>
+                            <span className="text-sm text-gray-600">
+                              Unique Customers:{" "}
+                            </span>
                             <span className="font-semibold text-indigo-700">
-                              {new Set(outstandingInvoices.map(inv => inv.customerName)).size}
+                              {
+                                new Set(
+                                  outstandingInvoices.map(
+                                    (inv) => inv.customerName
+                                  )
+                                ).size
+                              }
                             </span>
                           </div>
                         </div>
@@ -418,7 +535,9 @@ const OutstandingsPage: React.FC = () => {
                       <span className="mr-2">Show</span>
                       <select
                         value={entriesPerPage}
-                        onChange={(e) => setEntriesPerPage(Number(e.target.value))}
+                        onChange={(e) =>
+                          setEntriesPerPage(Number(e.target.value))
+                        }
                         className="border rounded px-2 py-1"
                       >
                         <option value={10}>10</option>
@@ -468,7 +587,10 @@ const OutstandingsPage: React.FC = () => {
                       </thead>
                       <tbody className="divide-y divide-gray-200">
                         {currentInvoices.map((invoice, index) => (
-                          <tr key={`${invoice.customerName}-${invoice.invoiceNumber}-${index}`} className="hover:bg-gray-50">
+                          <tr
+                            key={`${invoice.customerName}-${invoice.invoiceNumber}-${index}`}
+                            className="hover:bg-gray-50"
+                          >
                             <td className="px-4 py-3 border text-sm">
                               {invoice.customerName}
                             </td>
@@ -479,13 +601,28 @@ const OutstandingsPage: React.FC = () => {
                               {invoice.invoiceDate}
                             </td>
                             <td className="px-4 py-3 border text-sm text-right">
-                              {invoice.invoicedAmount.toFixed(2)}
+                              {Number(
+                                invoice.invoicedAmount.toFixed(2)
+                              ).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
                             </td>
                             <td className="px-4 py-3 border text-sm text-right">
-                              {invoice.pdcAmount.toFixed(2)}
+                              {Number(
+                                invoice.pdcAmount.toFixed(2)
+                              ).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
                             </td>
                             <td className="px-4 py-3 border text-sm text-right font-medium">
-                              {invoice.dueAmount.toFixed(2)}
+                              {Number(
+                                invoice.dueAmount.toFixed(2)
+                              ).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
                             </td>
                           </tr>
                         ))}
@@ -498,8 +635,8 @@ const OutstandingsPage: React.FC = () => {
                     <div className="flex justify-between items-center mt-4">
                       <div className="text-sm text-gray-600">
                         Showing {indexOfFirstInvoice + 1} to{" "}
-                        {Math.min(indexOfLastInvoice, filteredInvoices.length)} of{" "}
-                        {filteredInvoices.length} entries
+                        {Math.min(indexOfLastInvoice, filteredInvoices.length)}{" "}
+                        of {filteredInvoices.length} entries
                       </div>
                       <div className="flex space-x-1">
                         <button
@@ -508,34 +645,37 @@ const OutstandingsPage: React.FC = () => {
                           }
                           disabled={currentPage === 1}
                           className={`px-3 py-1 rounded ${currentPage === 1
-                            ? "bg-gray-200 cursor-not-allowed"
-                            : "bg-blue-600 text-white hover:bg-blue-700"
+                              ? "bg-gray-200 cursor-not-allowed"
+                              : "bg-blue-600 text-white hover:bg-blue-700"
                             }`}
                         >
                           Previous
                         </button>
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map(
-                          (pageNumber) => (
-                            <button
-                              key={pageNumber}
-                              onClick={() => setCurrentPage(pageNumber)}
-                              className={`px-3 py-1 rounded ${currentPage === pageNumber
+                        {Array.from(
+                          { length: totalPages },
+                          (_, i) => i + 1
+                        ).map((pageNumber) => (
+                          <button
+                            key={pageNumber}
+                            onClick={() => setCurrentPage(pageNumber)}
+                            className={`px-3 py-1 rounded ${currentPage === pageNumber
                                 ? "bg-blue-700 text-white"
                                 : "bg-blue-600 text-white hover:bg-blue-700"
-                                }`}
-                            >
-                              {pageNumber}
-                            </button>
-                          )
-                        )}
+                              }`}
+                          >
+                            {pageNumber}
+                          </button>
+                        ))}
                         <button
                           onClick={() =>
-                            setCurrentPage(Math.min(totalPages, currentPage + 1))
+                            setCurrentPage(
+                              Math.min(totalPages, currentPage + 1)
+                            )
                           }
                           disabled={currentPage === totalPages}
                           className={`px-3 py-1 rounded ${currentPage === totalPages
-                            ? "bg-gray-200 cursor-not-allowed"
-                            : "bg-blue-600 text-white hover:bg-blue-700"
+                              ? "bg-gray-200 cursor-not-allowed"
+                              : "bg-blue-600 text-white hover:bg-blue-700"
                             }`}
                         >
                           Next
@@ -549,7 +689,10 @@ const OutstandingsPage: React.FC = () => {
               {/* No data message */}
               {outstandingInvoices.length === 0 && !isLoading && (
                 <div className="text-center py-8 text-gray-500">
-                  <p>No outstanding invoices loaded. Please select customers to view their invoice data.</p>
+                  <p>
+                    No outstanding invoices loaded. Please select customers to
+                    view their invoice data.
+                  </p>
                 </div>
               )}
             </div>
