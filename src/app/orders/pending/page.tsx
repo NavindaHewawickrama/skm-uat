@@ -5,7 +5,6 @@ import SideNav from "@/components/Sidenav";
 import Footer from "@/components/Footer";
 import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 import ViewStatusPopup from "@/components/ViewStatusPopup";
-import { MessageCircle, X } from 'lucide-react';
 
 type OrderforStatus = {
   orderNumber: string;
@@ -51,7 +50,6 @@ type OrderType = {
   trackingNumber: string | null;
   rejectedReason: string;
   description?: string;
-  location: string | null;
 };
 
 type ItemsType = {
@@ -86,8 +84,31 @@ const PendingOrdersPage: React.FC = () => {
   const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<
     string | null
   >(null);
-  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
+  const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
+  // Fetch pending order data from API
+  useEffect(() => {
+    const fetchPendingOrderData = async () => {
+      try {
+        const response = await fetch(`/api/orders/pending`, {
+          method: "GET",
+          credentials: "include",
+        });
 
+        if (!response.ok) {
+          throw Error("Failed to fetch pending order data");
+        } else {
+          const data = await response.json();
+          //console.log(data);
+          setPendingOrders(data);
+          sessionStorage.setItem("notificationsData", JSON.stringify(data));
+        }
+      } catch (err) {
+        console.error("Error fetching pending order data:", err);
+      }
+    };
+
+    fetchPendingOrderData();
+  }, []);
 
   useEffect(() => {
     setUserName(
@@ -121,8 +142,6 @@ const PendingOrdersPage: React.FC = () => {
           const data = await response.json();
           //console.log(data);
           setNotificationOrders(data);
-          setPendingOrders(data);
-          sessionStorage.setItem("notificationsData", JSON.stringify(data));
         }
       } catch (err) {
         console.error("Error fetching pending order data:", err);
@@ -221,7 +240,7 @@ const PendingOrdersPage: React.FC = () => {
 
   const handleItemDetailsView = (order: OrderType, index: number) => {
     //console.log(order);
-   // setSelectedRowIndex(index);
+    setSelectedRowIndex(index);
     // Changed from order.items to order.orderedItems
     if (Array.isArray(order.orderedItems)) {
       setSelectedOrderItems(order.orderedItems);
@@ -240,7 +259,7 @@ const PendingOrdersPage: React.FC = () => {
   };
 
   const handleStatus = (order: OrderforStatus, index: number) => {
-   // setSelectedRowIndex(index);
+    setSelectedRowIndex(index);
     setSelectedOrderForStatus(order);
     setStatusViewOpen(true);
     // console.log(order);
@@ -356,10 +375,6 @@ const PendingOrdersPage: React.FC = () => {
                       <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                         Order No
                       </th>
-                      {userRoleType?.toLowerCase() === "admin" && (
-                        <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
-                          Order Location
-                        </th>)}
                       <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                         Customer
                       </th>
@@ -392,19 +407,14 @@ const PendingOrdersPage: React.FC = () => {
                   <tbody className="divide-y divide-gray-200">
                     {currentOrders.map((order, index) => (
                       <tr key={index}
-                        // className={`${selectedRowIndex === index
-                        //   ? "bg-blue-100 border-blue-300"
-                        //   : "hover:bg-gray-200"
-                        //   }`}
+                        className={`${selectedRowIndex === index
+                          ? "bg-blue-100 border-blue-300"
+                          : "hover:bg-gray-200"
+                          }`}
                       >
                         <td className="px-4 py-3 border text-sm">
                           {order.orderNumber}
                         </td>
-                        {userRoleType?.toLowerCase() === "admin" && (
-                          <td className="px-4 py-3 border text-sm">
-                            {order.location ? order.location : "N/A"}
-                          </td>
-                        )}
                         <td className="px-4 py-3 border text-sm">
                           {order.customerName}
                         </td>
@@ -422,8 +432,7 @@ const PendingOrdersPage: React.FC = () => {
                           )}
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {/* {order.paymentMethodType} */}
-                          Default
+                          {order.paymentMethodType}
                         </td>
                         <td className="px-4 py-3 border text-sm text-right">
                           {/* {order.totalAmount.toFixed(2)} */}
@@ -444,40 +453,7 @@ const PendingOrdersPage: React.FC = () => {
                           </button>
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {/* {order.specialNote} */}
-
-                          {order.specialNote && order.specialNote.trim() !== '' ? (
-                            <div className="flex items-center justify-center">
-                              <button
-                                onClick={() => setSelectedOrderId(order.orderNumber)}
-                                className="text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
-                                title="View special note"
-                              >
-                                <MessageCircle size={18} />
-                              </button>
-
-                            </div>
-                          ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
-
-                          {selectedOrderId === order.orderNumber && (
-                            <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-brightness-50 overflow-auto">
-                              <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 relative">
-                                <button
-                                  onClick={() => setSelectedOrderId(null)}
-                                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 cursor-pointer"
-                                >
-                                  <X size={20} />
-                                </button>
-                                <h3 className="text-lg font-semibold mb-3">Special Note</h3>
-                                <p className="text-gray-700 text-sm leading-relaxed">
-                                  {order.specialNote}
-                                </p>
-                              </div>
-                            </div>
-                          )}
-
+                          {order.specialNote}
                         </td>
                         <td className="px-4 py-3 border text-sm">
                           <span

@@ -5,7 +5,6 @@ import SideNav from "@/components/Sidenav";
 import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
 import Footer from "@/components/Footer";
 import ViewOrderDeliveryStatus from "@/components/ViewOrderDeliveryStatus";
-import { MessageCircle, X } from 'lucide-react';
 
 type OrderType = {
   orderNumber: number;
@@ -39,8 +38,6 @@ type OrderType = {
   deliveryDate: string | null;
   invoicedItems: string | null;
   trackingNumber: string | null;
-  invoiceNumber: string | null;
-  location: string | null; // Optional field for order location
 };
 
 type ItemsType = {
@@ -72,11 +69,9 @@ const DeliveredOrdersPage: React.FC = () => {
   const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(
     null
   );
-  const [selectedOrderInvoiceNumber, setSelectedOrderInvoiceNumber] = useState<string | null>(null);
   const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<
     string | null
   >(null);
-  const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
   // Fetch pending order data from API
   useEffect(() => {
@@ -122,8 +117,6 @@ const DeliveredOrdersPage: React.FC = () => {
     fetchDeliveredOrders();
   }, []);
 
-
-
   const fetchDeliveredOrders = async () => {
     try {
       setLoading(true);
@@ -137,7 +130,7 @@ const DeliveredOrdersPage: React.FC = () => {
         throw Error("Failed to fetch pending order data");
       } else {
         const data = await response.json();
-        console.log(data);
+        //console.log(data);
         setDeliveredOrders(data);
       }
     } catch (err) {
@@ -245,7 +238,6 @@ const DeliveredOrdersPage: React.FC = () => {
       setSelectedOrderItems(order.invoicedItems);
       setSelectedOrderNumber(order.orderNumber);
       setSelectedOrderCustomerName(order.customerName);
-      setSelectedOrderInvoiceNumber(order.invoiceNumber);
     } else {
       setSelectedOrderItems([]);
     }
@@ -381,10 +373,6 @@ const DeliveredOrdersPage: React.FC = () => {
                       <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                         Order No
                       </th>
-                      {userRoleType?.toLowerCase() === "admin" && (
-                        <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
-                          Order Location
-                        </th>)}
                       <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                         Customer
                       </th>
@@ -428,11 +416,6 @@ const DeliveredOrdersPage: React.FC = () => {
                         <td className="px-4 py-3 border text-sm">
                           {order.orderNumber}
                         </td>
-                        {userRoleType?.toLowerCase() === "admin" && (
-                          <td className="px-4 py-3 border text-sm">
-                            {order.location ? order.location : "N/A"}
-                          </td>
-                        )}
                         <td className="px-4 py-3 border text-sm">
                           {order.customerName}
                         </td>
@@ -450,8 +433,7 @@ const DeliveredOrdersPage: React.FC = () => {
                           )}
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {/* {order.paymentMethodType} */}
-                          Default
+                          {order.paymentMethodType}
                         </td>
                         <td className="px-4 py-3 border text-sm text-right">
                           {typeof order.totalAmount === "number"
@@ -480,36 +462,18 @@ const DeliveredOrdersPage: React.FC = () => {
                           </button>
                         </td>
                         <td className="px-4 py-3 border text-sm">
-                          {order.specialNote && order.specialNote.trim() !== '' ? (
-                            <div className="flex items-center justify-center">
-                              <button
-                                onClick={() => setSelectedOrderId(order.orderNumber)}
-                                className="text-blue-600 hover:text-blue-800 transition-colors cursor-pointer"
-                                title="View special note"
-                              >
-                                <MessageCircle size={18} />
+                          {order.specialNote &&
+                            order.specialNote.length > 15 ? (
+                            <div className="flex items-center">
+                              <span>
+                                {order.specialNote.substring(0, 15)}...
+                              </span>
+                              <button className="ml-2 bg-gray-300 text-gray-700 px-2 py-1 rounded text-xs">
+                                See
                               </button>
-
                             </div>
                           ) : (
-                            <span className="text-gray-400">-</span>
-                          )}
-
-                          {selectedOrderId === order.orderNumber && (
-                            <div className="fixed inset-0 flex items-center justify-center z-50 backdrop-brightness-50 overflow-auto">
-                              <div className="bg-white rounded-lg p-6 max-w-md w-full mx-4 relative">
-                                <button
-                                  onClick={() => setSelectedOrderId(null)}
-                                  className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 cursor-pointer"
-                                >
-                                  <X size={20} />
-                                </button>
-                                <h3 className="text-lg font-semibold mb-3">Special Note</h3>
-                                <p className="text-gray-700 text-sm leading-relaxed">
-                                  {order.specialNote}
-                                </p>
-                              </div>
-                            </div>
+                            order.specialNote
                           )}
                         </td>
                         <td className="px-4 py-3 border text-sm">
@@ -594,18 +558,10 @@ const DeliveredOrdersPage: React.FC = () => {
           {/* Footer Component */}
           <ViewOrderEditPopupButton
             open={listViewOpen}
-            // onClose={() => {
-            //   setListViewOpen(false),
-            //     setSelectedOrderInvoiceNumber("")
-            // }}
-            onClose={() => {
-              setListViewOpen(false);
-              setSelectedOrderInvoiceNumber("");
-            }}
+            onClose={() => setListViewOpen(false)}
             orderDetails={selectedOrderItems}
             orderNumber={selectedOrderNumber ?? 0}
             customerName={selectedOrderCustomerName ?? ""}
-            invoiceNumber={selectedOrderInvoiceNumber ?? ""}
           />
 
           <ViewOrderDeliveryStatus
