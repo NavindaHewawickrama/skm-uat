@@ -164,7 +164,8 @@ const PendingOrdersPage: React.FC = () => {
       (order) =>
         // order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
         order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.salesPersonName.toLowerCase().includes(searchQuery.toLowerCase())
+        order.salesPersonName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        order.orderNumber.toString().includes(searchQuery)
     );
   }, [pendingOrders, searchQuery]);
 
