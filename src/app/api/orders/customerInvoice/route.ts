@@ -5,7 +5,7 @@ import baseUrl from '../../../config';
 interface Invoice {
     invoiceNo: string;
     orderNo: string;
-    invoiceDate: string;
+    postedDate: string;
     pdcAmount: number;
     dueAmount: number;
     totalAmount: number;
@@ -56,12 +56,12 @@ export async function GET(request: Request) {
 
         // Transform the invoices while preserving the original structure
         const transformedInvoices = data.invoices?.map((invoice: Invoice) => ({
-            invoiceNo: invoice.invoiceNo,
-            orderNo: invoice.orderNo,
-            invoiceDate: invoice.invoiceDate,
-            pdcAmount: invoice.pdcAmount,
-            dueAmount: invoice.dueAmount,
-            totalAmount: invoice.totalAmount,
+            // invoiceNo: invoice.invoiceNo,
+            // orderNo: invoice.orderNo,
+            // invoiceDate: invoice.postedDate,
+            // pdcAmount: invoice.pdcAmount,
+            // dueAmount: invoice.dueAmount,
+            // totalAmount: invoice.totalAmount,
             //remainigAmount: invoice.remainingAmount,
         })) || [];
 
@@ -70,7 +70,7 @@ export async function GET(request: Request) {
             customerNo: data.customerNo,
             totalDueAmount: data.totalDueAmount,
             totalPdcAmount: data.totalPdcAmount,
-            invoices: transformedInvoices
+            //invoices: transformedInvoices
         };
 
         return NextResponse.json(responseData, { status: 200 });

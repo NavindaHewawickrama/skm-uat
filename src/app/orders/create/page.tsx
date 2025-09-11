@@ -61,7 +61,7 @@ interface CustomerOutstandingData {
   balanceBeforePDCs: number,
   releasedPDCs: number,
   balanceAfterPDCs: number,
-
+  orderDate: string;
 }
 
 interface Customer {
@@ -118,6 +118,7 @@ interface Invoice {
   balanceBeforePDCs: number;
   releasePDCs: number;
   balanceAfterPDCs: number;
+  orderDate: string;
 }
 
 const CreateOrderPage: React.FC = () => {
@@ -420,6 +421,7 @@ const CreateOrderPage: React.FC = () => {
 
     const tableColumn = [
       "Posting Date",
+      "Order Date",
       "Customer Name",
       "Invoice Number",
       "Invoiced Amount",
@@ -430,6 +432,7 @@ const CreateOrderPage: React.FC = () => {
     ];
     const tableRows = outstandingData.map((item) => [
       item.invoiceDate,
+      item.orderDate,
       item.customerName,
       item.invoiceNumber,
       `${Number(item.invoicedAmount.toFixed(2)).toLocaleString("en-US", {
@@ -459,7 +462,7 @@ const CreateOrderPage: React.FC = () => {
       body: tableRows,
       startY: 25,
       theme: "grid",
-      styles: { fontSize: 9, cellPadding: 2 },
+      styles: { fontSize: 9, cellPadding: 1.5 },
       headStyles: {
         fillColor: [200, 200, 200],
         textColor: [0, 0, 0],
@@ -541,13 +544,20 @@ const CreateOrderPage: React.FC = () => {
       }
 
       const data = await response.json();
-      //console.log("Fetched data:", data);
+      console.log("Fetched data:", data);
       const transformedData: CustomerOutstandingData[] = data.map(
         (invoice: Invoice) => ({
           customerName: selectedCustomer.customerName,
           invoiceNumber: invoice.invoiceNumber,
           invoiceDate: invoice.invoiceDate
             ? new Date(invoice.invoiceDate).toLocaleDateString("en-US", {
+              year: "numeric",
+              month: "short",
+              day: "2-digit",
+            })
+            : "N/A",
+          orderdDate: invoice.orderDate
+            ? new Date(invoice.orderDate).toLocaleDateString("en-US", {
               year: "numeric",
               month: "short",
               day: "2-digit",

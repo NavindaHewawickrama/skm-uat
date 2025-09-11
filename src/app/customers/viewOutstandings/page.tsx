@@ -45,6 +45,11 @@ interface CustomerOutstandingData {
   pdcAmount: number;
   dueAmount: number;
   remainingAmount: number;
+  originalAmount: number,
+  orderNo: string,
+  balanceBeforePDCs: number,
+  releasedPDCs: number,
+  balanceAfterPDCs: number,
 }
 
 interface Invoice {
@@ -55,7 +60,13 @@ interface Invoice {
   dueAmount: number;
   totalAmount: number;
   remainingAmount: number;
+  invoiceNo: string;
+  originalAmount: number;
+  balanceBeforePDCs: number;
+  releasePDCs: number;
+  balanceAfterPDCs: number;
 }
+
 
 const OutstandingsPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
@@ -238,6 +249,11 @@ const OutstandingsPage: React.FC = () => {
               ),
               pdcAmount: parseFloat(invoice.pdcAmount?.toString() || "0"),
               dueAmount: parseFloat(invoice.dueAmount?.toString() || "0"),
+              orderNo: invoice.orderNo,
+              originalAmount: parseFloat(invoice.originalAmount?.toString() || "0"),
+              balanceBeforePDCs: parseFloat(invoice.balanceBeforePDCs?.toString() || "0"),
+              releasedPDCs: parseFloat(invoice.releasePDCs?.toString() || "0"),
+              balanceAfterPDCs: parseFloat(invoice.balanceAfterPDCs?.toString() || "0")
             })
           );
 
@@ -318,27 +334,36 @@ const OutstandingsPage: React.FC = () => {
     pdf.text(currentDate, 195, 15, { align: "right" });
 
     const tableColumn = [
+      "Posting Date",
       "Customer Name",
       "Invoice Number",
-      "Order Date",
       "Invoiced Amount",
-      "PDC Amount",
-      "Due Amount",
+      "Original Amount",
+      "Balance Before PDCs",
+      "Released PDCs",
+      "Balance After PDCs",
     ];
     const tableRows = outstandingInvoices.map((item) => [
+      item.invoiceDate,
       item.customerName,
       item.invoiceNumber,
-      item.invoiceDate || "N/A",
       `${Number(item.invoicedAmount.toFixed(2)).toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
-      `${Number(item.pdcAmount.toFixed(2)).toLocaleString("en-US", {
+      `${Number(item.originalAmount.toFixed(2)).toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
-
-      `${Number(item.dueAmount.toFixed(2)).toLocaleString("en-US", {
+      `${Number(item.balanceBeforePDCs.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      `${Number(item.releasedPDCs.toFixed(2)).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      })}`,
+      `${Number(item.balanceAfterPDCs.toFixed(2)).toLocaleString("en-US", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
       })}`,
@@ -349,7 +374,7 @@ const OutstandingsPage: React.FC = () => {
       body: tableRows,
       startY: 25,
       theme: "grid",
-      styles: { fontSize: 10, cellPadding: 3 },
+      styles: { fontSize: 9, cellPadding: 2 },
       headStyles: {
         fillColor: [200, 200, 200],
         textColor: [0, 0, 0],
@@ -364,7 +389,7 @@ const OutstandingsPage: React.FC = () => {
     );
 
     const totalPDC = outstandingInvoices.reduce(
-      (sum, item) => sum + item.pdcAmount,
+      (sum, item) => sum + item.releasedPDCs,
       0
     );
     // const totalInvoiced = outstandingData.reduce(
@@ -645,8 +670,8 @@ const OutstandingsPage: React.FC = () => {
                           }
                           disabled={currentPage === 1}
                           className={`px-3 py-1 rounded ${currentPage === 1
-                              ? "bg-gray-200 cursor-not-allowed"
-                              : "bg-blue-600 text-white hover:bg-blue-700"
+                            ? "bg-gray-200 cursor-not-allowed"
+                            : "bg-blue-600 text-white hover:bg-blue-700"
                             }`}
                         >
                           Previous
@@ -659,8 +684,8 @@ const OutstandingsPage: React.FC = () => {
                             key={pageNumber}
                             onClick={() => setCurrentPage(pageNumber)}
                             className={`px-3 py-1 rounded ${currentPage === pageNumber
-                                ? "bg-blue-700 text-white"
-                                : "bg-blue-600 text-white hover:bg-blue-700"
+                              ? "bg-blue-700 text-white"
+                              : "bg-blue-600 text-white hover:bg-blue-700"
                               }`}
                           >
                             {pageNumber}
@@ -674,8 +699,8 @@ const OutstandingsPage: React.FC = () => {
                           }
                           disabled={currentPage === totalPages}
                           className={`px-3 py-1 rounded ${currentPage === totalPages
-                              ? "bg-gray-200 cursor-not-allowed"
-                              : "bg-blue-600 text-white hover:bg-blue-700"
+                            ? "bg-gray-200 cursor-not-allowed"
+                            : "bg-blue-600 text-white hover:bg-blue-700"
                             }`}
                         >
                           Next

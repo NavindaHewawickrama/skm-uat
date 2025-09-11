@@ -13,6 +13,8 @@ interface Invoice {
     balanceBeforePDCs: number;
     releasePDCs: number;
     balanceAfterPDCs: number;
+    postedDate: string;
+    orderedDate: string;
 }
 
 
@@ -66,7 +68,8 @@ export async function GET(request: Request) {
         // Transform the response to match your frontend expectations
         const transformedInvoices = data.invoices?.map((invoice: Invoice) => ({
             invoiceNumber: invoice.invoiceNo,
-            invoiceDate: invoice.invoiceDate,
+            orderDate: invoice.orderedDate,
+            invoiceDate: invoice.postedDate,
             totalAmount: invoice.totalAmount,
             pdcAmount: invoice.pdcAmount,
             dueAmount: invoice.dueAmount,
