@@ -44,8 +44,8 @@ export async function GET(request: Request) {
         try {
             data = JSON.parse(text);
         } catch (parseError) {
-            console.log('Response is not JSON, treating as base64 string');
-            
+            console.log('Response is not JSON, treating as base64 string', parseError);
+
             const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
             if (base64Regex.test(text.trim())) {
                 return NextResponse.json(text.trim(), { status: 200 });

@@ -56,13 +56,13 @@ export async function GET(request: Request) {
 
         // Transform the invoices while preserving the original structure
         const transformedInvoices = data.invoices?.map((invoice: Invoice) => ({
-            // invoiceNo: invoice.invoiceNo,
-            // orderNo: invoice.orderNo,
-            // invoiceDate: invoice.postedDate,
-            // pdcAmount: invoice.pdcAmount,
-            // dueAmount: invoice.dueAmount,
-            // totalAmount: invoice.totalAmount,
-            //remainigAmount: invoice.remainingAmount,
+            invoiceNo: invoice.invoiceNo,
+            orderNo: invoice.orderNo,
+            invoiceDate: invoice.postedDate,
+            pdcAmount: invoice.pdcAmount,
+            dueAmount: invoice.dueAmount,
+            totalAmount: invoice.totalAmount,
+            remainigAmount: invoice.remainingAmount,
         })) || [];
 
         // Return the complete response structure that your frontend expects
@@ -70,7 +70,7 @@ export async function GET(request: Request) {
             customerNo: data.customerNo,
             totalDueAmount: data.totalDueAmount,
             totalPdcAmount: data.totalPdcAmount,
-            //invoices: transformedInvoices
+            invoices: transformedInvoices
         };
 
         return NextResponse.json(responseData, { status: 200 });
