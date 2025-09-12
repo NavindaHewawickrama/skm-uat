@@ -1,13 +1,13 @@
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
-import AppBar from "../../../components/Appbar";
-import SideNav from "../../../components/Sidenav";
-import Footer from "../../../components/Footer";
+import AppBar from "../../components/Appbar";
+import SideNav from "../../components/Sidenav";
+import Footer from "../../components/Footer";
 import productImage from "../../../../public/images/products/pro1.png";
-import ImagePopup from "@/components/ImagePopup";
+import ImagePopup from "../../components/ImagePopup";
 import producctImage2 from "../../../../public/images/products/pro2.png";
 import { StaticImageData } from 'next/image';
-import Alert from "../../../components/Alert";
+import Alert from "../../components/Alert";
 
 interface Image {
   src: string;

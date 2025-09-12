@@ -1,11 +1,11 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import AppBar from "../../../components/Appbar";
-import SideNav from "../../../components/Sidenav";
-import Footer from "../../../components/Footer";
+import AppBar from "../../components/Appbar";
+import SideNav from "../../components/Sidenav";
+import Footer from "../../components/Footer";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
-import Alert from "../../../components/Alert";
+import Alert from "../../components/Alert";
 import Select from "react-select";
 
 type OrderType = {

@@ -1,6 +1,6 @@
 
 import { NextResponse } from 'next/server';
-import { getValidAccessToken } from '@/lib/auth';
+import { getValidAccessToken } from '@/app/lib/auth';
 import baseUrl from '../../../config';
 
 // get rejected order details
