@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useMemo, useEffect } from "react";
-import AppBar from "@/components/Appbar";
-import SideNav from "@/components/Sidenav";
-import Footer from "@/components/Footer";
-import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
-import ViewStatusPopup from "@/components/ViewStatusPopup";
+import AppBar from "../../components/Appbar";
+import SideNav from "../../components/Sidenav";
+import Footer from "../../components/Footer";
+import ViewOrderEditPopupButton from "../../components/viewOrderEditPopupButton";
+import ViewStatusPopup from "../../components/ViewStatusPopup";
 import { MessageCircle, X } from 'lucide-react';
 
 type OrderforStatus = {

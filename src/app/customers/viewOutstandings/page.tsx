@@ -1,10 +1,10 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import AppBar from "@/components/Appbar";
-import SideNav from "@/components/Sidenav";
-import Footer from "@/components/Footer";
-import CustomerSelectionPopup from "@/components/CustomerSelectionPopup";
-import Alert from "@/components/Alert";
+import AppBar from "../../components/Appbar";
+import SideNav from "../../components/Sidenav";
+import Footer from "../../components/Footer";
+import CustomerSelectionPopup from "../../components/CustomerSelectionPopup";
+import Alert from "../../components/Alert";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 

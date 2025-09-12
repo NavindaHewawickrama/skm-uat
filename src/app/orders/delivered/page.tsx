@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useMemo, useEffect } from "react";
-import AppBar from "@/components/Appbar";
-import SideNav from "@/components/Sidenav";
-import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
-import Footer from "@/components/Footer";
-import ViewOrderDeliveryStatus from "@/components/ViewOrderDeliveryStatus";
+import AppBar from "../../components/Appbar";
+import SideNav from "../../components/Sidenav";
+import ViewOrderEditPopupButton from "../../components/viewOrderEditPopupButton";
+import Footer from "../../components/Footer";
+import ViewOrderDeliveryStatus from "../../components/ViewOrderDeliveryStatus";
 
 type OrderType = {
   orderNumber: number;

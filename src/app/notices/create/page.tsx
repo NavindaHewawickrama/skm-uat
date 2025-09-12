@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useRef, useEffect } from "react";
-import AppBar from "../../../components/Appbar";
-import SideNav from "../../../components/Sidenav";
-import Footer from "../../../components/Footer";
-import Alert from "../../../components/Alert";
+import AppBar from "../../components/Appbar";
+import SideNav from "../../components/Sidenav";
+import Footer from "../../components/Footer";
+import Alert from "../../components/Alert";
 
 interface FormErrors {
   notice?: string;
