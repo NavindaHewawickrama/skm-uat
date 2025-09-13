@@ -398,126 +398,311 @@ const CreateOrderPage: React.FC = () => {
     }
   };
 
+  // const generatePDF = () => {
+  //   const pdf = new jsPDF();
+
+  //   pdf.setFontSize(18);
+  //   pdf.text("Customer Outstanding Report", 105, 15, { align: "center" });
+  //   pdf.setFontSize(12);
+  //   pdf.text(selectedCustomer?.customerName || "", 105, 22, {
+  //     align: "center",
+  //   });
+  //   // pdf.setFontSize(12);
+  //   // pdf.text(selectedCustomer?.customerName || "", 105, 22, { align: "center" });
+
+  //   const currentDate = new Date().toLocaleDateString("en-US", {
+  //     year: "numeric",
+  //     month: "short",
+  //     day: "2-digit",
+  //   });
+  //   pdf.setFontSize(9);
+  //   pdf.text(currentDate, 195, 15, { align: "right" });
+
+
+  //   const tableColumn = [
+  //     "Posting Date",
+  //     "Order Date",
+  //     "Customer Name",
+  //     "Invoice Number",
+  //     "Invoiced Amount",
+  //     "Original Amount",
+  //     "Balance Before PDCs",
+  //     "Released PDCs",
+  //     "Balance After PDCs",
+  //   ];
+  //   const tableRows = outstandingData.map((item) => [
+  //     item.invoiceDate,
+  //     item.orderDate,
+  //     item.customerName,
+  //     item.invoiceNumber,
+  //     `${Number(item.invoicedAmount.toFixed(2)).toLocaleString("en-US", {
+  //       minimumFractionDigits: 2,
+  //       maximumFractionDigits: 2,
+  //     })}`,
+  //     `${Number(item.originalAmount.toFixed(2)).toLocaleString("en-US", {
+  //       minimumFractionDigits: 2,
+  //       maximumFractionDigits: 2,
+  //     })}`,
+  //     `${Number(item.balanceBeforePDCs.toFixed(2)).toLocaleString("en-US", {
+  //       minimumFractionDigits: 2,
+  //       maximumFractionDigits: 2,
+  //     })}`,
+  //     `${Number(item.releasedPDCs.toFixed(2)).toLocaleString("en-US", {
+  //       minimumFractionDigits: 2,
+  //       maximumFractionDigits: 2,
+  //     })}`,
+  //     `${Number(item.balanceAfterPDCs.toFixed(2)).toLocaleString("en-US", {
+  //       minimumFractionDigits: 2,
+  //       maximumFractionDigits: 2,
+  //     })}`,
+  //   ]);
+
+  //   autoTable(pdf, {
+  //     head: [tableColumn],
+  //     body: tableRows,
+  //     startY: 25,
+  //     theme: "grid",
+  //     styles: { fontSize: 9, cellPadding: 1.5 },
+  //     headStyles: {
+  //       fillColor: [200, 200, 200],
+  //       textColor: [0, 0, 0],
+  //       fontStyle: "bold",
+  //     },
+  //     alternateRowStyles: { fillColor: [245, 245, 245] },
+  //   });
+
+  //   const totalDue = outstandingData.reduce(
+  //     (sum, item) => sum + item.dueAmount,
+  //     0
+  //   );
+
+  //   const totalPDC = outstandingData.reduce(
+  //     (sum, item) => sum + item.releasedPDCs,
+  //     0
+  //   );
+  //   // const totalInvoiced = outstandingData.reduce(
+  //   //   (sum, item) => sum + item.invoicedAmount,
+  //   //   0
+  //   // );
+
+  //   const finalY = pdf.lastAutoTable?.finalY || 60;
+  //   pdf.setFontSize(12);
+  //   pdf.text(
+  //     `Total Outstanding: ${Number(totalDue.toFixed(2)).toLocaleString(
+  //       "en-US",
+  //       {
+  //         minimumFractionDigits: 2,
+  //         maximumFractionDigits: 2,
+  //       }
+  //     )}`,
+  //     195,
+  //     finalY + 10,
+  //     {
+  //       align: "right",
+  //     }
+  //   );
+  //   pdf.setFontSize(12);
+  //   pdf.text(
+  //     `PDC Total: ${Number(totalPDC.toFixed(2)).toLocaleString("en-US", {
+  //       minimumFractionDigits: 2,
+  //       maximumFractionDigits: 2,
+  //     })}`,
+  //     195,
+  //     finalY + 20,
+  //     {
+  //       align: "right",
+  //     }
+  //   );
+
+  //   const blob = pdf.output("blob");
+  //   const url = URL.createObjectURL(blob);
+  //   window.open(url, "_blank");
+  // };
+
+  // imports:
+  // import { jsPDF } from "jspdf";
+  // import autoTable from "jspdf-autotable";
+
   const generatePDF = () => {
-    const pdf = new jsPDF();
+    const pdf = new jsPDF({ unit: "mm", format: "a4" });
+    const totalPagesExp = "{total_pages_count_string}";
 
-    pdf.setFontSize(18);
-    pdf.text("Customer Outstanding Report", 105, 15, { align: "center" });
-    pdf.setFontSize(12);
-    pdf.text(selectedCustomer?.customerName || "", 105, 22, {
-      align: "center",
-    });
-    // pdf.setFontSize(12);
-    // pdf.text(selectedCustomer?.customerName || "", 105, 22, { align: "center" });
+    // --- helpers ---
+    const leftX = 14;
+    const rightX = 200;
 
-    const currentDate = new Date().toLocaleDateString("en-US", {
+    const fmtMoney = (n: number) =>
+      Number(n || 0).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+    const fmtDate = (d?: string) =>
+      d
+        ? new Date(d).toLocaleDateString("en-US", {
+          month: "2-digit",
+          day: "2-digit",
+          year: "2-digit",
+        })
+        : "";
+
+    const nowStr = new Date().toLocaleString("en-US", {
       year: "numeric",
-      month: "short",
+      month: "numeric",
+      day: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    const agedAsOfStr = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
       day: "2-digit",
     });
-    pdf.setFontSize(9);
-    pdf.text(currentDate, 195, 15, { align: "right" });
 
+    // --- page header (drawn on every page) ---
+    autoTable(pdf, {
+      startY: 0,
+      theme: "plain",
+      didDrawPage: () => {
+        // Title
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(16);
+        pdf.text("Aged Accounts Receivable", leftX, 12);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(10);
+        pdf.text("SKM UAT 2", leftX, 18);
 
-    const tableColumn = [
-      "Posting Date",
-      "Order Date",
-      "Customer Name",
-      "Invoice Number",
-      "Invoiced Amount",
-      "Original Amount",
-      "Balance Before PDCs",
-      "Released PDCs",
-      "Balance After PDCs",
+        // Top-right meta
+        pdf.setFontSize(9);
+        pdf.text(nowStr, rightX, 10, { align: "right" });
+        pdf.text(
+          `Page ${pdf.getNumberOfPages()} / ${totalPagesExp}`,
+          rightX,
+          15,
+          { align: "right" }
+        );
+        pdf.text("OPS.MGR", rightX, 20, { align: "right" });
+
+        // Sub-header (left)
+        pdf.setFontSize(10);
+        pdf.text(`Aged as of ${agedAsOfStr}`, leftX, 28);
+        pdf.text("Aged by Due Date", leftX, 33);
+        pdf.text(
+          `Customer No.: ${selectedCustomer?.customerCode ?? ""}`,
+          leftX,
+          38
+        );
+
+        // Separator line
+        pdf.setDrawColor(180);
+        pdf.setLineWidth(0.2);
+        pdf.line(leftX, 41, rightX, 41);
+
+        // Customer band
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(11);
+        const code = selectedCustomer?.customerCode ?? "";
+        const name = selectedCustomer?.customerName ?? "";
+        pdf.text(`${code} - ${name}`, leftX, 48);
+
+        // If you have a phone, draw it on the right:
+        // pdf.text(`Phone No.: ${phoneNumber}`, rightX, 48, { align: "right" });
+      },
+    });
+
+    // --- table data (match screenshot columns) ---
+    const head = [
+      [
+        "Posting Date",
+        "Document Type",
+        "Document No.",
+        "Due Date",
+        "Original Amount",
+        "Balance before PDCs",
+        "Released PDCs",
+        "Balance after PDCs",
+      ],
     ];
-    const tableRows = outstandingData.map((item) => [
-      item.invoiceDate,
-      item.orderDate,
-      item.customerName,
-      item.invoiceNumber,
-      `${Number(item.invoicedAmount.toFixed(2)).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`,
-      `${Number(item.originalAmount.toFixed(2)).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`,
-      `${Number(item.balanceBeforePDCs.toFixed(2)).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`,
-      `${Number(item.releasedPDCs.toFixed(2)).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`,
-      `${Number(item.balanceAfterPDCs.toFixed(2)).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`,
+
+    const body = outstandingData.map((row) => [
+      fmtDate(row.invoiceDate), // Posting Date (from invoiceDate)
+      "Invoice",                // Document Type
+      row.invoiceNumber || "",  // Document No.
+      fmtDate(row.orderDate),   // Due Date (use your due date if you have it)
+      fmtMoney(row.originalAmount),
+      fmtMoney(row.balanceBeforePDCs),
+      fmtMoney(row.releasedPDCs),
+      fmtMoney(row.balanceAfterPDCs),
     ]);
 
     autoTable(pdf, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 25,
+      head,
+      body,
+      startY: 53,
       theme: "grid",
-      styles: { fontSize: 9, cellPadding: 1.5 },
+      styles: {
+        font: "helvetica",
+        fontSize: 9,
+        cellPadding: 2,
+        lineWidth: 0.2,
+        lineColor: [220, 220, 220],
+        textColor: [0, 0, 0],
+        halign: "left",
+        valign: "middle",
+      },
       headStyles: {
-        fillColor: [200, 200, 200],
+        fillColor: [240, 240, 240],
         textColor: [0, 0, 0],
         fontStyle: "bold",
+        halign: "left",
       },
-      alternateRowStyles: { fillColor: [245, 245, 245] },
+      columnStyles: {
+        0: { cellWidth: 24 },               // Posting Date
+        1: { cellWidth: 26 },               // Document Type
+        2: { cellWidth: 36 },               // Document No.
+        3: { cellWidth: 24 },               // Due Date
+        4: { cellWidth: 26, halign: "right" }, // money cols right-aligned
+        5: { cellWidth: 30, halign: "right" },
+        6: { cellWidth: 26, halign: "right" },
+        7: { cellWidth: 28, halign: "right" },
+      },
+      alternateRowStyles: { fillColor: [248, 248, 248] },
     });
 
-    const totalDue = outstandingData.reduce(
-      (sum, item) => sum + item.dueAmount,
+    // --- totals (like the image) ---
+    const finalY = pdf.lastAutoTable?.finalY ?? 100;
+    const subtotal = outstandingData.reduce(
+      (sum, r) => sum + (r.balanceAfterPDCs || 0),
       0
     );
 
-    const totalPDC = outstandingData.reduce(
-      (sum, item) => sum + item.releasedPDCs,
-      0
-    );
-    // const totalInvoiced = outstandingData.reduce(
-    //   (sum, item) => sum + item.invoicedAmount,
-    //   0
-    // );
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(10);
+    const subtotalLabel = `Total for ${selectedCustomer?.customerName ?? ""}   LKR`;
+    pdf.text(subtotalLabel, leftX, finalY + 8);
+    pdf.text(fmtMoney(subtotal), rightX, finalY + 8, { align: "right" });
 
-    const finalY = pdf.lastAutoTable?.finalY || 60;
-    pdf.setFontSize(12);
-    pdf.text(
-      `Total Outstanding: ${Number(totalDue.toFixed(2)).toLocaleString(
-        "en-US",
-        {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2,
-        }
-      )}`,
-      195,
-      finalY + 10,
-      {
-        align: "right",
-      }
-    );
-    pdf.setFontSize(12);
-    pdf.text(
-      `PDC Total: ${Number(totalPDC.toFixed(2)).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`,
-      195,
-      finalY + 20,
-      {
-        align: "right",
-      }
-    );
+    // rule above grand total
+    pdf.setDrawColor(150);
+    pdf.setLineWidth(0.2);
+    pdf.line(leftX, finalY + 12, rightX, finalY + 12);
 
+    // grand total (LCY)
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(10);
+    pdf.text("Total (LCY)", leftX, finalY + 20);
+    pdf.text(fmtMoney(subtotal), rightX, finalY + 20, { align: "right" });
+
+    // finalize page count
+    pdf.putTotalPages(totalPagesExp);
+
+    // open in new tab
     const blob = pdf.output("blob");
     const url = URL.createObjectURL(blob);
     window.open(url, "_blank");
   };
+
 
   const handleViewDetails = async () => {
     setIsLoading(true);
