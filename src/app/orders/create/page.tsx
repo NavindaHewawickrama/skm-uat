@@ -524,184 +524,180 @@ const CreateOrderPage: React.FC = () => {
   // import autoTable from "jspdf-autotable";
 
   const generatePDF = () => {
-    const pdf = new jsPDF({ unit: "mm", format: "a4" });
-    const totalPagesExp = "{total_pages_count_string}";
+  const pdf = new jsPDF({ unit: "mm", format: "a4" });
+  const totalPagesExp = "{total_pages_count_string}";
 
-    // --- helpers ---
-    const leftX = 14;
-    const rightX = 200;
+  // --- helpers ---
+  const leftX = 14;
+  const rightX = 196;
 
-    const fmtMoney = (n: number) =>
-      Number(n || 0).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      });
-
-    const fmtDate = (d?: string) =>
-      d
-        ? new Date(d).toLocaleDateString("en-US", {
-          month: "2-digit",
-          day: "2-digit",
-          year: "2-digit",
-        })
-        : "";
-
-    const nowStr = new Date().toLocaleString("en-US", {
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
+  const fmtMoney = (n: number) =>
+    Number(n || 0).toLocaleString("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
     });
 
-    const agedAsOfStr = new Date().toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "2-digit",
-    });
+  const fmtDate = (d?: string) =>
+    d
+      ? new Date(d).toLocaleDateString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "2-digit",
+      })
+      : "";
 
-    // --- page header (drawn on every page) ---
-    autoTable(pdf, {
-      startY: 0,
-      theme: "plain",
-      didDrawPage: () => {
-        // Title
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(16);
-        pdf.text("Aged Accounts Receivable", leftX, 12);
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(10);
-        pdf.text("SKM UAT 2", leftX, 18);
+  const nowStr = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  }) + ", " + new Date().toLocaleTimeString("en-US", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 
-        // Top-right meta
-        pdf.setFontSize(9);
-        pdf.text(nowStr, rightX, 10, { align: "right" });
-        pdf.text(
-          `Page ${pdf.getNumberOfPages()} / ${totalPagesExp}`,
-          rightX,
-          15,
-          { align: "right" }
-        );
-        pdf.text("OPS.MGR", rightX, 20, { align: "right" });
+  const agedAsOfStr = new Date().toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "2-digit",
+  });
 
-        // Sub-header (left)
-        pdf.setFontSize(10);
-        pdf.text(`Aged as of ${agedAsOfStr}`, leftX, 28);
-        pdf.text("Aged by Due Date", leftX, 33);
-        pdf.text(
-          `Customer No.: ${selectedCustomer?.customerCode ?? ""}`,
-          leftX,
-          38
-        );
+  autoTable(pdf, {
+    startY: 0,
+    theme: "plain",
+    didDrawPage: () => {
+      // Title
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(16);
+      pdf.text("Aged Accounts Receivable", leftX, 12);
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(10);
+      pdf.text("SKM UAT 2", leftX, 18);
 
-        // Separator line
-        pdf.setDrawColor(180);
-        pdf.setLineWidth(0.2);
-        pdf.line(leftX, 41, rightX, 41);
+      // Top-right meta
+      pdf.setFontSize(9);
+      pdf.text(nowStr, rightX, 10, { align: "right" });
+      pdf.text(
+        `Page ${pdf.getNumberOfPages()} / ${totalPagesExp}`,
+        rightX,
+        15,
+        { align: "right" }
+      );
+      pdf.text("OPS.MGR", rightX, 20, { align: "right" });
 
-        // Customer band
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(11);
-        const code = selectedCustomer?.customerCode ?? "";
-        const name = selectedCustomer?.customerName ?? "";
-        pdf.text(`${code} - ${name}`, leftX, 48);
+      // Sub-header (left)
+      pdf.setFontSize(10);
+      pdf.text(`Aged as of ${agedAsOfStr}`, leftX, 28);
+      pdf.text("Aged by Due Date", leftX, 33);
+      pdf.text(
+        `Customer No.: ${selectedCustomer?.customerCode ?? ""}`,
+        leftX,
+        38
+      );
 
-        // If you have a phone, draw it on the right:
-        // pdf.text(`Phone No.: ${phoneNumber}`, rightX, 48, { align: "right" });
-      },
-    });
+      // Separator line
+      pdf.setDrawColor(180);
+      pdf.setLineWidth(0.2);
+      pdf.line(leftX, 41, rightX, 41);
 
-    // --- table data (match screenshot columns) ---
-    const head = [
-      [
-        "Posting Date",
-        "Document Type",
-        "Document No.",
-        "Due Date",
-        "Original Amount",
-        "Balance before PDCs",
-        "Released PDCs",
-        "Balance after PDCs",
-      ],
-    ];
+      // Customer band
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(11);
+      const code = selectedCustomer?.customerCode ?? "";
+      const name = selectedCustomer?.customerName ?? "";
+      pdf.text(`${code} - ${name}`, leftX, 48);
+    },
+  });
 
-    const body = outstandingData.map((row) => [
-      fmtDate(row.invoiceDate), // Posting Date (from invoiceDate)
-      "Invoice",                // Document Type
-      row.invoiceNumber || "",  // Document No.
-      fmtDate(row.orderDate),   // Due Date (use your due date if you have it)
-      fmtMoney(row.originalAmount),
-      fmtMoney(row.balanceBeforePDCs),
-      fmtMoney(row.releasedPDCs),
-      fmtMoney(row.balanceAfterPDCs),
-    ]);
+  const head = [
+    [
+      "Posting Date",
+      "Document Type",
+      "Document No.",
+      "Due Date",
+      "Original Amount",
+      "Balance before PDCs",
+      "Released PDCs",
+      "Balance after PDCs",
+    ],
+  ];
 
-    autoTable(pdf, {
-      head,
-      body,
-      startY: 53,
-      theme: "grid",
-      styles: {
-        font: "helvetica",
-        fontSize: 9,
-        cellPadding: 2,
-        lineWidth: 0.2,
-        lineColor: [220, 220, 220],
-        textColor: [0, 0, 0],
-        halign: "left",
-        valign: "middle",
-      },
-      headStyles: {
-        fillColor: [240, 240, 240],
-        textColor: [0, 0, 0],
-        fontStyle: "bold",
-        halign: "left",
-      },
-      columnStyles: {
-        0: { cellWidth: 24 },               // Posting Date
-        1: { cellWidth: 26 },               // Document Type
-        2: { cellWidth: 36 },               // Document No.
-        3: { cellWidth: 24 },               // Due Date
-        4: { cellWidth: 26, halign: "right" }, // money cols right-aligned
-        5: { cellWidth: 30, halign: "right" },
-        6: { cellWidth: 26, halign: "right" },
-        7: { cellWidth: 28, halign: "right" },
-      },
-      alternateRowStyles: { fillColor: [248, 248, 248] },
-    });
+  const body = outstandingData.map((row) => [
+    fmtDate(row.invoiceDate),
+    "Invoice",
+    row.invoiceNumber || "",
+    fmtDate(row.orderDate),
+    fmtMoney(row.originalAmount),
+    fmtMoney(row.balanceBeforePDCs),
+    fmtMoney(row.releasedPDCs),
+    fmtMoney(row.balanceAfterPDCs),
+  ]);
 
-    // --- totals (like the image) ---
-    const finalY = pdf.lastAutoTable?.finalY ?? 100;
-    const subtotal = outstandingData.reduce(
-      (sum, r) => sum + (r.balanceAfterPDCs || 0),
-      0
-    );
+  autoTable(pdf, {
+    head,
+    body,
+    startY: 55, 
+    theme: "grid",
+    styles: {
+      font: "helvetica",
+      fontSize: 8, 
+      cellPadding: 1.5,
+      lineWidth: 0.2,
+      lineColor: [220, 220, 220],
+      textColor: [0, 0, 0],
+      halign: "left",
+      valign: "middle",
+    },
+    headStyles: {
+      fillColor: [240, 240, 240],
+      textColor: [0, 0, 0],
+      fontStyle: "bold",
+      halign: "left",
+    },
+    columnStyles: {
+      0: { cellWidth: 20 },                // Posting Date
+      1: { cellWidth: 22 },                // Document Type  
+      2: { cellWidth: 24 },                // Document No.
+      3: { cellWidth: 20 },                // Due Date
+      4: { cellWidth: 24, halign: "right" }, // Original Amount
+      5: { cellWidth: 26, halign: "right" }, // Balance before PDCs
+      6: { cellWidth: 22, halign: "right" }, // Released PDCs
+      7: { cellWidth: 24, halign: "right" }, // Balance after PDCs
+    },
+    alternateRowStyles: { fillColor: [248, 248, 248] },
+    margin: { left: leftX, right: 14 }, 
+  });
 
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(10);
-    const subtotalLabel = `Total for ${selectedCustomer?.customerName ?? ""}   LKR`;
-    pdf.text(subtotalLabel, leftX, finalY + 8);
-    pdf.text(fmtMoney(subtotal), rightX, finalY + 8, { align: "right" });
+  const finalY = pdf.lastAutoTable?.finalY ?? 100;
+  const subtotal = outstandingData.reduce(
+    (sum, r) => sum + (r.balanceAfterPDCs || 0),
+    0
+  );
 
-    // rule above grand total
-    pdf.setDrawColor(150);
-    pdf.setLineWidth(0.2);
-    pdf.line(leftX, finalY + 12, rightX, finalY + 12);
+  pdf.setFont("helvetica", "bold");
+  pdf.setFontSize(10);
+  const subtotalLabel = `Total for ${selectedCustomer?.customerName ?? ""}   LKR`;
+  pdf.text(subtotalLabel, leftX, finalY + 8);
+  pdf.text(fmtMoney(subtotal), rightX, finalY + 8, { align: "right" });
 
-    // grand total (LCY)
-    pdf.setFont("helvetica", "normal");
-    pdf.setFontSize(10);
-    pdf.text("Total (LCY)", leftX, finalY + 20);
-    pdf.text(fmtMoney(subtotal), rightX, finalY + 20, { align: "right" });
+  // rule above grand total
+  pdf.setDrawColor(150);
+  pdf.setLineWidth(0.2);
+  pdf.line(leftX, finalY + 12, rightX, finalY + 12);
 
-    // finalize page count
-    pdf.putTotalPages(totalPagesExp);
+  // grand total (LCY)
+  pdf.setFont("helvetica", "normal");
+  pdf.setFontSize(10);
+  pdf.text("Total (LCY)", leftX, finalY + 20);
+  pdf.text(fmtMoney(subtotal), rightX, finalY + 20, { align: "right" });
 
-    // open in new tab
-    const blob = pdf.output("blob");
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
-  };
+  // finalize page count
+  pdf.putTotalPages(totalPagesExp);
+
+  // open in new tab
+  const blob = pdf.output("blob");
+  const url = URL.createObjectURL(blob);
+  window.open(url, "_blank");
+};
 
 
   const handleViewDetails = async () => {
