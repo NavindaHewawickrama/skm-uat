@@ -11,7 +11,7 @@ interface Invoice {
     totalAmount: number;
     originalAmount: number;
     balanceBeforePDCs: number;
-    releasePDCs: number;
+    releasedPDCs: number;
     balanceAfterPDCs: number;
     postedDate: string;
     orderedDate: string;
@@ -67,6 +67,7 @@ export async function GET(request: Request) {
 
         // Transform the response to match your frontend expectations
         const transformedInvoices = data.invoices?.map((invoice: Invoice) => ({
+            totalDueAmount: data.totalDueAmount,
             invoiceNumber: invoice.invoiceNo,
             orderDate: invoice.orderedDate,
             invoiceDate: invoice.postedDate,
@@ -76,7 +77,7 @@ export async function GET(request: Request) {
             orderNo: invoice.orderNo,
             originalAmount: invoice.originalAmount,
             balanceBeforePDCs: invoice.balanceBeforePDCs,
-            releasedPDCs: invoice.releasePDCs,
+            releasedPDCs: invoice.releasedPDCs,
             balanceAfterPDCs: invoice.balanceAfterPDCs
         })) || [];
 

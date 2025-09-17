@@ -50,6 +50,7 @@ interface CustomerOutstandingData {
   balanceBeforePDCs: number,
   releasedPDCs: number,
   balanceAfterPDCs: number,
+  totalDueAmount: number;
 }
 
 interface Invoice {
@@ -63,8 +64,9 @@ interface Invoice {
   invoiceNo: string;
   originalAmount: number;
   balanceBeforePDCs: number;
-  releasePDCs: number;
+  releasedPDCs: number;
   balanceAfterPDCs: number;
+  totalDueAmount: number;
 }
 
 
@@ -150,10 +152,17 @@ const OutstandingsPage: React.FC = () => {
   };
 
   // Calculate total due amount from actual data
-  const totalDueAmount = outstandingInvoices.reduce(
-    (total, invoice) => total + invoice.dueAmount,
-    0
-  );
+  const totalDueAmountClean = outstandingInvoices
+    .reduce((customerMap, invoice) => {
+
+      if (!customerMap.has(invoice.customerName)) {
+        customerMap.set(invoice.customerName, invoice.totalDueAmount);
+      }
+      return customerMap;
+    }, new Map())
+
+    .values()
+    .reduce((sum, amount) => sum + amount, 0);
 
   // Filter invoices based on search query
   const filteredInvoices = outstandingInvoices.filter(
@@ -236,6 +245,7 @@ const OutstandingsPage: React.FC = () => {
           const transformedData: CustomerOutstandingData[] = data.map(
             (invoice: Invoice) => ({
               customerName: customerName,
+              totalDueAmount: invoice.totalDueAmount,
               invoiceNumber: invoice.invoiceNumber,
               invoiceDate: invoice.invoiceDate
                 ? new Date(invoice.invoiceDate).toLocaleDateString("en-US", {
@@ -252,10 +262,11 @@ const OutstandingsPage: React.FC = () => {
               orderNo: invoice.orderNo,
               originalAmount: parseFloat(invoice.originalAmount?.toString() || "0"),
               balanceBeforePDCs: parseFloat(invoice.balanceBeforePDCs?.toString() || "0"),
-              releasedPDCs: parseFloat(invoice.releasePDCs?.toString() || "0"),
+              releasedPDCs: parseFloat(invoice.releasedPDCs?.toString() || "0"),
               balanceAfterPDCs: parseFloat(invoice.balanceAfterPDCs?.toString() || "0")
             })
           );
+
 
           // Add to the accumulated data
           allInvoiceData = [...allInvoiceData, ...transformedData];
@@ -272,7 +283,7 @@ const OutstandingsPage: React.FC = () => {
           errorCount++;
         }
       }
-      // console.log(allInvoiceData);
+      console.log(allInvoiceData);
       // Update the state with all collected invoice data
       setOutstandingInvoices(allInvoiceData);
       setCurrentPage(1); // Reset to first page
@@ -313,100 +324,179 @@ const OutstandingsPage: React.FC = () => {
     }, 5000);
   };
 
+
   const generatePDF = () => {
-    const pdf = new jsPDF();
+    const pdf = new jsPDF({ unit: "mm", format: "a4" });
+    const totalPagesExp = "{total_pages_count_string}";
 
-    pdf.setFontSize(18);
-    pdf.text("Customer Outstanding Report", 105, 15, { align: "center" });
-    pdf.setFontSize(12);
-    pdf.text("All Selected Customers", 105, 22, {
-      align: "center",
-    });
-    // pdf.setFontSize(12);
-    // pdf.text(selectedCustomer?.customerName || "", 105, 22, { align: "center" });
+    // --- helpers ---
+    const leftX = 14;
+    const rightX = 196;
 
-    const currentDate = new Date().toLocaleDateString("en-US", {
+    const fmtMoney = (n: number) =>
+      Number(n || 0).toLocaleString("en-US", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      });
+
+    const fmtDate = (d?: string) =>
+      d
+        ? new Date(d).toLocaleDateString("en-US", {
+          month: "2-digit",
+          day: "2-digit",
+          year: "2-digit",
+        })
+        : "";
+
+    const nowStr = new Date().toLocaleDateString("en-US", {
       year: "numeric",
-      month: "short",
+      month: "numeric",
+      day: "numeric",
+    }) + ", " + new Date().toLocaleTimeString("en-US", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    const agedAsOfStr = new Date().toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "long",
       day: "2-digit",
     });
-    pdf.setFontSize(10);
-    pdf.text(currentDate, 195, 15, { align: "right" });
 
-    const tableColumn = [
-      "Posting Date",
-      "Customer Name",
-      "Invoice Number",
-      "Invoiced Amount",
-      "Original Amount",
-      "Balance Before PDCs",
-      "Released PDCs",
-      "Balance After PDCs",
+    autoTable(pdf, {
+      startY: 0,
+      theme: "plain",
+      didDrawPage: () => {
+        // Title
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(16);
+        pdf.text("Aged Accounts Receivable", leftX, 12);
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(10);
+        // pdf.text("SKM UAT 2", leftX, 18);
+
+        // Top-right meta
+        pdf.setFontSize(9);
+        pdf.text(nowStr, rightX, 10, { align: "right" });
+        pdf.text(
+          `Page ${pdf.getNumberOfPages()} / ${totalPagesExp}`,
+          rightX,
+          20,
+          { align: "right" }
+        );
+        // pdf.text("OPS.MGR", rightX, 20, { align: "right" });
+
+        // Sub-header (left)
+        pdf.setFontSize(10);
+        pdf.text(`Aged as of ${agedAsOfStr}`, leftX, 28);
+        pdf.text("Aged by Due Date", leftX, 33);
+        // pdf.text(
+        //   `Customer No.: ${selectedCustomer?.customerCode ?? ""}`,
+        //   leftX,
+        //   38
+        // );
+
+        // Separator line
+        pdf.setDrawColor(180);
+        pdf.setLineWidth(0.2);
+        pdf.line(leftX, 41, rightX, 41);
+
+        // Customer band
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(11);
+        // const code = selectedCustomer?.customerCode ?? "";
+        // const name = selectedCustomer?.customerName ?? "";
+        //pdf.text(`${code} - ${name}`, leftX, 48);
+      },
+    });
+
+    const head = [
+      [
+        "Posting Date",
+        "Document Type",
+        "Customer Name",
+        "Document No.",
+        // "Due Date",
+        "Invoiced Amount",
+        "Balance before PDCs",
+        "Released PDCs",
+        "Balance after PDCs",
+      ],
     ];
-    const tableRows = outstandingInvoices.map((item) => [
-      item.invoiceDate,
-      item.customerName,
-      item.invoiceNumber,
-      `${Number(item.invoicedAmount.toFixed(2)).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`,
-      `${Number(item.originalAmount.toFixed(2)).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`,
-      `${Number(item.balanceBeforePDCs.toFixed(2)).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`,
-      `${Number(item.releasedPDCs.toFixed(2)).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`,
-      `${Number(item.balanceAfterPDCs.toFixed(2)).toLocaleString("en-US", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      })}`,
+
+    const body = outstandingInvoices.map((row) => [
+      fmtDate(row.invoiceDate),
+      "Invoice",
+      row.customerName,
+      row.invoiceNumber || "",
+      // fmtDate(row.orderDate),
+      fmtMoney(row.invoicedAmount),
+      fmtMoney(row.balanceBeforePDCs),
+      fmtMoney(row.releasedPDCs),
+      fmtMoney(row.balanceAfterPDCs),
     ]);
 
     autoTable(pdf, {
-      head: [tableColumn],
-      body: tableRows,
-      startY: 25,
+      head,
+      body,
+      startY: 55,
       theme: "grid",
-      styles: { fontSize: 9, cellPadding: 2 },
+      styles: {
+        font: "helvetica",
+        fontSize: 8,
+        cellPadding: 1.5,
+        lineWidth: 0.2,
+        lineColor: [220, 220, 220],
+        textColor: [0, 0, 0],
+        halign: "center",
+        valign: "middle",
+      },
       headStyles: {
-        fillColor: [200, 200, 200],
+        fillColor: [240, 240, 240],
         textColor: [0, 0, 0],
         fontStyle: "bold",
+        halign: "center",
       },
-      alternateRowStyles: { fillColor: [245, 245, 245] },
+      columnStyles: {
+        0: { cellWidth: 18 },                // Posting Date
+        1: { cellWidth: 18 },                // Document Type  
+        2: { cellWidth: 30 },                // customer name
+        3: { cellWidth: 28 },                // document no
+        4: { cellWidth: 22, halign: "right" }, // invoice Amount
+        5: { cellWidth: 24, halign: "right" }, // Balance before PDCs
+        6: { cellWidth: 22, halign: "right" }, // Released PDCs
+        7: { cellWidth: 24, halign: "right" }, // Balance after PDCs
+      },
+      alternateRowStyles: { fillColor: [248, 248, 248] },
+      margin: { left: leftX, right: 14 },
     });
 
-    const totalDue = outstandingInvoices.reduce(
-      (sum, item) => sum + item.dueAmount,
-      0
-    );
+    const finalY = pdf.lastAutoTable?.finalY ?? 100;
+    //const subtotal = outstandingInvoices[0].totalDueAmount || 0;
 
-    const totalPDC = outstandingInvoices.reduce(
-      (sum, item) => sum + item.releasedPDCs,
-      0
-    );
-    // const totalInvoiced = outstandingData.reduce(
-    //   (sum, item) => sum + item.invoicedAmount,
-    //   0
-    // );
+    const subtotal = totalDueAmountClean || 0;
 
-    const finalY = pdf.lastAutoTable?.finalY || 60;
-    pdf.setFontSize(12);
-    pdf.text(`Total Outstanding: ${totalDue.toFixed(2)}`, 195, finalY + 10, {
-      align: "right",
-    });
-    pdf.setFontSize(12);
-    pdf.text(`PDC Total: ${totalPDC.toFixed(2)}`, 195, finalY + 20, {
-      align: "right",
-    });
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(10);
+    const subtotalLabel = `Total -   LKR`;
+    pdf.text(subtotalLabel, leftX, finalY + 8);
+    pdf.text(fmtMoney(subtotal), rightX, finalY + 8, { align: "right" });
 
+    // rule above grand total
+    pdf.setDrawColor(150);
+    pdf.setLineWidth(0.2);
+    pdf.line(leftX, finalY + 12, rightX, finalY + 12);
+
+    // grand total (LCY)
+    pdf.setFont("helvetica", "normal");
+    pdf.setFontSize(10);
+    pdf.text("Total (LCY)", leftX, finalY + 20);
+    pdf.text(fmtMoney(subtotal), rightX, finalY + 20, { align: "right" });
+
+    // finalize page count
+    pdf.putTotalPages(totalPagesExp);
+
+    // open in new tab
     const blob = pdf.output("blob");
     const url = URL.createObjectURL(blob);
     window.open(url, "_blank");
@@ -497,10 +587,16 @@ const OutstandingsPage: React.FC = () => {
                             </span>
                             <span className="font-bold text-blue-700 text-lg">
                               LKR{" "}
-                              {totalDueAmount.toLocaleString("en-US", {
+                              {totalDueAmountClean.toLocaleString("en-US", {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
                               })}
+                              {/* {
+                                totalDueAmountForAllCustomers.toLocaleString("en-US", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })
+                              } */}
                             </span>
                           </div>
                           <div>
@@ -591,22 +687,26 @@ const OutstandingsPage: React.FC = () => {
                       <thead className="bg-gray-200">
                         <tr>
                           <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                            Posting Date
+                          </th>
+                          <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                             Customer
                           </th>
                           <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                             Invoice No
                           </th>
-                          <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
-                            Order Date
-                          </th>
+
                           <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
                             Invoiced Amount
                           </th>
                           <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
-                            PDC Amount
+                            Balance Before PDCs
                           </th>
                           <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
-                            Due Amount
+                            Released PDCs
+                          </th>
+                          <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                            Balance After PDCs
                           </th>
                         </tr>
                       </thead>
@@ -617,14 +717,15 @@ const OutstandingsPage: React.FC = () => {
                             className="hover:bg-gray-50"
                           >
                             <td className="px-4 py-3 border text-sm">
+                              {invoice.invoiceDate}
+                            </td>
+                            <td className="px-4 py-3 border text-sm">
                               {invoice.customerName}
                             </td>
                             <td className="px-4 py-3 border text-sm">
                               {invoice.invoiceNumber}
                             </td>
-                            <td className="px-4 py-3 border text-sm">
-                              {invoice.invoiceDate}
-                            </td>
+
                             <td className="px-4 py-3 border text-sm text-right">
                               {Number(
                                 invoice.invoicedAmount.toFixed(2)
@@ -635,7 +736,15 @@ const OutstandingsPage: React.FC = () => {
                             </td>
                             <td className="px-4 py-3 border text-sm text-right">
                               {Number(
-                                invoice.pdcAmount.toFixed(2)
+                                invoice.balanceBeforePDCs.toFixed(2)
+                              ).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })}
+                            </td>
+                            <td className="px-4 py-3 border text-sm text-right">
+                              {Number(
+                                invoice.releasedPDCs.toFixed(2)
                               ).toLocaleString("en-US", {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
@@ -643,7 +752,7 @@ const OutstandingsPage: React.FC = () => {
                             </td>
                             <td className="px-4 py-3 border text-sm text-right font-medium">
                               {Number(
-                                invoice.dueAmount.toFixed(2)
+                                invoice.balanceAfterPDCs.toFixed(2)
                               ).toLocaleString("en-US", {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,

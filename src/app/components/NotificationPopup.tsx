@@ -128,7 +128,7 @@ const NotificationPopup: React.FC<ModalProps> = ({
                                         <p>
                                             <strong>Total Amount:</strong>{" "}
                                             <span className="text-green-700 font-semibold">
-                                                ${order.totalAmount.toLocaleString()}
+                                                {order.totalAmount.toLocaleString()}
                                             </span>
                                         </p>
                                         <p>
