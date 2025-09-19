@@ -435,7 +435,7 @@ const StockView = () => {
         });
         return acc;
       }, []);
-     // console.log(transformedData);
+      // console.log(transformedData);
       setStockItems(transformedData);
     } catch (err) {
       console.error("Error fetching stock data:", err);
@@ -725,10 +725,10 @@ const StockView = () => {
                   {displayedItems.map((item, index) => (
                     <tr
                       key={`${item.itemCode}-${item.location}-${index}`}
-                      className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-01-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-02-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH-01-SKM" ? "bg-[#f2fa84]" : item.location === "WELISARA-WH-01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
+                      // className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-01-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-02-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH-01-SKM" ? "bg-[#f2fa84]" : item.location === "WELISARA-WH-01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
+                      //   }`}
+                      className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH01-SKM" ? "bg-[#f2fa84]" : item.location === "WELISARA-WH01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
                         }`}
-                    // className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH01-SKM" ? "bg-[#f2fa84]" : item.location === "WELISARA-WH01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
-                    //   }`}
                     >
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 text-center">
                         {item.itemCode}
