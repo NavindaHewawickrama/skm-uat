@@ -159,7 +159,7 @@ const CreateOrderPage: React.FC = () => {
     setSelectedItemSelectedLocationStock,
   ] = useState<string>('0');
   // const [formattedAmount, setFormattedAmount] = useState("");
-  const [loading, setLoading] = useState(true);
+ // const [loading, setLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
@@ -171,6 +171,11 @@ const CreateOrderPage: React.FC = () => {
   const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
+  const [isLoadingCustomers, setIsLoadingCustomers] = useState(false);
+  const [isLoadingLocations, setIsLoadingLocations] = useState(false);
+  const [isLoadingItems, setIsLoadingItems] = useState(false);
+  const [isLoadingDueAmount, setIsLoadingDueAmount] = useState(false);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const locationOptions = locations
     .filter(
       (loc) =>
@@ -276,68 +281,154 @@ const CreateOrderPage: React.FC = () => {
     }, 5000);
   };
 
+  // const fetchCustomersDetails = async () => {
+  //   try {
+  //     setLoading(true);
+
+  //     const response = await fetch(`/api/orders/getCustomers`, {
+  //       method: "GET",
+  //       credentials: "include",
+  //     });
+  //     if (!response.ok) {
+  //       throw Error("Failed to fetch pending order data");
+  //     } else {
+  //       const data = await response.json();
+  //       setCustomers(data);
+  //     }
+  //     setLoading(false);
+  //   } catch (err) {
+  //     console.error("Error fetching pending order data:", err);
+  //   }
+  // };
+
+
+
+  // const fetchLocationDetails = async () => {
+  //   try {
+  //     setLoading(true);
+
+  //     const response = await fetch(`/api/orders/getLocations`, {
+  //       method: "GET",
+  //       credentials: "include",
+  //     });
+
+  //     if (!response.ok) {
+  //       throw Error("Failed to fetch pending order data");
+  //     } else {
+  //       const data = await response.json();
+  //       setLocations(data);
+  //     }
+  //     setLoading(false);
+  //   } catch (err) {
+  //     console.error("Error fetching pending order data:", err);
+  //   }
+  // };
+
+  // const fetchItemsDetails = async () => {
+  //   try {
+  //     setLoading(true);
+
+  //     const response = await fetch(`/api/orders/getItems`, {
+  //       method: "GET",
+  //       credentials: "include",
+  //     });
+
+  //     if (!response.ok) {
+  //       throw Error("Failed to fetch pending order data");
+  //     } else {
+  //       const data = await response.json();
+  //       //console.log(data);
+  //       setItemsList(data);
+  //     }
+  //     setLoading(false);
+  //   } catch (err) {
+  //     console.error("Error fetching pending order data:", err);
+  //   }
+  // };
+
   const fetchCustomersDetails = async () => {
     try {
-      setLoading(true);
+      setIsLoadingCustomers(true);
+
+      if (customers.length > 0) {
+        setIsLoadingCustomers(false);
+        return;
+      }
 
       const response = await fetch(`/api/orders/getCustomers`, {
         method: "GET",
         credentials: "include",
+        headers: {
+          'Cache-Control': 'max-age=300',
+        }
       });
+
       if (!response.ok) {
-        throw Error("Failed to fetch pending order data");
+        throw Error("Failed to fetch customers data");
       } else {
         const data = await response.json();
         setCustomers(data);
       }
-      setLoading(false);
     } catch (err) {
-      console.error("Error fetching pending order data:", err);
+      console.error("Error fetching customers data:", err);
+      handleShowAlert("error", "Failed to load customers list");
+    } finally {
+      setIsLoadingCustomers(false);
     }
   };
 
   const fetchLocationDetails = async () => {
     try {
-      setLoading(true);
+      setIsLoadingLocations(true);
 
       const response = await fetch(`/api/orders/getLocations`, {
         method: "GET",
         credentials: "include",
+        headers: {
+          'Cache-Control': 'max-age=300',
+        }
       });
 
       if (!response.ok) {
-        throw Error("Failed to fetch pending order data");
+        throw Error("Failed to fetch locations data");
       } else {
         const data = await response.json();
         setLocations(data);
       }
-      setLoading(false);
     } catch (err) {
-      console.error("Error fetching pending order data:", err);
+      console.error("Error fetching locations data:", err);
+      handleShowAlert("error", "Failed to load locations");
+    } finally {
+      setIsLoadingLocations(false);
     }
   };
 
   const fetchItemsDetails = async () => {
     try {
-      setLoading(true);
-
+      setIsLoadingItems(true);
+      console.log(isLoadingItems);
       const response = await fetch(`/api/orders/getItems`, {
         method: "GET",
         credentials: "include",
+        headers: {
+          'Cache-Control': 'max-age=300',
+        }
       });
 
       if (!response.ok) {
-        throw Error("Failed to fetch pending order data");
+        throw Error("Failed to fetch items data");
       } else {
         const data = await response.json();
-        //console.log(data);
         setItemsList(data);
       }
-      setLoading(false);
     } catch (err) {
-      console.error("Error fetching pending order data:", err);
+      console.error("Error fetching items data:", err);
+      handleShowAlert("error", "Failed to load items");
+    } finally {
+      setIsLoadingItems(false);
     }
   };
+
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -578,9 +669,11 @@ const CreateOrderPage: React.FC = () => {
 
   const handleViewDetails = async () => {
     setIsLoading(true);
+    setIsGeneratingPDF(true);
     if (!selectedCustomer) {
       handleShowAlert("error", "Please select a customer first");
       setIsLoading(false);
+      setIsGeneratingPDF(false);
       return;
     }
 
@@ -649,10 +742,33 @@ const CreateOrderPage: React.FC = () => {
     } finally {
       setIsLoading(false);
       setIsLoadingInvoices(false);
+      setIsGeneratingPDF(false);
     }
   };
 
-  const handleCustomerChange = (customerCode: string) => {
+  // const handleCustomerChange = (customerCode: string) => {
+  //   console.log(customerCode);
+  //   setCustomer(customerCode);
+
+  //   const selected = customers.find((c) => c.customerCode === customerCode);
+  //   if (selected) {
+  //     setSelectedCustomer(selected);
+  //     setOutstandingData(selected.outstandingData || []);
+  //     //     console.log(selected)
+  //     setSelectedCustomerDueAmount(selected.dueAmount);
+
+  //     const creditLimit = Number(selected.creditLimit) || 0;
+  //     const balanceCredit = Number(selected.balanceCredit ?? 0);
+  //     const customerTotal = creditLimit - balanceCredit;
+
+  //     // setSelectedCustomerTotal(customerTotal);
+  //     console.log(customerTotal);
+  //   }
+  // };
+
+  // Update current item field
+
+  const handleCustomerChange = async (customerCode: string) => {
     console.log(customerCode);
     setCustomer(customerCode);
 
@@ -660,19 +776,41 @@ const CreateOrderPage: React.FC = () => {
     if (selected) {
       setSelectedCustomer(selected);
       setOutstandingData(selected.outstandingData || []);
-      //     console.log(selected)
-      setSelectedCustomerDueAmount(selected.dueAmount);
 
-      const creditLimit = Number(selected.creditLimit) || 0;
-      const balanceCredit = Number(selected.balanceCredit ?? 0);
-      const customerTotal = creditLimit - balanceCredit;
+      // Show loading for due amount
+      setIsLoadingDueAmount(true);
 
-      // setSelectedCustomerTotal(customerTotal);
-      console.log(customerTotal);
+      // Set temporary loading value
+      setSelectedCustomerDueAmount(0);
+
+      // Fetch due amount from the new API
+      try {
+        const response = await fetch(`/api/orders/getCustomerDueAmount?customerId=${customerCode}`, {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (response.ok) {
+          const dueAmountData = await response.json();
+          setSelectedCustomerDueAmount(dueAmountData);
+        } else {
+          // Fallback to the existing dueAmount if API fails
+          setSelectedCustomerDueAmount(selected.dueAmount);
+        }
+      } catch (error) {
+        console.error("Error fetching customer due amount:", error);
+        setSelectedCustomerDueAmount(selected.dueAmount);
+      } finally {
+        setIsLoadingDueAmount(false);
+      }
+
+      //const creditLimit = Number(selected.creditLimit) || 0;
+      //const balanceCredit = Number(selected.balanceCredit ?? 0);
+      //const customerTotal = creditLimit - balanceCredit;
+      
     }
   };
 
-  // Update current item field
   const updateCurrentItem = (name: string, value: string) => {
     console.log("Updating item:", value, name);
     setSelectedItem(value);
@@ -814,7 +952,7 @@ const CreateOrderPage: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (isLoadingCustomers || isLoadingLocations) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
         <AppBar
@@ -861,9 +999,9 @@ const CreateOrderPage: React.FC = () => {
             {/* Order Form */}
             <div className="bg-white p-6 rounded-md shadow-sm mb-4">
               <h2 className="text-lg font-bold mb-4">Order</h2>
-              {/*Location*/}
 
-              <div className="mb-4 w-[250px]">
+              {/*Location*/}
+              {/* <div className="mb-4 w-[250px]">
                 <label className="block text-gray-700 font-medium mb-1.5">
                   Location:
                 </label>
@@ -882,6 +1020,28 @@ const CreateOrderPage: React.FC = () => {
                   placeholder="Select a Location"
                   isSearchable
                 />
+              </div> */}
+              <div className="mb-4 w-[250px]">
+                <label className="block text-gray-700 font-medium mb-1.5">
+                  Location:
+                </label>
+                <Select
+                  className="w-full text-sm"
+                  styles={{
+                    control: (provided) => ({
+                      ...provided,
+                      minHeight: "40px",
+                      height: "40px",
+                    }),
+                  }}
+                  options={locationOptions}
+                  value={locationOptions.find((opt) => opt.value === location)}
+                  onChange={(selected) => setLocation(selected?.value || "")}
+                  placeholder={isLoadingLocations ? "Loading locations..." : "Select a Location"}
+                  isSearchable
+                  isLoading={isLoadingLocations}
+                  isDisabled={isLoadingLocations}
+                />
               </div>
 
               {/* Customer and Totals Row */}
@@ -891,7 +1051,7 @@ const CreateOrderPage: React.FC = () => {
                     Customer:
                   </label>
 
-                  <Select
+                  {/* <Select
                     className="w-full text-sm"
                     styles={{
                       control: (provided) => ({
@@ -911,19 +1071,39 @@ const CreateOrderPage: React.FC = () => {
                     getOptionValue={(option) => option.value}
                     placeholder="Select a Customer"
                     isSearchable
+                  /> */}
+                  <Select
+                    className="w-full text-sm"
+                    styles={{
+                      control: (provided) => ({
+                        ...provided,
+                        minHeight: "41px",
+                        height: "41px",
+                      }),
+                    }}
+                    options={customerOptions}
+                    value={
+                      customerOptions.find((c) => c.value === customer) || null
+                    }
+                    onChange={(selected) =>
+                      handleCustomerChange(selected?.value || "")
+                    }
+                    getOptionLabel={(option) => option.label}
+                    getOptionValue={(option) => option.value}
+                    placeholder={isLoadingCustomers ? "Loading customers..." : "Select a Customer"}
+                    isSearchable
+                    isLoading={isLoadingCustomers}
+                    isDisabled={isLoadingCustomers}
                   />
                 </div>
-                <div>
+                {/* total due amount */}
+                {/* <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Total Due Amount:
                   </label>
                   <input
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
-                    // value={Number(selectedCustomerDueAmount).toLocaleString('en-US', {
-                    //   minimumFractionDigits: 2,
-                    //   maximumFractionDigits: 2
-                    // })}
                     value={Number(selectedCustomerDueAmount).toLocaleString(
                       "en-US",
                       {
@@ -934,7 +1114,7 @@ const CreateOrderPage: React.FC = () => {
                     readOnly
                   />
                   <div className="flex justify-start mt-2">
-                    <button
+                    {/* <button
                       disabled={isLoading}
                       onClick={handleViewDetails}
                       className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${isLoading
@@ -943,6 +1123,53 @@ const CreateOrderPage: React.FC = () => {
                         } text-white`}
                     >
                       {isLoading ? "Loading..." : "View Details"}
+                    </button> */}
+                {/* <button
+                      disabled={isLoading}
+                      onClick={handleViewDetails}
+                      className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${isLoading
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
+                        } text-white`}
+                    >
+                      {isLoading ? (isGeneratingPDF ? "Generating PDF..." : "Loading...") : "View Details"}
+                    </button>
+                  </div>
+                </div>  */}
+                <div>
+                  <label className="block text-gray-700 font-medium mb-2">
+                    Total Due Amount:
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
+                      value={
+                        isLoadingDueAmount
+                          ? "Loading..."
+                          : Number(selectedCustomerDueAmount).toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })
+                      }
+                      readOnly
+                    />
+                    {isLoadingDueAmount && (
+                      <div className="absolute right-3 top-1/2 transform -translate-y-1/2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500"></div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex justify-start mt-2">
+                    <button
+                      disabled={isLoading}
+                      onClick={handleViewDetails}
+                      className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${isLoading
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
+                        } text-white`}
+                    >
+                      {isLoading ? (isGeneratingPDF ? "Generating PDF..." : "Loading...") : "View Details"}
                     </button>
                   </div>
                 </div>
@@ -954,8 +1181,6 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
-                    //value={selectedCustomerTotal}
-                    //value={orderTotal.toFixed(2)}
                     value={Number(orderTotal.toFixed(2)).toLocaleString(
                       "en-US",
                       {
@@ -966,6 +1191,10 @@ const CreateOrderPage: React.FC = () => {
                     readOnly
                   />
                 </div>
+              </div>
+              <div>
+
+
               </div>
 
               {/* Payment Type and Notes Row */}
@@ -1054,20 +1283,6 @@ const CreateOrderPage: React.FC = () => {
                     Items by Code:
                   </label>
                   <div className="relative">
-                    {/* <select
-                      className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                      value={selectedItem}
-                      onChange={(e) =>
-                        updateCurrentItem("itemCode", e.target.value)
-                      }
-                    >
-                      <option value="">Select item code</option>
-                      {itemsList.map((item, index) => (
-                        <option key={index} value={item.itemCode}>
-                          {item.itemCode}
-                        </option>
-                      ))}
-                    </select> */}
                     <Select<Item>
                       options={location ? locationWiseItems : itemsList}
                       className="w-full text-sm"
@@ -1091,21 +1306,6 @@ const CreateOrderPage: React.FC = () => {
                       placeholder="Select item code"
                       isSearchable
                     />
-                    {/* <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                      <svg
-                        className="h-4 w-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          strokeWidth={2}
-                          d="M19 9l-7 7-7-7"
-                        />
-                      </svg>
-                    </div> */}
                   </div>
                   <label className="block text-blue-500 text-xs mt-2">
                     Item:{" "}
@@ -1187,21 +1387,8 @@ const CreateOrderPage: React.FC = () => {
                   </label>
                   <input
                     type="number"
-                    //min={0}
                     className="block w-full p-2 border border-gray-300 rounded"
                     value={selectedItemQuantity}
-                    // value={Number(selectedItemQuantity).toLocaleString('en-US', {
-                    //   minimumFractionDigits: 2,
-                    //   maximumFractionDigits: 2
-                    // })}
-                    // onChange={(e) => {
-                    //   const value = parseInt(e.target.value);
-                    //   if (value > selectedItemSelectedLocationStock) {
-                    //     handleShowAlert("error", "Please select a Quantity amout lower than stock amount");
-                    //   } else {
-                    //     setSelectedItemQuantity(value);
-                    //   }
-                    // }}
                     onChange={(e) => {
                       setSelectedItemQuantity(parseInt(e.target.value));
                     }}
@@ -1230,9 +1417,6 @@ const CreateOrderPage: React.FC = () => {
                   <input
                     type="text"
                     className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
-                    // value={
-                    //   calculateItemTotal() ? calculateItemTotal().toFixed(2) : 0
-                    // }
                     value={Number(
                       calculateItemTotal() ? calculateItemTotal().toFixed(2) : 0
                     ).toLocaleString("en-US", {
