@@ -123,6 +123,11 @@ interface Invoice {
   totalDueAmount: number;
 }
 
+interface PaymentMethod {
+  paymentMethodCode: string;
+  description: string;
+}
+
 const CreateOrderPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [location, setLocation] = useState("");
@@ -144,6 +149,7 @@ const CreateOrderPage: React.FC = () => {
   const [customer, setCustomer] = useState<string>("");
   //const [paymentTypes, setPaymentTypes] = useState<Payment[]>([]);
   const [itemsList, setItemsList] = useState<Item[]>([]);
+  const [paymentMethodList, setPaymentMethodList] = useState<PaymentMethod[]>([])
   const [locationWiseItems, setLocationWiseItems] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState("");
   const [selectedItemName, setSelectedItemName] = useState("");
@@ -159,7 +165,7 @@ const CreateOrderPage: React.FC = () => {
     setSelectedItemSelectedLocationStock,
   ] = useState<string>('0');
   // const [formattedAmount, setFormattedAmount] = useState("");
- // const [loading, setLoading] = useState(true);
+  // const [loading, setLoading] = useState(true);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
@@ -243,8 +249,6 @@ const CreateOrderPage: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // const pendingOrderList = sessionStorage.getItem("notificationsData");
-    // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
     setUserName(
       sessionStorage.getItem("userName")
         ? sessionStorage.getItem("userName")
@@ -268,6 +272,7 @@ const CreateOrderPage: React.FC = () => {
     fetchLocationDetails();
     fetchCustomersDetails();
     fetchItemsDetails();
+    fetchPaymentMethods();
   }, []);
 
   const handleShowAlert = (type: string, message: string) => {
@@ -280,71 +285,6 @@ const CreateOrderPage: React.FC = () => {
       setShowAlert(false);
     }, 5000);
   };
-
-  // const fetchCustomersDetails = async () => {
-  //   try {
-  //     setLoading(true);
-
-  //     const response = await fetch(`/api/orders/getCustomers`, {
-  //       method: "GET",
-  //       credentials: "include",
-  //     });
-  //     if (!response.ok) {
-  //       throw Error("Failed to fetch pending order data");
-  //     } else {
-  //       const data = await response.json();
-  //       setCustomers(data);
-  //     }
-  //     setLoading(false);
-  //   } catch (err) {
-  //     console.error("Error fetching pending order data:", err);
-  //   }
-  // };
-
-
-
-  // const fetchLocationDetails = async () => {
-  //   try {
-  //     setLoading(true);
-
-  //     const response = await fetch(`/api/orders/getLocations`, {
-  //       method: "GET",
-  //       credentials: "include",
-  //     });
-
-  //     if (!response.ok) {
-  //       throw Error("Failed to fetch pending order data");
-  //     } else {
-  //       const data = await response.json();
-  //       setLocations(data);
-  //     }
-  //     setLoading(false);
-  //   } catch (err) {
-  //     console.error("Error fetching pending order data:", err);
-  //   }
-  // };
-
-  // const fetchItemsDetails = async () => {
-  //   try {
-  //     setLoading(true);
-
-  //     const response = await fetch(`/api/orders/getItems`, {
-  //       method: "GET",
-  //       credentials: "include",
-  //     });
-
-  //     if (!response.ok) {
-  //       throw Error("Failed to fetch pending order data");
-  //     } else {
-  //       const data = await response.json();
-  //       //console.log(data);
-  //       setItemsList(data);
-  //     }
-  //     setLoading(false);
-  //   } catch (err) {
-  //     console.error("Error fetching pending order data:", err);
-  //   }
-  // };
 
   const fetchCustomersDetails = async () => {
     try {
@@ -429,6 +369,32 @@ const CreateOrderPage: React.FC = () => {
     }
   };
 
+  const fetchPaymentMethods = async () => {
+    try {
+      setIsLoadingItems(true);
+      console.log(isLoadingItems);
+      const response = await fetch(`/api/orders/getPaymentMethod`, {
+        method: "GET",
+        credentials: "include",
+        headers: {
+          'Cache-Control': 'max-age=300',
+        }
+      });
+
+      if (!response.ok) {
+        throw Error("Failed to payment method data");
+      } else {
+        const data = await response.json();
+        setPaymentMethodList(data);
+      }
+    } catch (err) {
+      console.error("Error payment method data:", err);
+      handleShowAlert("error", "Failed to load payment methods");
+    } finally {
+      setIsLoadingItems(false);
+    }
+  };
+
 
   const toggleSideNav = () => {
     setSideNavOpen(!sideNavOpen);
@@ -450,7 +416,7 @@ const CreateOrderPage: React.FC = () => {
         !selectedItem ||
         !selectedItemQuantity ||
         !selectedCustomer ||
-        //!paymentType ||
+        !paymentType ||
         !location
       ) {
         handleShowAlert("error", "Please fill in all required fields");
@@ -746,28 +712,6 @@ const CreateOrderPage: React.FC = () => {
     }
   };
 
-  // const handleCustomerChange = (customerCode: string) => {
-  //   console.log(customerCode);
-  //   setCustomer(customerCode);
-
-  //   const selected = customers.find((c) => c.customerCode === customerCode);
-  //   if (selected) {
-  //     setSelectedCustomer(selected);
-  //     setOutstandingData(selected.outstandingData || []);
-  //     //     console.log(selected)
-  //     setSelectedCustomerDueAmount(selected.dueAmount);
-
-  //     const creditLimit = Number(selected.creditLimit) || 0;
-  //     const balanceCredit = Number(selected.balanceCredit ?? 0);
-  //     const customerTotal = creditLimit - balanceCredit;
-
-  //     // setSelectedCustomerTotal(customerTotal);
-  //     console.log(customerTotal);
-  //   }
-  // };
-
-  // Update current item field
-
   const handleCustomerChange = async (customerCode: string) => {
     console.log(customerCode);
     setCustomer(customerCode);
@@ -803,11 +747,6 @@ const CreateOrderPage: React.FC = () => {
       } finally {
         setIsLoadingDueAmount(false);
       }
-
-      //const creditLimit = Number(selected.creditLimit) || 0;
-      //const balanceCredit = Number(selected.balanceCredit ?? 0);
-      //const customerTotal = creditLimit - balanceCredit;
-      
     }
   };
 
@@ -846,15 +785,6 @@ const CreateOrderPage: React.FC = () => {
   };
 
   const handleSave = async () => {
-    // const newData = {
-    //   customerCode: selectedCustomer?.customerCode,
-    //   locationCode: location,
-    //   paymentMethodCode: selectedCustomer?.paymentTermCode,
-    //   specialNote: specialNote,
-    //   totalAmount: orderTotal,
-    //   items: orderItems,
-    // };
-    // console.log("Saving order data:", newData);
     try {
       setIsSaving(true);
 
@@ -863,7 +793,7 @@ const CreateOrderPage: React.FC = () => {
         body: JSON.stringify({
           customerCode: selectedCustomer?.customerCode,
           locationCode: location,
-          paymentMethodCode: selectedCustomer?.paymentTermCode,
+          paymentMethodCode: paymentType,
           specialNote: specialNote,
           totalAmount: orderTotal,
           items: orderItems,
@@ -1001,26 +931,6 @@ const CreateOrderPage: React.FC = () => {
               <h2 className="text-lg font-bold mb-4">Order</h2>
 
               {/*Location*/}
-              {/* <div className="mb-4 w-[250px]">
-                <label className="block text-gray-700 font-medium mb-1.5">
-                  Location:
-                </label>
-                <Select
-                  className="w-full text-sm"
-                  styles={{
-                    control: (provided) => ({
-                      ...provided,
-                      minHeight: "40px",
-                      height: "40px",
-                    }),
-                  }}
-                  options={locationOptions}
-                  value={locationOptions.find((opt) => opt.value === location)}
-                  onChange={(selected) => setLocation(selected?.value || "")}
-                  placeholder="Select a Location"
-                  isSearchable
-                />
-              </div> */}
               <div className="mb-4 w-[250px]">
                 <label className="block text-gray-700 font-medium mb-1.5">
                   Location:
@@ -1050,28 +960,6 @@ const CreateOrderPage: React.FC = () => {
                   <label className="block text-gray-700 font-medium mb-2">
                     Customer:
                   </label>
-
-                  {/* <Select
-                    className="w-full text-sm"
-                    styles={{
-                      control: (provided) => ({
-                        ...provided,
-                        minHeight: "41px",
-                        height: "41px",
-                      }),
-                    }}
-                    options={customerOptions}
-                    value={
-                      customerOptions.find((c) => c.value === customer) || null
-                    }
-                    onChange={(selected) =>
-                      handleCustomerChange(selected?.value || "")
-                    }
-                    getOptionLabel={(option) => option.label}
-                    getOptionValue={(option) => option.value}
-                    placeholder="Select a Customer"
-                    isSearchable
-                  /> */}
                   <Select
                     className="w-full text-sm"
                     styles={{
@@ -1096,46 +984,6 @@ const CreateOrderPage: React.FC = () => {
                     isDisabled={isLoadingCustomers}
                   />
                 </div>
-                {/* total due amount */}
-                {/* <div>
-                  <label className="block text-gray-700 font-medium mb-2">
-                    Total Due Amount:
-                  </label>
-                  <input
-                    type="text"
-                    className="block w-full p-2 border border-gray-200 rounded bg-gray-100 focus:outline-none"
-                    value={Number(selectedCustomerDueAmount).toLocaleString(
-                      "en-US",
-                      {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      }
-                    )}
-                    readOnly
-                  />
-                  <div className="flex justify-start mt-2">
-                    {/* <button
-                      disabled={isLoading}
-                      onClick={handleViewDetails}
-                      className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${isLoading
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
-                        } text-white`}
-                    >
-                      {isLoading ? "Loading..." : "View Details"}
-                    </button> */}
-                {/* <button
-                      disabled={isLoading}
-                      onClick={handleViewDetails}
-                      className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${isLoading
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
-                        } text-white`}
-                    >
-                      {isLoading ? (isGeneratingPDF ? "Generating PDF..." : "Loading...") : "View Details"}
-                    </button>
-                  </div>
-                </div>  */}
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Total Due Amount:
@@ -1165,8 +1013,8 @@ const CreateOrderPage: React.FC = () => {
                       disabled={isLoading}
                       onClick={handleViewDetails}
                       className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${isLoading
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
                         } text-white`}
                     >
                       {isLoading ? (isGeneratingPDF ? "Generating PDF..." : "Loading...") : "View Details"}
@@ -1206,11 +1054,19 @@ const CreateOrderPage: React.FC = () => {
                     </label>
                     <div className="relative">
                       <select
-                        disabled
                         className="block w-full p-2 border border-gray-300 rounded bg-gray-50 text-gray-600 appearance-none"
                         value={paymentType}
+                        onChange={(e) => setPaymentType(e.target.value)}
                       >
-                        <option>Default payment type</option>
+                        <option value="">Select Payment Method</option>
+                        {paymentMethodList.map((method) => (
+                          <option
+                            key={method.paymentMethodCode}
+                            value={method.paymentMethodCode}
+                          >
+                            {method.description}
+                          </option>
+                        ))}
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
                         <svg
