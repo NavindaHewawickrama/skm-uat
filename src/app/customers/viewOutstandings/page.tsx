@@ -152,17 +152,18 @@ const OutstandingsPage: React.FC = () => {
   };
 
   // Calculate total due amount from actual data
-  const totalDueAmountClean = outstandingInvoices
-    .reduce((customerMap, invoice) => {
+  const totalDueAmountClean = Array.from(
+    outstandingInvoices
+      .reduce((customerMap, invoice) => {
 
-      if (!customerMap.has(invoice.customerName)) {
-        customerMap.set(invoice.customerName, invoice.totalDueAmount);
-      }
-      return customerMap;
-    }, new Map())
+        if (!customerMap.has(invoice.customerName)) {
+          customerMap.set(invoice.customerName, invoice.totalDueAmount);
+        }
+        return customerMap;
+      }, new Map())
 
-    .values()
-    .reduce((sum, amount) => sum + amount, 0);
+      .values()
+  ).reduce((sum, amount) => sum + amount, 0);
 
   // Filter invoices based on search query
   const filteredInvoices = outstandingInvoices.filter(
