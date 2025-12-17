@@ -28,7 +28,7 @@ WORKDIR /app
 
 #makes sure the app runs in production mode
 ENV NODE_ENV production
-ENV NEXT_PUBLIC_API_BASE_URL=http://10.0.2.10
+ENV NEXT_PUBLIC_API_BASE_URL=http://10.0.2.10:8080
 
 #group for permissions 
 RUN addgroup --system --gid 1001 nodejs

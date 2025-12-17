@@ -49,7 +49,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(
-      { error: 'Failed to login user' },
+      { error: error? error: 'Failed to login user' },
       { status: 500 }
     );
   }
