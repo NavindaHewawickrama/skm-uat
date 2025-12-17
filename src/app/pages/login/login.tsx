@@ -60,7 +60,7 @@ const LoginPage = () => {
       });
 
       const data = await response.json();
-
+      console.log(response);
       if (response.ok) {
         // Success case
         handleShowAlert(
