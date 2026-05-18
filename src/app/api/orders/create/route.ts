@@ -1,11 +1,11 @@
-import { getValidAccessToken } from '@/lib/auth';
+import { tokenManager } from '@/app/lib/auth';
 import { NextResponse } from 'next/server';
 import baseUrl from '../../../config';
 
 //create an order
 export async function POST(request: Request) {
     try {
-        const result = await getValidAccessToken();
+        const result = await tokenManager.getValidAccessToken();
         const { userId, token, status, message } = result;
 
         if (status !== 200 || !token || !userId) {
@@ -13,11 +13,11 @@ export async function POST(request: Request) {
         }
 
         const body = await request.json();
-        const { customerCode, locationCode, paymentMethodCode, totalAmount, items } = body;
+        const { customerCode, locationCode, paymentMethodCode, specialNote, totalAmount, items } = body;
 
         const response = await fetch(`${baseUrl.apiBaseUrl}/api/Business/CreateOrder?userId=${userId}`, {
             method: 'POST',
-            body: JSON.stringify({ customerCode, locationCode, paymentMethodCode, totalAmount, items }),
+            body: JSON.stringify({ customerCode, locationCode, paymentMethodCode, specialNote, totalAmount, items }),
             headers: {
                 'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',

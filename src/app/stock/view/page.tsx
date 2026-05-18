@@ -1,13 +1,15 @@
 "use client";
 import React, { useState, useEffect, useMemo } from "react";
-import AppBar from "../../../components/Appbar";
-import SideNav from "../../../components/Sidenav";
-import Footer from "../../../components/Footer";
+import AppBar from "../../components/Appbar";
+import SideNav from "../../components/Sidenav";
+import Footer from "../../components/Footer";
 import productImage from "../../../../public/images/products/pro1.png";
-import ImagePopup from "@/components/ImagePopup";
+import ImagePopup from "../../components/ImagePopup";
 import producctImage2 from "../../../../public/images/products/pro2.png";
 import { StaticImageData } from 'next/image';
-import Alert from "../../../components/Alert";
+import Alert from "../../components/Alert";
+import { useStockData } from "../../hooks/useStockData";
+//import { useStockStore } from "../../stores/stockStore";
 
 interface Image {
   src: string;
@@ -77,8 +79,8 @@ const StockView = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [currentPage, setCurrentPage] = useState(1);
   const [openImagePopup, setOpenImagePopup] = useState(false);
-  const [stockItems, setStockItems] = useState<StockItem[]>([]);
-  const [loading, setLoading] = useState(true);
+  // const [stockItems, setStockItems] = useState<StockItem[]>([]);
+  // const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
@@ -88,6 +90,13 @@ const StockView = () => {
   const [alertType, setAlertType] = useState("");
   const [loadingItemCode, setLoadingItemCode] = useState<string | null>(null);
   const [loadingLocationCode, setLoadingLocationCode] = useState<string | null>(null);
+
+  const {
+    stockItems,
+    isLoading: stockLoading,
+    error: stockError,
+    refreshStock
+  } = useStockData(true); //true = auto-fetch on mount
 
   // Fetch pending order data from API
   useEffect(() => {
@@ -117,9 +126,18 @@ const StockView = () => {
   useEffect(() => {
     setUserName(sessionStorage.getItem("userName") ? sessionStorage.getItem("userName") : "");
     setUserRoleType(sessionStorage.getItem("userRoleName") ? sessionStorage.getItem("userRoleName") : "");
-    // const pendingOrderList = sessionStorage.getItem("notificationsData");
-    // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
   }, []);
+
+  const handleRefreshStock = () => {
+    refreshStock();
+    handleShowAlert("success", "Stock data refreshed");
+  };
+
+  useEffect(() => {
+    if (stockError) {
+      setError(stockError);
+    }
+  }, [stockError]);
 
   const defaultImage: Image = {
     ...producctImage2,
@@ -143,198 +161,39 @@ const StockView = () => {
     }, 5000);
   };
 
-  // Fetch stock data from API
-  useEffect(() => {
-    // const fetchStockData = async () => {
-    //   try {
-    //     setLoading(true);
-    //     setError(null);
-
-    //     // const response = await fetch("/api/stock", {
-    //     //   method: "GET",
-    //     //   credentials: "include",
-    //     // });
-
-    //     // if (!response.ok) {
-    //     //   throw Error("Failed to fetch stock data");
-    //     // }
-
-    //     // const apiData: ApiStockItem[] = await response.json();
-
-    //     // // Transform API data to match component interface
-    //     // const transformedData: StockItem[] = apiData.map((item) => ({
-    //     //   itemCode: item.itemCode,
-    //     //   itemName: item.itemName,
-    //     //   location: item.location,
-    //     //   stock: item.stock,
-    //     //   unitPrice: item.unitPrice,
-    //     //   itemCategory: item.itemCategory,
-    //     //   category: item.category,
-    //     //   subCategory: item.subCategory,
-    //     //   description: item.description,
-    //     //   description2: item.description2,
-    //     //   unitOfMeasure: item.unitOfMeasure,
-    //     //   size: item.size,
-    //     //   reorderQuantity: item.reorderQuantity,
-    //     //   image: item.image,
-    //     //   img: item.image ? item.image : productImage,
-    //     // }));
-
-    //     // setStockItems(transformedData);
-    //     const response = await fetch("/api/stock", {
-    //       method: "GET",
-    //       credentials: "include",
-    //     });
-
-    //     if (!response.ok) {
-    //       throw new Error("Failed to fetch stock data");
-    //     }
-
-    //     const reader = response.body?.getReader();
-    //     const decoder = new TextDecoder("utf-8");
-
-    //     let buffer = "";
-    //     let done = false;
-
-    //     while (!done) {
-    //       const { value, done: readerDone } = await reader!.read();
-    //       done = readerDone;
-    //       buffer += decoder.decode(value || new Uint8Array(), { stream: true });
-
-    //       // Split buffer into JSON objects if backend sends newline-delimited JSON
-    //       let lines = buffer.split("\n");
-
-    //       // Keep the last partial line in the buffer
-    //       buffer = lines.pop() || "";
-
-    //       for (const line of lines) {
-    //         if (line.trim()) {
-    //           try {
-    //             const item: ApiStockItem = JSON.parse(line);
-    //             const transformed: StockItem = {
-    //               itemCode: item.itemCode,
-    //               itemName: item.itemName,
-    //               location: item.location,
-    //               stock: item.stock,
-    //               unitPrice: item.unitPrice,
-    //               itemCategory: item.itemCategory,
-    //               category: item.category,
-    //               subCategory: item.subCategory,
-    //               description: item.description,
-    //               description2: item.description2,
-    //               unitOfMeasure: item.unitOfMeasure,
-    //               size: item.size,
-    //               reorderQuantity: item.reorderQuantity,
-    //               image: item.image,
-    //               img: item.image ? item.image : productImage,
-    //             };
-
-    //             // Append item as it arrives
-    //             setStockItems(prev => [...prev, transformed]);
-    //           } catch (err) {
-    //             console.error("Failed to parse chunk", err);
-    //           }
-    //         }
-    //       }
-    //     }
-
-    //     setLoading(false);
-
-    //   } catch (err) {
-    //     console.error("Error fetching stock data:", err);
-    //     setError(
-    //       err instanceof Error ? err.message : "Failed to fetch stock data"
-    //     );
-    //   } finally {
-    //     setLoading(false);
-    //   }
-    // };
-
-    fetchStockData();
-  }, []);
-
-  const fetchStockData = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-
-      const response = await fetch("/api/stock", {
-        method: "GET",
-        credentials: "include",
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to fetch stock data");
-      }
-
-      const reader = response.body?.getReader();
-      const decoder = new TextDecoder("utf-8");
-      let buffer = "";
-
-      if (!reader) throw new Error("Readable stream not supported");
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || ""; // Keep incomplete JSON in buffer
-
-        for (const line of lines) {
-          if (line.trim()) {
-            try {
-              const item: ApiStockItem = JSON.parse(line);
-
-              const transformed: StockItem = {
-                itemCode: item.itemCode,
-                itemName: item.itemName,
-                location: item.location,
-                stock: item.stock,
-                unitPrice: item.unitPrice,
-                itemCategory: item.itemCategory,
-                category: item.category,
-                subCategory: item.subCategory,
-                description: item.description,
-                description2: item.description2,
-                unitOfMeasure: item.unitOfMeasure,
-                size: item.size,
-                reorderQuantity: item.reorderQuantity,
-                image: item.image,
-                img: item.image ? item.image : productImage,
-              };
-
-              // Add each item as it streams in
-              setStockItems(prev => [...prev, transformed]);
-            } catch (parseErr) {
-              console.error("JSON parse error:", parseErr);
-            }
-          }
-        }
-      }
-
-      setLoading(false);
-    } catch (err) {
-      console.error("Error fetching stock data:", err);
-      setError(
-        err instanceof Error ? err.message : "Failed to fetch stock data"
-      );
-      setLoading(false);
-    }
-  };
-
-
-  // Filter items based on search query
   const filteredItems = useMemo(() => {
-    return stockItems.filter(
-      (item) =>
-        item.itemCode.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.itemName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.subCategory.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    if (!searchQuery.trim()) return stockItems;
+
+    const query = searchQuery.toLowerCase().trim();
+    const searchTerms = query.split(/\s+/);
+
+    return stockItems.filter((item) => {
+      // Create a comprehensive searchable text
+      const searchableFields = [
+        item.itemCode.toLowerCase(),
+        item.itemName.toLowerCase(),
+        item.location.toLowerCase(),
+        item.category.toLowerCase(),
+        item.subCategory.toLowerCase(),
+        item.itemCategory.toLowerCase(),
+        item.description.toLowerCase(),
+        // Combined fields
+        `${item.category} ${item.subCategory}`.toLowerCase(),
+        `${item.itemCategory} ${item.category}`.toLowerCase(),
+        `${item.itemCategory} ${item.subCategory}`.toLowerCase(),
+        `${item.itemCategory} ${item.category} ${item.subCategory}`.toLowerCase(),
+      ];
+
+      // For single word search
+      if (searchTerms.length === 1) {
+        return searchableFields.some(field => field.includes(query));
+      }
+
+      // For multi-word search - all words must match somewhere
+      return searchTerms.every(term =>
+        searchableFields.some(field => field.includes(term))
+      );
+    });
   }, [stockItems, searchQuery]);
 
   const totalPages = useMemo(() => {
@@ -403,24 +262,6 @@ const StockView = () => {
   };
 
   const handleViewImage = async (itemNo: string, location: string) => {
-    // setOpenImagePopup(true);
-
-    // if (typeof img === "string") {
-    //   const base64Image = `data:image/jpeg;base64,${img}`;
-    //   setSelectedProductImage({
-    //     src: base64Image,
-    //     width: 400,
-    //     height: 300,
-    //   });
-    // } else if (img && typeof img === "object") {
-    //   // Handle StaticImageData - convert to Image format
-    //   setSelectedProductImage({
-    //     src: img.src,
-    //     width: img.width || 400,
-    //     height: img.height || 300,
-    //   });
-    // }
-    //console.log(itemCode);
 
     setLoadingItemCode(itemNo);
     setLoadingLocationCode(location);
@@ -468,7 +309,7 @@ const StockView = () => {
     }
   }
 
-  if (loading) {
+  if (stockLoading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
         <AppBar toggleSideNav={toggleSideNav} userRole={userRoleType} userName={userName} notificationData={pendingOrders} />
@@ -519,6 +360,18 @@ const StockView = () => {
           <Alert message={alertMessage} type={alertType} duration={5000} />
         )}
         <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Add refresh button */}
+          <div className="flex justify-end p-4">
+            <button
+              onClick={handleRefreshStock}
+              className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Refresh Stock
+            </button>
+          </div>
           <div className="flex-1 p-4 overflow-auto">
             {/* Table Controls */}
             <div className="bg-white p-4 flex flex-wrap justify-between items-center mb-4">
@@ -603,7 +456,7 @@ const StockView = () => {
                   {displayedItems.map((item, index) => (
                     <tr
                       key={`${item.itemCode}-${item.location}-${index}`}
-                      // className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-01-SKM" || "COLOMBO-RETAIL-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-02-SNS" || "COLOMBO-RETAIL-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH-01-SKM" || "WELISARA-WH01-SKM"? "bg-[#f2fa84]" : item.location === "WELISARA-WH-01-SNS" || "WELISARA-WH01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
+                      // className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-01-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-02-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH-01-SKM" ? "bg-[#f2fa84]" : item.location === "WELISARA-WH-01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
                       //   }`}
                       className={`hover:bg-red ${item.location === "Colombo 10" ? "bg-[#bbd2fc]" : item.location === "RGM-SKM01" ? "bg-[#62b1ff]" : item.location === "COLOMBO-RETAIL-SKM" ? "bg-[#fa8484]" : item.location === "COLOMBO-RETAIL-SNS" ? "bg-[#9cffff]" : item.location === "WELISARA-WH01-SKM" ? "bg-[#f2fa84]" : item.location === "WELISARA-WH01-SNS" ? "bg-[#84fa84]" : "bg-[#ffffff]"
                         }`}
@@ -618,7 +471,7 @@ const StockView = () => {
                         {item.location}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
-                        {item.stock}
+                        {item.stock == "0+" ? "0" : item.stock}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.unitPrice}

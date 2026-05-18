@@ -1,11 +1,11 @@
-import { getValidAccessToken } from '@/lib/auth';
+import { tokenManager } from '@/app/lib/auth';
 import { NextResponse } from 'next/server';
 import baseUrl from '../../../config';
 
 // Upload a document
 export async function POST(request: Request) {
     try {
-        const result = await getValidAccessToken();
+       const result = await tokenManager.getValidAccessToken();
 
         const { userId, token, status, message } = result;
 

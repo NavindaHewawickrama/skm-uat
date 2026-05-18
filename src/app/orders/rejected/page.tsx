@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useMemo, useEffect } from "react";
-import AppBar from "@/components/Appbar";
-import SideNav from "@/components/Sidenav";
-import Footer from "@/components/Footer";
-import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
+import AppBar from "../../components/Appbar";
+import SideNav from "../../components/Sidenav";
+import Footer from "../../components/Footer";
+import ViewOrderEditPopupButton from "../../components/viewOrderEditPopupButton";
 
 type OrderType = {
   orderNumber: number;
@@ -147,7 +147,7 @@ const RejectedOrdersPage: React.FC = () => {
   const filteredOrders = useMemo(() => {
     return rejectedOrders.filter(
       (order) =>
-        order.orderNumber ||
+        order.orderNumber.toString().includes(searchQuery) ||
         order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
         order.salesPersonName.toLowerCase().includes(searchQuery.toLowerCase())
     );
@@ -257,7 +257,7 @@ const RejectedOrdersPage: React.FC = () => {
             <div className="text-center">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500 mx-auto"></div>
               <p className="mt-4 text-lg text-gray-600">
-                Loading rejected orders data...
+                Loading Rejected orders data...
               </p>
             </div>
           </div>

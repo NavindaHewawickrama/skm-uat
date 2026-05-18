@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useMemo, useEffect } from "react";
-import AppBar from "@/components/Appbar";
-import SideNav from "@/components/Sidenav";
-import Footer from "@/components/Footer";
-import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
-import ViewStatusPopup from "@/components/ViewStatusPopup";
+import AppBar from "../../components/Appbar";
+import SideNav from "../../components/Sidenav";
+import Footer from "../../components/Footer";
+import ViewOrderEditPopupButton from "../../components/viewOrderEditPopupButton";
+import ViewStatusPopup from "../../components/ViewStatusPopup";
 
 type OrderforStatus = {
   orderNumber: string;
@@ -164,7 +164,8 @@ const PendingOrdersPage: React.FC = () => {
       (order) =>
         // order.orderNumber.toLowerCase().includes(searchQuery.toLowerCase()) ||
         order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.salesPersonName.toLowerCase().includes(searchQuery.toLowerCase())
+        order.salesPersonName.toLowerCase().includes(searchQuery.toLowerCase()) || 
+        order.orderNumber.toString().includes(searchQuery)
     );
   }, [pendingOrders, searchQuery]);
 

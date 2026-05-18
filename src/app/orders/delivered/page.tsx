@@ -1,10 +1,10 @@
 "use client";
 import React, { useState, useMemo, useEffect } from "react";
-import AppBar from "@/components/Appbar";
-import SideNav from "@/components/Sidenav";
-import ViewOrderEditPopupButton from "@/components/viewOrderEditPopupButton";
-import Footer from "@/components/Footer";
-import ViewOrderDeliveryStatus from "@/components/ViewOrderDeliveryStatus";
+import AppBar from "../../components/Appbar";
+import SideNav from "../../components/Sidenav";
+import ViewOrderEditPopupButton from "../../components/viewOrderEditPopupButton";
+import Footer from "../../components/Footer";
+import ViewOrderDeliveryStatus from "../../components/ViewOrderDeliveryStatus";
 
 type OrderType = {
   orderNumber: number;
@@ -149,15 +149,23 @@ const DeliveredOrdersPage: React.FC = () => {
   const filteredOrders = useMemo(() => {
     return deliveredOrders.filter(
       (order) =>
-        order.orderNumber ||
+        // order.orderNumber ||
         order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.salesPersonName.toLowerCase().includes(searchQuery.toLowerCase())
+        order.salesPersonName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        order.orderNumber.toString().includes(searchQuery)
     );
-  }, []);
+  }, [searchQuery, deliveredOrders]);
 
   const totalPages = useMemo(() => {
     return Math.ceil(filteredOrders.length / parseInt(entriesPerPage));
   }, [filteredOrders.length, entriesPerPage]);
+
+  const currentOrders = useMemo(() => {
+    const itemsPerPage = parseInt(entriesPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredOrders.slice(startIndex, endIndex);
+  }, [filteredOrders, currentPage, entriesPerPage]);
 
   // Generate page numbers for pagination
   const getPageNumbers = () => {
@@ -406,7 +414,7 @@ const DeliveredOrdersPage: React.FC = () => {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
-                    {deliveredOrders.map((order, index) => (
+                    {currentOrders.map((order, index) => (
                       <tr key={index}
                         className={`${selectedRowIndex === index
                           ? "bg-blue-100 border-blue-300"

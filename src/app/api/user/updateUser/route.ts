@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server';
-import { getValidAccessToken } from '@/lib/auth';
+import { tokenManager } from '@/app/lib/auth';
 import baseUrl from '../../../config';
 
 export async function PUT(request: Request) {
     try {
-        const result = await getValidAccessToken();
+        const result = await tokenManager.getValidAccessToken();
 
         const { userId, token, status, message } = result;
 

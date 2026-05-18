@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import AppBar from "../../../components/Appbar";
-import SideNav from "../../../components/Sidenav";
-import Footer from "../../../components/Footer";
+import AppBar from "../../components/Appbar";
+import SideNav from "../../components/Sidenav";
+import Footer from "../../components/Footer";
 
 const ReportsOutstandings = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);

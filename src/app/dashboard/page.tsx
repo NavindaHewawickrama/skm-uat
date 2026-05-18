@@ -1,9 +1,9 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import AppBar from "../../components/Appbar";
-import SideNav from "../../components/Sidenav";
-import Footer from "../../components/Footer";
-import SalesChart from "@/components/SalesChart";
+import AppBar from "../components/Appbar";
+import SideNav from "../components/Sidenav";
+import Footer from "../components/Footer";
+import SalesChart from "../components/SalesChart";
 
 interface Notices {
   originalName: string;

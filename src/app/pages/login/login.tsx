@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
-import Alert from "../../../components/Alert";
+import Alert from "../../components/Alert";
 
 const LoginPage = () => {
   const router = useRouter();
@@ -60,7 +60,7 @@ const LoginPage = () => {
       });
 
       const data = await response.json();
-
+      console.log(response);
       if (response.ok) {
         // Success case
         handleShowAlert(
