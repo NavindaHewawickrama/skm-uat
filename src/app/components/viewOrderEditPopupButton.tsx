@@ -68,7 +68,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
 
     const tableColumn = [
       "Item Code",
-      "Item Name",
+      "Item Description",
       "Unit Price",
       "Quantity",
       "Discount(%)",
@@ -219,7 +219,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
                       Item Code
                     </th>
                     <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
-                      Item Name
+                      Item Description
                     </th>
                     <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
                       Unit Price
