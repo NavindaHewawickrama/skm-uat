@@ -1,11 +1,11 @@
-import { getValidAccessToken } from '@/app/lib/auth';
+import { tokenManager } from '@/app/lib/auth';
 import { NextResponse } from 'next/server';
 import baseUrl from '../../../config';
 
 // get delivered order details
 export async function GET() {
     try {
-        const result = await getValidAccessToken();
+        const result = await tokenManager.getValidAccessToken();
 
         const { userId, token, status, message } = result;
 

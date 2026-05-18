@@ -7,11 +7,22 @@ export async function POST(request: Request) {
     const body = await request.json();
     const { usernameOrEmail, password, rememberme } = body;
 
+    // Get client IP from headers
+    const forwardedFor = request.headers.get('x-forwarded-for');
+    const realIp = request.headers.get('x-real-ip');
+
+    // Get the first IP from x-forwarded-for (client's real IP)
+    const clientIp = forwardedFor
+      ? forwardedFor.split(',')[0].trim()
+      : realIp || 'unknown';
+    console.log(clientIp);
+
     const response = await fetch(`${baseUrl.apiBaseUrl}/api/User/login`, {
       method: 'POST',
       body: JSON.stringify({ usernameOrEmail, password, rememberme }),
       headers: {
         'Content-Type': 'application/json',
+        'X-Forwarded-For': clientIp,
       },
     });
     //console.log(response);
@@ -26,7 +37,7 @@ export async function POST(request: Request) {
     const cookieStore = cookies();
     (await cookieStore).set({
       name: 'acctoken',
-      value: data.acctoken, 
+      value: data.acctoken,
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
@@ -36,7 +47,7 @@ export async function POST(request: Request) {
 
     (await cookieStore).set({
       name: 'refreshtoken',
-      value: data.refToken, 
+      value: data.refToken,
       httpOnly: true,
       secure: false,
       sameSite: 'lax',
@@ -49,7 +60,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Login error:', error);
     return NextResponse.json(
-      { error: 'Failed to login user' },
+      { error: error ? error : 'Failed to login user' },
       { status: 500 }
     );
   }
