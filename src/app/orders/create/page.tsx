@@ -192,7 +192,7 @@ const CreateOrderPage: React.FC = () => {
     )
     .map((loc) => ({
       value: loc.locationCode,
-      label: loc.locationName,
+      label: loc.locationCode,
     }));
 
   const customerOptions = customers
