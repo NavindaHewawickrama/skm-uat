@@ -9,6 +9,8 @@ interface OrderItem {
   itemCode: string;
   quantity: string | number;
   discountPercent: string | number;
+  total: string | number;
+  specialNote?: string;
 }
 
 interface ModalProps {
@@ -18,6 +20,7 @@ interface ModalProps {
   orderNumber: number;
   customerName: string;
   invoiceNumber?: string | null;
+  specialNote?: string;
 }
 
 const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
@@ -27,6 +30,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
   orderNumber = 0,
   customerName = "",
   invoiceNumber = "",
+  specialNote = "",
 }) => {
   // console.log(orderDetails);
 
@@ -42,7 +46,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
       `${customerName} : Order Number ${orderNumber.toString()}`,
       105,
       21,
-      { align: "center" }
+      { align: "center" },
     );
     // {
     //   invoiceNumber && (
@@ -63,7 +67,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
       month: "short",
       day: "2-digit",
     });
-    pdf.setFontSize(10);
+    pdf.setFontSize(9);
     pdf.text(currentDate, 195, 15, { align: "right" });
 
     const tableColumn = [
@@ -73,6 +77,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
       "Quantity",
       "Discount(%)",
       "Total",
+      "Note",
     ];
 
     // Fix 1: Use correct variable names and calculate total
@@ -108,6 +113,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }), // Total
+        specialNote || "",
       ];
     });
 
@@ -148,7 +154,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
       finalY + 10,
       {
         align: "right",
-      }
+      },
     );
 
     const blob = pdf.output("blob");
@@ -230,6 +236,9 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
                     <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
                       Discount
                     </th>
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black tracking-wider">
+                      Total
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="text-center">
@@ -244,12 +253,12 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
                         {typeof item.unitPrice === "number"
                           ? Number(item.unitPrice.toFixed(2)).toLocaleString(
-                            "en-US",
-                            {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            }
-                          )
+                              "en-US",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              },
+                            )
                           : item.unitPrice}
                       </td>
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
@@ -258,9 +267,47 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
                       <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
                         {item.discountPercent} %
                       </td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm">
+                        {Number(
+                          (
+                            Number(item.unitPrice) *
+                            Number(item.quantity) *
+                            Number(1 - Number(item.discountPercent) / 100)
+                          ).toFixed(2),
+                        ).toLocaleString("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
+                <tfoot>
+                  <tr className="bg-blue-100 border-t-2 border-blue-200">
+                    <td
+                      colSpan={5}
+                      className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black"
+                    >
+                      Grand Total
+                    </td>
+                    <td className="px-2 sm:px-4 py-2 sm:py-3 text-center text-xs sm:text-sm font-bold text-black">
+                      {Number(
+                        orderDetails
+                          .reduce((sum, item) => {
+                            const subTotal =
+                              Number(item.unitPrice) * Number(item.quantity);
+                            const discount =
+                              subTotal * (Number(item.discountPercent) / 100);
+                            return sum + (subTotal - discount);
+                          }, 0)
+                          .toFixed(2),
+                      ).toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </td>
+                  </tr>
+                </tfoot>
               </table>
             </div>
           </div>
