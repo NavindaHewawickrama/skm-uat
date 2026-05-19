@@ -21,15 +21,15 @@ type OrderType = {
     total: number;
   }[];
   items:
-  | string
-  | {
-    itemCode: string;
-    description: string;
-    unitPrice: number;
-    quantity: string;
-    discountPercent: number;
-    total: number;
-  }[];
+    | string
+    | {
+        itemCode: string;
+        description: string;
+        unitPrice: number;
+        quantity: string;
+        discountPercent: number;
+        total: number;
+      }[];
   specialNote: string;
   rejectReason: string | null;
   status: string;
@@ -64,12 +64,15 @@ const RejectedOrdersPage: React.FC = () => {
   const [userName, setUserName] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(
-    null
+    null,
   );
   const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<
     string | null
   >(null);
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
+  const [selectedOrderSpecialNote, setSelectedOrderSpecialNote] =
+    useState<string>("");
+
   // Fetch pending order data from API
   useEffect(() => {
     const fetchPendingOrderData = async () => {
@@ -99,12 +102,12 @@ const RejectedOrdersPage: React.FC = () => {
     setUserName(
       sessionStorage.getItem("userName")
         ? sessionStorage.getItem("userName")
-        : ""
+        : "",
     );
     setUserRoleType(
       sessionStorage.getItem("userRoleName")
         ? sessionStorage.getItem("userRoleName")
-        : ""
+        : "",
     );
     // const pendingOrderList = sessionStorage.getItem("notificationsData");
     // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
@@ -136,7 +139,7 @@ const RejectedOrdersPage: React.FC = () => {
       setError(
         err instanceof Error
           ? err.message
-          : "Failed to fetch pending order data"
+          : "Failed to fetch pending order data",
       );
     } finally {
       setLoading(false);
@@ -149,7 +152,7 @@ const RejectedOrdersPage: React.FC = () => {
       (order) =>
         order.orderNumber.toString().includes(searchQuery) ||
         order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.salesPersonName.toLowerCase().includes(searchQuery.toLowerCase())
+        order.salesPersonName.toLowerCase().includes(searchQuery.toLowerCase()),
     );
   }, [rejectedOrders, searchQuery]);
 
@@ -230,6 +233,7 @@ const RejectedOrdersPage: React.FC = () => {
       setSelectedOrder(order.orderedItems);
       setSelectedOrderNumber(order.orderNumber);
       setSelectedOrderCustomerName(order.customerName);
+      setSelectedOrderSpecialNote(order.specialNote || "");
     } else {
       setSelectedOrder([]);
     }
@@ -349,60 +353,62 @@ const RejectedOrdersPage: React.FC = () => {
                 <table className="min-w-full bg-white border border-gray-200">
                   <thead className="bg-gray-200">
                     <tr>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
-                        Order No
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
-                        Customer
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
-                        Sales Ref
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                         Order Date
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
+                        Order No
+                      </th>
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
+                        Customer
+                      </th>
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
+                        Sales Ref
+                      </th>
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                         Total
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                         Item Details
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                         Status
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                         Reason
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {currentOrders.map((order: OrderType, index) => (
-                      <tr key={index}
-                        className={`${selectedRowIndex === index
-                          ? "bg-blue-100 border-blue-300"
-                          : "hover:bg-gray-200"
-                          }`}
+                      <tr
+                        key={index}
+                        className={`${
+                          selectedRowIndex === index
+                            ? "bg-blue-100 border-blue-300"
+                            : "hover:bg-gray-200"
+                        }`}
                       >
-                        <td className="px-4 py-3 border text-sm">
-                          {order.orderNumber}
-                        </td>
-                        <td className="px-4 py-3 border text-sm">
-                          {order.customerName}
-                        </td>
-                        <td className="px-4 py-3 border text-sm">
-                          {order.salesPersonName}
-                        </td>
-                        <td className="px-4 py-3 border text-sm">
+                        <td className="px-4 py-3 border text-sm text-center">
                           {new Date(order.orderDate).toLocaleDateString(
                             "en-US",
                             {
                               year: "numeric",
                               month: "short",
                               day: "2-digit",
-                            }
+                            },
                           )}
                         </td>
-                        <td className="px-4 py-3 border text-sm text-right">
+                        <td className="px-4 py-3 border text-sm text-center">
+                          {order.orderNumber}
+                        </td>
+                        <td className="px-4 py-3 border text-sm text-center">
+                          {order.customerName}
+                        </td>
+                        <td className="px-4 py-3 border text-sm text-center">
+                          {order.salesPersonName}
+                        </td>
+                        <td className="px-4 py-3 border text-sm text-center">
                           {typeof order.totalAmount === "number"
                             ? order.totalAmount.toFixed(2)
                             : order.totalAmount}
@@ -415,12 +421,12 @@ const RejectedOrdersPage: React.FC = () => {
                             View
                           </button>
                         </td>
-                        <td className="px-4 py-3 border text-sm">
-                          <span className="px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                        <td className="px-4 py-3 border text-sm text-center">
+                          <span className="px-2 py-1 bg-red-200 text-red-800 rounded-full text-xs font-medium">
                             {order.status}
                           </span>
                         </td>
-                        <td className="px-4 py-3 border text-sm">
+                        <td className="px-4 py-3 border text-sm text-center">
                           {order.rejectReason}
                         </td>
                       </tr>
@@ -439,7 +445,7 @@ const RejectedOrdersPage: React.FC = () => {
                   to{" "}
                   {Math.min(
                     currentPage * parseInt(entriesPerPage),
-                    filteredOrders.length
+                    filteredOrders.length,
                   )}{" "}
                   of {filteredOrders.length} entries
                 </div>
@@ -447,8 +453,9 @@ const RejectedOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
-                      }`}
+                    className={`px-3 py-1 border rounded cursor-pointer ${
+                      currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
+                    }`}
                   >
                     Previous
                   </button>
@@ -457,12 +464,13 @@ const RejectedOrdersPage: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => typeof page === "number" && goToPage(page)}
-                      className={`px-3 py-1 border rounded ${page === currentPage
-                        ? "bg-blue-500 text-white"
-                        : page === "..."
-                          ? ""
-                          : "hover:bg-gray-100"
-                        }`}
+                      className={`px-3 py-1 border rounded ${
+                        page === currentPage
+                          ? "bg-blue-500 text-white"
+                          : page === "..."
+                            ? ""
+                            : "hover:bg-gray-100"
+                      }`}
                       disabled={page === "..."}
                     >
                       {page}
@@ -472,10 +480,11 @@ const RejectedOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages || totalPages === 0}
-                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === totalPages || totalPages === 0
-                      ? "text-gray-400"
-                      : "hover:bg-gray-100"
-                      }`}
+                    className={`px-3 py-1 border rounded cursor-pointer ${
+                      currentPage === totalPages || totalPages === 0
+                        ? "text-gray-400"
+                        : "hover:bg-gray-100"
+                    }`}
                   >
                     Next
                   </button>
@@ -489,6 +498,7 @@ const RejectedOrdersPage: React.FC = () => {
             orderDetails={selectedOrder}
             orderNumber={selectedOrderNumber ?? 0}
             customerName={selectedOrderCustomerName ?? ""}
+            specialNote={selectedOrderSpecialNote}
           />
           {/* Footer Component */}
           <Footer />

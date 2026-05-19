@@ -22,15 +22,15 @@ type OrderType = {
     total: number;
   }[];
   items:
-  | string
-  | {
-    itemCode: string;
-    description: string;
-    unitPrice: number;
-    quantity: string;
-    discountPercent: number;
-    total: number;
-  }[];
+    | string
+    | {
+        itemCode: string;
+        description: string;
+        unitPrice: number;
+        quantity: string;
+        discountPercent: number;
+        total: number;
+      }[];
   specialNote: string;
   rejectReason: string | null;
   status: string;
@@ -67,12 +67,15 @@ const DeliveredOrdersPage: React.FC = () => {
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
   const [selectedOrderNumber, setSelectedOrderNumber] = useState<number | null>(
-    null
+    null,
   );
   const [selectedOrderCustomerName, setSelectedOrderCustomerName] = useState<
     string | null
   >(null);
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
+  const [selectedOrderSpecialNote, setSelectedOrderSpecialNote] =
+    useState<string>("");
+
   // Fetch pending order data from API
   useEffect(() => {
     const fetchPendingOrderData = async () => {
@@ -102,12 +105,12 @@ const DeliveredOrdersPage: React.FC = () => {
     setUserName(
       sessionStorage.getItem("userName")
         ? sessionStorage.getItem("userName")
-        : ""
+        : "",
     );
     setUserRoleType(
       sessionStorage.getItem("userRoleName")
         ? sessionStorage.getItem("userRoleName")
-        : ""
+        : "",
     );
     // const pendingOrderList = sessionStorage.getItem("notificationsData");
     // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
@@ -138,7 +141,7 @@ const DeliveredOrdersPage: React.FC = () => {
       setError(
         err instanceof Error
           ? err.message
-          : "Failed to fetch pending order data"
+          : "Failed to fetch pending order data",
       );
     } finally {
       setLoading(false);
@@ -151,8 +154,10 @@ const DeliveredOrdersPage: React.FC = () => {
       (order) =>
         // order.orderNumber ||
         order.customerName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.salesPersonName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        order.orderNumber.toString().includes(searchQuery)
+        order.salesPersonName
+          .toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        order.orderNumber.toString().includes(searchQuery),
     );
   }, [searchQuery, deliveredOrders]);
 
@@ -233,6 +238,7 @@ const DeliveredOrdersPage: React.FC = () => {
       setSelectedOrderItems(order.orderedItems);
       setSelectedOrderNumber(order.orderNumber);
       setSelectedOrderCustomerName(order.customerName);
+      setSelectedOrderSpecialNote(order.specialNote || "");
     } else {
       setSelectedOrderItems([]);
     }
@@ -260,7 +266,7 @@ const DeliveredOrdersPage: React.FC = () => {
     setSelectedRowIndex(index);
     setOrderTrackingNumber(order.trackingNumber ? order.trackingNumber : "");
     setOrderDeliverPersonName(
-      order.delivertPersonName ? order.delivertPersonName : ""
+      order.delivertPersonName ? order.delivertPersonName : "",
     );
     setOrderDeliveryDate(order.deliveryDate ? order.deliveryDate : "");
     setDeliveryViewOpen(true);
@@ -378,79 +384,81 @@ const DeliveredOrdersPage: React.FC = () => {
                 <table className="min-w-full bg-white border border-gray-200">
                   <thead className="bg-gray-200">
                     <tr>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
-                        Order No
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
-                        Customer
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
-                        Sales Ref
-                      </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                         Order Date
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
-                        Type
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
+                        Order No
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
+                        Customer
+                      </th>
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
+                        Sales Ref
+                      </th>
+                      {/* <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                        Type
+                      </th> */}
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                         Total
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                         Item Details
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                         Invoiced Item Details
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                         Note
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                         Status
                       </th>
-                      <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                         Delivery Details
                       </th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-gray-200">
                     {currentOrders.map((order, index) => (
-                      <tr key={index}
-                        className={`${selectedRowIndex === index
-                          ? "bg-blue-100 border-blue-300"
-                          : "hover:bg-gray-200"
-                          }`}
+                      <tr
+                        key={index}
+                        className={`${
+                          selectedRowIndex === index
+                            ? "bg-blue-100 border-blue-300"
+                            : "hover:bg-gray-200"
+                        }`}
                       >
-                        <td className="px-4 py-3 border text-sm">
-                          {order.orderNumber}
-                        </td>
-                        <td className="px-4 py-3 border text-sm">
-                          {order.customerName}
-                        </td>
-                        <td className="px-4 py-3 border text-sm">
-                          {order.salesPersonName}
-                        </td>
-                        <td className="px-4 py-3 border text-sm">
+                        <td className="px-4 py-3 border text-sm text-center">
                           {new Date(order.orderDate).toLocaleDateString(
                             "en-US",
                             {
                               year: "numeric",
                               month: "short",
                               day: "2-digit",
-                            }
+                            },
                           )}
                         </td>
-                        <td className="px-4 py-3 border text-sm">
-                          {order.paymentMethodType}
+                        <td className="px-4 py-3 border text-sm text-center">
+                          {order.orderNumber}
                         </td>
-                        <td className="px-4 py-3 border text-sm text-right">
+                        <td className="px-4 py-3 border text-sm text-center">
+                          {order.customerName}
+                        </td>
+                        <td className="px-4 py-3 border text-sm text-center">
+                          {order.salesPersonName}
+                        </td>
+                        {/* <td className="px-4 py-3 border text-sm">
+                          {order.paymentMethodType}
+                        </td> */}
+                        <td className="px-4 py-3 border text-sm text-center">
                           {typeof order.totalAmount === "number"
                             ? Number(
-                              order.totalAmount.toFixed(2)
-                            ).toLocaleString("en-US", {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            })
+                                order.totalAmount.toFixed(2),
+                              ).toLocaleString("en-US", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              })
                             : order.totalAmount}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
@@ -464,14 +472,16 @@ const DeliveredOrdersPage: React.FC = () => {
                         <td className="px-4 py-3 border text-sm text-center">
                           <button
                             className="bg-blue-900 text-white py-1 px-4 rounded hover:bg-blue-950 focus:outline-none cursor-pointer"
-                            onClick={() => handleInvoicedItemDetailsView(order, index)}
+                            onClick={() =>
+                              handleInvoicedItemDetailsView(order, index)
+                            }
                           >
                             View
                           </button>
                         </td>
-                        <td className="px-4 py-3 border text-sm">
+                        <td className="px-4 py-3 border text-sm text-center">
                           {order.specialNote &&
-                            order.specialNote.length > 15 ? (
+                          order.specialNote.length > 15 ? (
                             <div className="flex items-center">
                               <span>
                                 {order.specialNote.substring(0, 15)}...
@@ -484,15 +494,17 @@ const DeliveredOrdersPage: React.FC = () => {
                             order.specialNote
                           )}
                         </td>
-                        <td className="px-4 py-3 border text-sm">
-                          <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                        <td className="px-4 py-3 border text-sm text-center">
+                          <span className="px-2 py-1 bg-green-200 text-green-800 rounded-full text-xs font-medium">
                             {order.status}
                           </span>
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
                           <button
                             className="bg-blue-900 hover:bg-blue-950 text-white py-1 px-4 rounded focus:outline-none cursor-pointer"
-                            onClick={() => handleDeliveryDetailsView(order, index)}
+                            onClick={() =>
+                              handleDeliveryDetailsView(order, index)
+                            }
                           >
                             View
                           </button>
@@ -513,7 +525,7 @@ const DeliveredOrdersPage: React.FC = () => {
                   to{" "}
                   {Math.min(
                     currentPage * parseInt(entriesPerPage),
-                    filteredOrders.length
+                    filteredOrders.length,
                   )}{" "}
                   of {filteredOrders.length} entries
                 </div>
@@ -521,8 +533,9 @@ const DeliveredOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage - 1)}
                     disabled={currentPage === 1}
-                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
-                      }`}
+                    className={`px-3 py-1 border rounded cursor-pointer ${
+                      currentPage === 1 ? "text-gray-400" : "hover:bg-gray-100"
+                    }`}
                   >
                     Previous
                   </button>
@@ -531,12 +544,13 @@ const DeliveredOrdersPage: React.FC = () => {
                     <button
                       key={index}
                       onClick={() => typeof page === "number" && goToPage(page)}
-                      className={`px-3 py-1 border rounded ${page === currentPage
-                        ? "bg-blue-500 text-white"
-                        : page === "..."
-                          ? ""
-                          : "hover:bg-gray-100"
-                        }`}
+                      className={`px-3 py-1 border rounded ${
+                        page === currentPage
+                          ? "bg-blue-500 text-white"
+                          : page === "..."
+                            ? ""
+                            : "hover:bg-gray-100"
+                      }`}
                       disabled={page === "..."}
                     >
                       {page}
@@ -546,10 +560,11 @@ const DeliveredOrdersPage: React.FC = () => {
                   <button
                     onClick={() => goToPage(currentPage + 1)}
                     disabled={currentPage === totalPages || totalPages === 0}
-                    className={`px-3 py-1 border rounded cursor-pointer ${currentPage === totalPages || totalPages === 0
-                      ? "text-gray-400"
-                      : "hover:bg-gray-100"
-                      }`}
+                    className={`px-3 py-1 border rounded cursor-pointer ${
+                      currentPage === totalPages || totalPages === 0
+                        ? "text-gray-400"
+                        : "hover:bg-gray-100"
+                    }`}
                   >
                     Next
                   </button>
@@ -570,6 +585,7 @@ const DeliveredOrdersPage: React.FC = () => {
             orderDetails={selectedOrderItems}
             orderNumber={selectedOrderNumber ?? 0}
             customerName={selectedOrderCustomerName ?? ""}
+            specialNote={selectedOrderSpecialNote}
           />
 
           <ViewOrderDeliveryStatus

@@ -1365,14 +1365,17 @@ const CreateOrderPage: React.FC = () => {
                         ))}
                       </tbody>
                       <tfoot>
-                        <tr className="bg-blue-50 border-t-2 border-blue-200">
+                        <tr className="bg-blue-100 border-t-2 border-blue-200">
                           <td
-                            colSpan={6}
-                            className="py-3 px-4 text-right font-bold text-gray-700"
+                            colSpan={7}
+                            className="py-3 px-4 text-center font-bold text-gray-700"
                           >
                             Order Total
                           </td>
-                          <td className="py-3 px-4 text-right font-bold text-blue-900 text-base">
+                          <td
+                            colSpan={2}
+                            className="py-3 px-4 text-center font-bold text-blue-900 text-base bg-blue-100"
+                          >
                             {Number(orderTotal.toFixed(2)).toLocaleString(
                               "en-US",
                               {
@@ -1381,7 +1384,6 @@ const CreateOrderPage: React.FC = () => {
                               },
                             )}
                           </td>
-                          <td className="py-3 px-4 bg-blue-50"></td>
                         </tr>
                       </tfoot>
                     </table>
