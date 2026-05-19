@@ -74,6 +74,10 @@ export const useStockStore = create<StockState>()(
 
                     const apiData = await response.json();
 
+                    if (!Array.isArray(apiData)) {
+                        throw new Error("Invalid API response: expected an array");
+                    }
+
                     // Transform the data
                     const transformedData = (apiData as Array<any>).reduce((acc: StockItem[], item: any) => {
                         acc.push({
