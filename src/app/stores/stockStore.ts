@@ -20,6 +20,23 @@ interface StockItem {
     image?: string;
 }
 
+interface ApiStockItem {
+    itemCode: string;
+    itemName: string;
+    location: string;
+    stock: number | string;
+    unitPrice: number;
+    itemCategory: string;
+    category: string;
+    subCategory: string;
+    description: string;
+    description2: string;
+    unitOfMeasure: string;
+    size: string;
+    reorderQuantity: number;
+    image?: string;
+}
+
 interface StockState {
     stockItems: StockItem[];
     isLoading: boolean;
@@ -72,14 +89,14 @@ export const useStockStore = create<StockState>()(
                         throw new Error("Failed to fetch stock data");
                     }
 
-                    const apiData = await response.json();
+                    const apiData: ApiStockItem[] = await response.json();
 
                     if (!Array.isArray(apiData)) {
                         throw new Error("Invalid API response: expected an array");
                     }
 
                     // Transform the data
-                    const transformedData = (apiData as Array<any>).reduce((acc: StockItem[], item: any) => {
+                    const transformedData = apiData.reduce((acc: StockItem[], item: ApiStockItem) => {
                         acc.push({
                             itemCode: item.itemCode,
                             itemName: item.itemName,
@@ -137,11 +154,11 @@ export const useStockStore = create<StockState>()(
             },
         }),
         {
-            name: 'stock-storage', // unique name for localStorage
+            name: 'stock-storage',
             partialize: (state) => ({
                 stockItems: state.stockItems,
                 lastFetched: state.lastFetched
-            }), // only persist these fields
+            }),
         }
     )
 );

@@ -97,10 +97,10 @@ interface Item {
   locationWiseInventory?: LocationWiseInventory[];
 }
 
-interface Location {
-  locationCode: string;
-  locationName: string;
-}
+// interface Location {
+//   locationCode: string;
+//   locationName: string;
+// }
 
 interface Customer {
   customerCode: string;
@@ -124,10 +124,10 @@ interface Invoice {
   totalDueAmount: number;
 }
 
-interface PaymentMethod {
-  paymentMethodCode: string;
-  description: string;
-}
+// interface PaymentMethod {
+//   paymentMethodCode: string;
+//   description: string;
+// }
 
 const CreateOrderPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
@@ -135,7 +135,7 @@ const CreateOrderPage: React.FC = () => {
   const [paymentType, setPaymentType] = useState("");
   //const [notes, setNotes] = useState("");
   const [total, setTotal] = useState(0);
-
+  console.log("New total is:", total);
   const [orderTotal, setOrderTotal] = useState(0);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
 
@@ -182,10 +182,10 @@ const CreateOrderPage: React.FC = () => {
     isLoading: isDataLoading,
     isLoadingCustomers,
     isLoadingLocations,
-    isLoadingItems,
+    // isLoadingItems,
     getItemsByLocation,
     getCustomerByCode,
-    refreshAll
+    //  refreshAll
   } = useOrderCreationData(true);
 
 

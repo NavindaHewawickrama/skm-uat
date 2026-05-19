@@ -3,10 +3,10 @@ import React, { useState, useEffect, useMemo } from "react";
 import AppBar from "../../components/Appbar";
 import SideNav from "../../components/Sidenav";
 import Footer from "../../components/Footer";
-import productImage from "../../../../public/images/products/pro1.png";
+//import productImage from "../../../../public/images/products/pro1.png";
 import ImagePopup from "../../components/ImagePopup";
 import producctImage2 from "../../../../public/images/products/pro2.png";
-import { StaticImageData } from 'next/image';
+//import { StaticImageData } from 'next/image';
 import Alert from "../../components/Alert";
 import { useStockData } from "../../hooks/useStockData";
 //import { useStockStore } from "../../stores/stockStore";
@@ -20,41 +20,41 @@ interface Image {
   blurHeight?: number;
 }
 
-interface StockItem {
-  img?: string | StaticImageData;
-  description: string;
-  description2: string;
-  unitOfMeasure: string;
-  size: string;
-  reorderQuantity: number;
-  itemCode: string;
-  itemName: string;
-  location: string;
-  stock: number | string;
-  unitPrice: number;
-  itemCategory: string;
-  category: string;
-  subCategory: string;
-  image?: string;
-}
+// interface StockItem {
+//   img?: string | StaticImageData;
+//   description: string;
+//   description2: string;
+//   unitOfMeasure: string;
+//   size: string;
+//   reorderQuantity: number;
+//   itemCode: string;
+//   itemName: string;
+//   location: string;
+//   stock: number | string;
+//   unitPrice: number;
+//   itemCategory: string;
+//   category: string;
+//   subCategory: string;
+//   image?: string;
+// }
 
 // API Response Interface
-interface ApiStockItem {
-  itemCode: string;
-  itemName: string;
-  location: string;
-  stock: string;
-  unitPrice: number;
-  itemCategory: string;
-  category: string;
-  subCategory: string;
-  description: string;
-  description2: string;
-  unitOfMeasure: string;
-  size: string;
-  reorderQuantity: number;
-  image?: string;
-}
+// interface ApiStockItem {
+//   itemCode: string;
+//   itemName: string;
+//   location: string;
+//   stock: string;
+//   unitPrice: number;
+//   itemCategory: string;
+//   category: string;
+//   subCategory: string;
+//   description: string;
+//   description2: string;
+//   unitOfMeasure: string;
+//   size: string;
+//   reorderQuantity: number;
+//   image?: string;
+// }
 
 type OrderType = {
   orderNumber: number;
