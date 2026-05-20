@@ -7,6 +7,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import Alert from "../../components/Alert";
 import Select from "react-select";
+import { useOrderCreationData } from "../../hooks/useOrderCreationData";
 
 type OrderType = {
   orderNumber: number;
@@ -96,10 +97,10 @@ interface Item {
   locationWiseInventory?: LocationWiseInventory[];
 }
 
-interface Location {
-  locationCode: string;
-  locationName: string;
-}
+// interface Location {
+//   locationCode: string;
+//   locationName: string;
+// }
 
 interface Customer {
   customerCode: string;
@@ -123,10 +124,10 @@ interface Invoice {
   totalDueAmount: number;
 }
 
-interface PaymentMethod {
-  paymentMethodCode: string;
-  description: string;
-}
+// interface PaymentMethod {
+//   paymentMethodCode: string;
+//   description: string;
+// }
 
 const CreateOrderPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
@@ -134,24 +135,15 @@ const CreateOrderPage: React.FC = () => {
   const [paymentType, setPaymentType] = useState("");
   //const [notes, setNotes] = useState("");
   const [total, setTotal] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
-
+  console.log("New total is:", total);
   const [orderTotal, setOrderTotal] = useState(0);
   const [orderItems, setOrderItems] = useState<OrderItem[]>([]);
-  const [locations, setLocations] = useState<Location[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
 
   const [selectedCustomer, setSelectedCustomer] = useState<Customer | null>(
     null,
   );
   const [selectedCustomerDueAmount, setSelectedCustomerDueAmount] = useState(0);
-  //const [selectedCustomerTotal, setSelectedCustomerTotal] = useState<number>(0);
   const [customer, setCustomer] = useState<string>("");
-  //const [paymentTypes, setPaymentTypes] = useState<Payment[]>([]);
-  const [itemsList, setItemsList] = useState<Item[]>([]);
-  const [paymentMethodList, setPaymentMethodList] = useState<PaymentMethod[]>(
-    [],
-  );
   const [locationWiseItems, setLocationWiseItems] = useState<Item[]>([]);
   const [selectedItem, setSelectedItem] = useState("");
   const [selectedItemName, setSelectedItemName] = useState("");
@@ -179,11 +171,24 @@ const CreateOrderPage: React.FC = () => {
   const [isLoadingInvoices, setIsLoadingInvoices] = useState(false);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
   const [userName, setUserName] = useState<string | null>(null);
-  const [isLoadingCustomers, setIsLoadingCustomers] = useState(false);
-  const [isLoadingLocations, setIsLoadingLocations] = useState(false);
-  const [isLoadingItems, setIsLoadingItems] = useState(false);
   const [isLoadingDueAmount, setIsLoadingDueAmount] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+
+  const {
+    customers,
+    locations,
+    items: itemsList,
+    paymentMethods: paymentMethodList,
+    isLoading: isDataLoading,
+    isLoadingCustomers,
+    isLoadingLocations,
+    // isLoadingItems,
+    getItemsByLocation,
+    getCustomerByCode,
+    //  refreshAll
+  } = useOrderCreationData(true);
+
+
   const locationOptions = locations
     .filter(
       (loc) =>
@@ -196,7 +201,7 @@ const CreateOrderPage: React.FC = () => {
       value: loc.locationCode,
       label: loc.locationCode,
     }));
-
+  const [isLoading, setIsLoading] = useState(false);
   const customerOptions = customers
     .filter(
       (customer) =>
@@ -210,21 +215,17 @@ const CreateOrderPage: React.FC = () => {
       label: customer.customerName,
     }));
 
+
+
   useEffect(() => {
     if (!location) {
       setLocationWiseItems([]);
       return;
     }
-    setLocationWiseItems(
-      itemsList.filter(
-        (item) =>
-          Array.isArray(item.locationWiseInventory) &&
-          item.locationWiseInventory.some(
-            (inv) => inv.locationCode === location,
-          ),
-      ),
-    );
-  }, [location, itemsList]);
+    // Use the store's helper function
+    const filteredItems = getItemsByLocation(location);
+    setLocationWiseItems(filteredItems);
+  }, [location, getItemsByLocation]);
 
   // Fetch pending order data from API
   useEffect(() => {
@@ -272,10 +273,6 @@ const CreateOrderPage: React.FC = () => {
         ? sessionStorage.getItem("userRoleName")
         : "",
     );
-    fetchLocationDetails();
-    fetchCustomersDetails();
-    fetchItemsDetails();
-    fetchPaymentMethods();
   }, []);
 
   const handleShowAlert = (type: string, message: string) => {
@@ -287,115 +284,6 @@ const CreateOrderPage: React.FC = () => {
     setTimeout(() => {
       setShowAlert(false);
     }, 5000);
-  };
-
-  const fetchCustomersDetails = async () => {
-    try {
-      setIsLoadingCustomers(true);
-
-      if (customers.length > 0) {
-        setIsLoadingCustomers(false);
-        return;
-      }
-
-      const response = await fetch(`/api/orders/getCustomers`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Cache-Control": "max-age=300",
-        },
-      });
-
-      if (!response.ok) {
-        throw Error("Failed to fetch customers data");
-      } else {
-        const data = await response.json();
-        setCustomers(data);
-      }
-    } catch (err) {
-      console.error("Error fetching customers data:", err);
-      handleShowAlert("error", "Failed to load customers list");
-    } finally {
-      setIsLoadingCustomers(false);
-    }
-  };
-
-  const fetchLocationDetails = async () => {
-    try {
-      setIsLoadingLocations(true);
-
-      const response = await fetch(`/api/orders/getLocations`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Cache-Control": "max-age=300",
-        },
-      });
-
-      if (!response.ok) {
-        throw Error("Failed to fetch locations data");
-      } else {
-        const data = await response.json();
-        setLocations(data);
-      }
-    } catch (err) {
-      console.error("Error fetching locations data:", err);
-      handleShowAlert("error", "Failed to load locations");
-    } finally {
-      setIsLoadingLocations(false);
-    }
-  };
-
-  const fetchItemsDetails = async () => {
-    try {
-      setIsLoadingItems(true);
-      console.log(isLoadingItems);
-      const response = await fetch(`/api/orders/getItems`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Cache-Control": "max-age=300",
-        },
-      });
-
-      if (!response.ok) {
-        throw Error("Failed to fetch items data");
-      } else {
-        const data = await response.json();
-        setItemsList(data);
-      }
-    } catch (err) {
-      console.error("Error fetching items data:", err);
-      handleShowAlert("error", "Failed to load items");
-    } finally {
-      setIsLoadingItems(false);
-    }
-  };
-
-  const fetchPaymentMethods = async () => {
-    try {
-      setIsLoadingItems(true);
-      console.log(isLoadingItems);
-      const response = await fetch(`/api/orders/getPaymentMethod`, {
-        method: "GET",
-        credentials: "include",
-        headers: {
-          "Cache-Control": "max-age=300",
-        },
-      });
-
-      if (!response.ok) {
-        throw Error("Failed to payment method data");
-      } else {
-        const data = await response.json();
-        setPaymentMethodList(data);
-      }
-    } catch (err) {
-      console.error("Error payment method data:", err);
-      handleShowAlert("error", "Failed to load payment methods");
-    } finally {
-      setIsLoadingItems(false);
-    }
   };
 
   const toggleSideNav = () => {
@@ -413,18 +301,49 @@ const CreateOrderPage: React.FC = () => {
   // Add item to order list
   const addToList = () => {
     if (orderItems.length >= 14) {
-    } else {
-      if (
-        !selectedItem ||
-        !selectedItemQuantity ||
-        !selectedCustomer ||
-        !paymentType ||
-        !location
-      ) {
-        handleShowAlert("error", "Please fill in all required fields");
-        return;
-      }
+      handleShowAlert("error", "14 Items are already selected. Cannot add more items to the list");
+      return;
+    }
 
+    if (
+      !selectedItem ||
+      !selectedItemQuantity ||
+      !selectedCustomer ||
+      !location
+    ) {
+      handleShowAlert("error", "Please fill in all required fields");
+      return;
+    }
+
+    // Check if item already exists in the order list
+    const existingItemIndex = orderItems.findIndex(
+      (item) => item.itemCode === selectedItem
+    );
+
+    let updatedOrderItems;
+
+    if (existingItemIndex !== -1) {
+      // Item exists - update quantity and total
+      const existingItem = orderItems[existingItemIndex];
+      const newQuantity = existingItem.quantity + selectedItemQuantity;
+
+      // Calculate new total for this item
+      const newItemTotal = existingItem.unitPrice * newQuantity * (1 - existingItem.discountPercent / 100);
+
+      // Update the existing item
+      const updatedItem = {
+        ...existingItem,
+        quantity: newQuantity,
+        total: newItemTotal
+      };
+
+      // Create new array with updated item
+      updatedOrderItems = [...orderItems];
+      updatedOrderItems[existingItemIndex] = updatedItem;
+
+      handleShowAlert("info", `Updated ${selectedItemName} quantity to ${newQuantity}`);
+    } else {
+      // Item doesn't exist - add as new item
       const newItem = {
         itemCode: selectedItem,
         description: selectedItemName,
@@ -434,31 +353,30 @@ const CreateOrderPage: React.FC = () => {
         total: calculateItemTotal(),
       };
 
-      //const newItem = { ...currentItem, total: calculateItemTotal() };
-      const updatedOrderItems = [...orderItems, newItem];
-      setOrderItems(updatedOrderItems);
-
-      const newOrderTotal = updatedOrderItems.reduce(
-        (acc, item) => acc + item.total,
-        0,
-      );
-      setOrderTotal(newOrderTotal);
-
-      // Update order totals
-      const newTotal = total + newItem.total;
-      setTotal(newTotal);
-
-      // Reset current item
-      setSelectedItem("");
-      setSelectedItemName("");
-      setSelectedItemUnitPrice("");
-      setSelectedItemQuantity(0);
-      setSelectedItemDiscount(0);
-      setSelectedItemSelectedLocationStock("0");
-      setSpecialNote("");
+      updatedOrderItems = [...orderItems, newItem];
+      handleShowAlert("success", `${selectedItemName} added to order`);
     }
-  };
 
+    // Update state with new order items
+    setOrderItems(updatedOrderItems);
+
+    // Calculate new order total
+    const newOrderTotal = updatedOrderItems.reduce(
+      (acc, item) => acc + item.total,
+      0,
+    );
+    setOrderTotal(newOrderTotal);
+    setTotal(newOrderTotal);
+
+    // Reset current item fields
+    setSelectedItem("");
+    setSelectedItemName("");
+    setSelectedItemUnitPrice("");
+    setSelectedItemQuantity(0);
+    setSelectedItemDiscount(0);
+    setSelectedItemSelectedLocationStock("0");
+    setSpecialNote("");
+  };
   const generatePDF = () => {
     const pdf = new jsPDF({ unit: "mm", format: "a4" });
     const totalPagesExp = "{total_pages_count_string}";
@@ -476,10 +394,10 @@ const CreateOrderPage: React.FC = () => {
     const fmtDate = (d?: string) =>
       d
         ? new Date(d).toLocaleDateString("en-US", {
-            month: "2-digit",
-            day: "2-digit",
-            year: "2-digit",
-          })
+          month: "2-digit",
+          day: "2-digit",
+          year: "2-digit",
+        })
         : "";
 
     const nowStr =
@@ -713,17 +631,17 @@ const CreateOrderPage: React.FC = () => {
           invoiceNumber: invoice.invoiceNumber,
           invoiceDate: invoice.invoiceDate
             ? new Date(invoice.invoiceDate).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "2-digit",
-              })
+              year: "numeric",
+              month: "short",
+              day: "2-digit",
+            })
             : "N/A",
           orderdDate: invoice.orderDate
             ? new Date(invoice.orderDate).toLocaleDateString("en-US", {
-                year: "numeric",
-                month: "short",
-                day: "2-digit",
-              })
+              year: "numeric",
+              month: "short",
+              day: "2-digit",
+            })
             : "N/A",
           invoicedAmount: parseFloat(invoice.totalAmount?.toString() || "0"),
           pdcAmount: parseFloat(invoice.pdcAmount?.toString() || "0"),
@@ -751,7 +669,7 @@ const CreateOrderPage: React.FC = () => {
       console.error("Error:", error);
       handleShowAlert(
         "error",
-        "Failed to fetch customer invoice data... This Cutomer does not have any invoices...",
+        "Failed to fetch customer invoice data. This Cutomer does not have any invoices.",
       );
       setOutstandingData([]);
     } finally {
@@ -765,18 +683,17 @@ const CreateOrderPage: React.FC = () => {
     console.log(customerCode);
     setCustomer(customerCode);
 
-    const selected = customers.find((c) => c.customerCode === customerCode);
+    // Use store helper instead of direct find
+    const selected = getCustomerByCode(customerCode);
     if (selected) {
       setSelectedCustomer(selected);
       setOutstandingData(selected.outstandingData || []);
 
       // Show loading for due amount
       setIsLoadingDueAmount(true);
-
-      // Set temporary loading value
       setSelectedCustomerDueAmount(0);
 
-      // Fetch due amount from the new API
+      // Fetch due amount from API (keep this part as is)
       try {
         const response = await fetch(
           `/api/orders/getCustomerDueAmount?customerId=${customerCode}`,
@@ -790,7 +707,6 @@ const CreateOrderPage: React.FC = () => {
           const dueAmountData = await response.json();
           setSelectedCustomerDueAmount(dueAmountData);
         } else {
-          // Fallback to the existing dueAmount if API fails
           setSelectedCustomerDueAmount(selected.dueAmount);
         }
       } catch (error) {
@@ -812,13 +728,13 @@ const CreateOrderPage: React.FC = () => {
       setSelectedItemSelectedLocationStock(
         selected.locationWiseInventory
           ? selected.locationWiseInventory.find(
-              (loc) => loc.locationCode === location,
-            )?.inventory !== undefined
+            (loc) => loc.locationCode === location,
+          )?.inventory !== undefined
             ? String(
-                selected.locationWiseInventory.find(
-                  (loc) => loc.locationCode === location,
-                )?.inventory,
-              )
+              selected.locationWiseInventory.find(
+                (loc) => loc.locationCode === location,
+              )?.inventory,
+            )
             : "0"
           : "0",
       );
@@ -936,7 +852,7 @@ const CreateOrderPage: React.FC = () => {
     }
   };
 
-  if (isLoadingCustomers || isLoadingLocations) {
+  if (isDataLoading) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
         <AppBar
@@ -1058,12 +974,12 @@ const CreateOrderPage: React.FC = () => {
                         isLoadingDueAmount
                           ? "Loading..."
                           : Number(selectedCustomerDueAmount).toLocaleString(
-                              "en-US",
-                              {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              },
-                            )
+                            "en-US",
+                            {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            },
+                          )
                       }
                       readOnly
                     />
@@ -1077,11 +993,10 @@ const CreateOrderPage: React.FC = () => {
                     <button
                       disabled={isLoading}
                       onClick={handleViewDetails}
-                      className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${
-                        isLoading
-                          ? "bg-gray-400 cursor-not-allowed"
-                          : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
-                      } text-white`}
+                      className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${isLoading
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
+                        } text-white`}
                     >
                       {isLoading
                         ? isGeneratingPDF
@@ -1244,13 +1159,12 @@ const CreateOrderPage: React.FC = () => {
                   />
                   {selectedItem && (
                     <span
-                      className={`inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
-                        location === ""
-                          ? "bg-gray-100 text-gray-500"
-                          : parseInt(selectedItemSelectedLocationStock) > 0
-                            ? "bg-green-100 text-green-700 border border-green-300"
-                            : "bg-red-100 text-red-600 border border-red-300"
-                      }`}
+                      className={`inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${location === ""
+                        ? "bg-gray-100 text-gray-500"
+                        : parseInt(selectedItemSelectedLocationStock) > 0
+                          ? "bg-green-100 text-green-700 border border-green-300"
+                          : "bg-red-100 text-red-600 border border-red-300"
+                        }`}
                     >
                       {location === ""
                         ? "Select a location to check stock"
@@ -1268,8 +1182,8 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                      // value={currentItem.itemName}
-                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
+                    // value={currentItem.itemName}
+                    // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
                       {substitutedItemsList?.length === 0 ? (
                         <option value="" disabled>
@@ -1527,11 +1441,10 @@ const CreateOrderPage: React.FC = () => {
                   <button
                     disabled={isSaving}
                     onClick={handleSave}
-                    className={`px-6 py-2 rounded font-medium transition duration-300 ${
-                      isSaving
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                    } text-white`}
+                    className={`px-6 py-2 rounded font-medium transition duration-300 ${isSaving
+                      ? "bg-gray-400 cursor-not-allowed"
+                      : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                      } text-white`}
                   >
                     {isSaving ? "Saving..." : "Save"}
                   </button>
