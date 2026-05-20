@@ -61,13 +61,15 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
     if (invoiceNumber) {
       pdf.text(`Invoice Number: ${invoiceNumber}`, 15, 27, { align: "left" });
     }
+    pdf.text(`Note: ${specialNote || ""}`, 15, invoiceNumber ? 33 : 27, { align: "left" });
+
     //pdf.text({}, 105, 15, { align: "center" });
     const currentDate = new Date().toLocaleDateString("en-US", {
       year: "numeric",
       month: "short",
       day: "2-digit",
     });
-    pdf.setFontSize(9);
+    pdf.setFontSize(10);
     pdf.text(currentDate, 195, 15, { align: "right" });
 
     const tableColumn = [
@@ -77,7 +79,6 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
       "Quantity",
       "Discount(%)",
       "Total",
-      "Note",
     ];
 
     // Fix 1: Use correct variable names and calculate total
@@ -113,14 +114,13 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         }), // Total
-        specialNote || "",
       ];
     });
 
     autoTable(pdf, {
       head: [tableColumn],
       body: tableRows,
-      startY: invoiceNumber ? 30 : 25,
+      startY: invoiceNumber ? 38 : 33,
       theme: "grid",
       styles: { fontSize: 10, cellPadding: 3 },
       headStyles: {

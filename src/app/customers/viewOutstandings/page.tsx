@@ -45,11 +45,11 @@ interface CustomerOutstandingData {
   pdcAmount: number;
   dueAmount: number;
   remainingAmount: number;
-  originalAmount: number,
-  orderNo: string,
-  balanceBeforePDCs: number,
-  releasedPDCs: number,
-  balanceAfterPDCs: number,
+  originalAmount: number;
+  orderNo: string;
+  balanceBeforePDCs: number;
+  releasedPDCs: number;
+  balanceAfterPDCs: number;
   totalDueAmount: number;
 }
 
@@ -68,7 +68,6 @@ interface Invoice {
   balanceAfterPDCs: number;
   totalDueAmount: number;
 }
-
 
 const OutstandingsPage: React.FC = () => {
   const [sideNavOpen, setSideNavOpen] = useState(false);
@@ -118,12 +117,12 @@ const OutstandingsPage: React.FC = () => {
     setUserName(
       sessionStorage.getItem("userName")
         ? sessionStorage.getItem("userName")
-        : ""
+        : "",
     );
     setUserRoleType(
       sessionStorage.getItem("userRoleName")
         ? sessionStorage.getItem("userRoleName")
-        : ""
+        : "",
     );
     // const pendingOrderList = sessionStorage.getItem("notificationsData");
     // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
@@ -155,14 +154,13 @@ const OutstandingsPage: React.FC = () => {
   const totalDueAmountClean = Array.from(
     outstandingInvoices
       .reduce((customerMap, invoice) => {
-
         if (!customerMap.has(invoice.customerName)) {
           customerMap.set(invoice.customerName, invoice.totalDueAmount);
         }
         return customerMap;
       }, new Map())
 
-      .values()
+      .values(),
   ).reduce((sum, amount) => sum + amount, 0);
 
   // Filter invoices based on search query
@@ -172,7 +170,7 @@ const OutstandingsPage: React.FC = () => {
         .toString()
         .toLowerCase()
         .includes(searchQuery.toLowerCase()) ||
-      invoice.customerName.toLowerCase().includes(searchQuery.toLowerCase())
+      invoice.customerName.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // Calculate pagination
@@ -180,7 +178,7 @@ const OutstandingsPage: React.FC = () => {
   const indexOfFirstInvoice = indexOfLastInvoice - entriesPerPage;
   const currentInvoices = filteredInvoices.slice(
     indexOfFirstInvoice,
-    indexOfLastInvoice
+    indexOfLastInvoice,
   );
   const totalPages = Math.ceil(filteredInvoices.length / entriesPerPage);
 
@@ -216,13 +214,13 @@ const OutstandingsPage: React.FC = () => {
         try {
           // Find customer name from customers list
           const customer = customers.find(
-            (c) => c.customerCode === customerCode
+            (c) => c.customerCode === customerCode,
           );
           const customerName =
             customer?.customerName || `Customer ${customerCode}`;
 
           console.log(
-            `Fetching invoices for customer: ${customerCode} (${customerName})`
+            `Fetching invoices for customer: ${customerCode} (${customerName})`,
           );
 
           const response = await fetch(
@@ -230,12 +228,12 @@ const OutstandingsPage: React.FC = () => {
             {
               method: "GET",
               credentials: "include",
-            }
+            },
           );
 
           if (!response.ok) {
             throw new Error(
-              `Failed to fetch invoices for customer ${customerCode}`
+              `Failed to fetch invoices for customer ${customerCode}`,
             );
           }
 
@@ -250,36 +248,41 @@ const OutstandingsPage: React.FC = () => {
               invoiceNumber: invoice.invoiceNumber,
               invoiceDate: invoice.invoiceDate
                 ? new Date(invoice.invoiceDate).toLocaleDateString("en-US", {
-                  year: "numeric",
-                  month: "short",
-                  day: "2-digit",
-                })
+                    year: "numeric",
+                    month: "short",
+                    day: "2-digit",
+                  })
                 : "",
               invoicedAmount: parseFloat(
-                invoice.totalAmount?.toString() || "0"
+                invoice.totalAmount?.toString() || "0",
               ),
               pdcAmount: parseFloat(invoice.pdcAmount?.toString() || "0"),
               dueAmount: parseFloat(invoice.dueAmount?.toString() || "0"),
               orderNo: invoice.orderNo,
-              originalAmount: parseFloat(invoice.originalAmount?.toString() || "0"),
-              balanceBeforePDCs: parseFloat(invoice.balanceBeforePDCs?.toString() || "0"),
+              originalAmount: parseFloat(
+                invoice.originalAmount?.toString() || "0",
+              ),
+              balanceBeforePDCs: parseFloat(
+                invoice.balanceBeforePDCs?.toString() || "0",
+              ),
               releasedPDCs: parseFloat(invoice.releasedPDCs?.toString() || "0"),
-              balanceAfterPDCs: parseFloat(invoice.balanceAfterPDCs?.toString() || "0")
-            })
+              balanceAfterPDCs: parseFloat(
+                invoice.balanceAfterPDCs?.toString() || "0",
+              ),
+            }),
           );
-
 
           // Add to the accumulated data
           allInvoiceData = [...allInvoiceData, ...transformedData];
           successCount++;
 
           console.log(
-            `Successfully processed ${transformedData.length} invoices for ${customerName}`
+            `Successfully processed ${transformedData.length} invoices for ${customerName}`,
           );
         } catch (customerError) {
           console.error(
             `Error fetching data for customer ${customerCode}:`,
-            customerError
+            customerError,
           );
           errorCount++;
         }
@@ -293,17 +296,17 @@ const OutstandingsPage: React.FC = () => {
       if (successCount > 0 && errorCount === 0) {
         handleShowAlert(
           "success",
-          `Successfully loaded ${allInvoiceData.length} invoice records from ${successCount} customer(s)`
+          `Successfully loaded ${allInvoiceData.length} invoice records from ${successCount} customer(s)`,
         );
       } else if (successCount > 0 && errorCount > 0) {
         handleShowAlert(
           "warning",
-          `Loaded ${allInvoiceData.length} invoice records from ${successCount} customer(s). Failed to load data for ${errorCount} customer(s)... This may be due to missing invoices for that customer`
+          `Loaded ${allInvoiceData.length} invoice records from ${successCount} customer(s). Failed to load data for ${errorCount} customer(s)... This may be due to missing invoices for that customer`,
         );
       } else {
         handleShowAlert(
           "error",
-          `Failed to load data for all ${errorCount} selected customer(s)... This may be due to missing invoices for that customer`
+          `Failed to load data for all ${errorCount} selected customer(s)... This may be due to missing invoices for that customer`,
         );
       }
     } catch (error) {
@@ -325,7 +328,6 @@ const OutstandingsPage: React.FC = () => {
     }, 5000);
   };
 
-
   const generatePDF = () => {
     const pdf = new jsPDF({ unit: "mm", format: "a4" });
     const totalPagesExp = "{total_pages_count_string}";
@@ -343,20 +345,23 @@ const OutstandingsPage: React.FC = () => {
     const fmtDate = (d?: string) =>
       d
         ? new Date(d).toLocaleDateString("en-US", {
-          month: "2-digit",
-          day: "2-digit",
-          year: "2-digit",
-        })
+            month: "2-digit",
+            day: "2-digit",
+            year: "2-digit",
+          })
         : "";
 
-    const nowStr = new Date().toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "numeric",
-      day: "numeric",
-    }) + ", " + new Date().toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+    const nowStr =
+      new Date().toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "numeric",
+        day: "numeric",
+      }) +
+      ", " +
+      new Date().toLocaleTimeString("en-US", {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
 
     const agedAsOfStr = new Date().toLocaleDateString("en-US", {
       year: "numeric",
@@ -383,7 +388,7 @@ const OutstandingsPage: React.FC = () => {
           `Page ${pdf.getNumberOfPages()} / ${totalPagesExp}`,
           rightX,
           20,
-          { align: "right" }
+          { align: "right" },
         );
         // pdf.text("OPS.MGR", rightX, 20, { align: "right" });
 
@@ -459,10 +464,10 @@ const OutstandingsPage: React.FC = () => {
         halign: "center",
       },
       columnStyles: {
-        0: { cellWidth: 18 },                // Posting Date
-        1: { cellWidth: 18 },                // Document Type  
-        2: { cellWidth: 30 },                // customer name
-        3: { cellWidth: 28 },                // document no
+        0: { cellWidth: 18 }, // Posting Date
+        1: { cellWidth: 18 }, // Document Type
+        2: { cellWidth: 30 }, // customer name
+        3: { cellWidth: 28 }, // document no
         4: { cellWidth: 22, halign: "right" }, // invoice Amount
         5: { cellWidth: 24, halign: "right" }, // Balance before PDCs
         6: { cellWidth: 22, halign: "right" }, // Released PDCs
@@ -473,15 +478,45 @@ const OutstandingsPage: React.FC = () => {
     });
 
     const finalY = pdf.lastAutoTable?.finalY ?? 100;
-    //const subtotal = outstandingInvoices[0].totalDueAmount || 0;
 
-    const subtotal = totalDueAmountClean || 0;
+    // Calculate totals for each column
+    const totalInvoicedAmount = outstandingInvoices.reduce(
+      (sum, row) => sum + row.invoicedAmount,
+      0,
+    );
+    const totalBalanceBefore = outstandingInvoices.reduce(
+      (sum, row) => sum + row.balanceBeforePDCs,
+      0,
+    );
+    const totalReleasedPDCs = outstandingInvoices.reduce(
+      (sum, row) => sum + row.releasedPDCs,
+      0,
+    );
+    const totalBalanceAfter = outstandingInvoices.reduce(
+      (sum, row) => sum + row.balanceAfterPDCs,
+      0,
+    );
+
+    const colInvoiced = 14 + 18 + 18 + 30 + 28 + 22;
+    const colBalBefore = colInvoiced + 24;
+    const colReleased = colBalBefore + 22;
+    const colBalAfter = colReleased + 24;
 
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(10);
-    const subtotalLabel = `Total -   LKR`;
-    pdf.text(subtotalLabel, leftX, finalY + 8);
-    pdf.text(fmtMoney(subtotal), rightX, finalY + 8, { align: "right" });
+    pdf.text(`Total  LKR`, leftX, finalY + 8);
+    pdf.text(fmtMoney(totalInvoicedAmount), colInvoiced, finalY + 8, {
+      align: "right",
+    });
+    pdf.text(fmtMoney(totalBalanceBefore), colBalBefore, finalY + 8, {
+      align: "right",
+    });
+    pdf.text(fmtMoney(totalReleasedPDCs), colReleased, finalY + 8, {
+      align: "right",
+    });
+    pdf.text(fmtMoney(totalBalanceAfter), rightX, finalY + 8, {
+      align: "right",
+    });
 
     // rule above grand total
     pdf.setDrawColor(150);
@@ -492,7 +527,18 @@ const OutstandingsPage: React.FC = () => {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(10);
     pdf.text("Total (LCY)", leftX, finalY + 20);
-    pdf.text(fmtMoney(subtotal), rightX, finalY + 20, { align: "right" });
+    pdf.text(fmtMoney(totalInvoicedAmount), colInvoiced, finalY + 20, {
+      align: "right",
+    });
+    pdf.text(fmtMoney(totalBalanceBefore), colBalBefore, finalY + 20, {
+      align: "right",
+    });
+    pdf.text(fmtMoney(totalReleasedPDCs), colReleased, finalY + 20, {
+      align: "right",
+    });
+    pdf.text(fmtMoney(totalBalanceAfter), rightX, finalY + 20, {
+      align: "right",
+    });
 
     // finalize page count
     pdf.putTotalPages(totalPagesExp);
@@ -557,8 +603,9 @@ const OutstandingsPage: React.FC = () => {
                 </h2>
                 <div className="flex justify-start mb-6">
                   <button
-                    className={`bg-green-500 w-[50%] md:w-[50%] sm:w-full text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none cursor-pointer ${isLoading ? "opacity-50 cursor-not-allowed" : ""
-                      }`}
+                    className={`bg-green-500 w-[50%] md:w-[50%] sm:w-full text-white px-4 py-2 rounded hover:bg-green-600 focus:outline-none cursor-pointer ${
+                      isLoading ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
                     onClick={handleOpenCustomerPopup}
                     disabled={isLoading}
                   >
@@ -616,8 +663,8 @@ const OutstandingsPage: React.FC = () => {
                               {
                                 new Set(
                                   outstandingInvoices.map(
-                                    (inv) => inv.customerName
-                                  )
+                                    (inv) => inv.customerName,
+                                  ),
                                 ).size
                               }
                             </span>
@@ -729,7 +776,7 @@ const OutstandingsPage: React.FC = () => {
 
                             <td className="px-4 py-3 border text-sm text-right">
                               {Number(
-                                invoice.invoicedAmount.toFixed(2)
+                                invoice.invoicedAmount.toFixed(2),
                               ).toLocaleString("en-US", {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
@@ -737,7 +784,7 @@ const OutstandingsPage: React.FC = () => {
                             </td>
                             <td className="px-4 py-3 border text-sm text-right">
                               {Number(
-                                invoice.balanceBeforePDCs.toFixed(2)
+                                invoice.balanceBeforePDCs.toFixed(2),
                               ).toLocaleString("en-US", {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
@@ -745,7 +792,7 @@ const OutstandingsPage: React.FC = () => {
                             </td>
                             <td className="px-4 py-3 border text-sm text-right">
                               {Number(
-                                invoice.releasedPDCs.toFixed(2)
+                                invoice.releasedPDCs.toFixed(2),
                               ).toLocaleString("en-US", {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
@@ -753,7 +800,7 @@ const OutstandingsPage: React.FC = () => {
                             </td>
                             <td className="px-4 py-3 border text-sm text-right font-medium">
                               {Number(
-                                invoice.balanceAfterPDCs.toFixed(2)
+                                invoice.balanceAfterPDCs.toFixed(2),
                               ).toLocaleString("en-US", {
                                 minimumFractionDigits: 2,
                                 maximumFractionDigits: 2,
@@ -779,24 +826,26 @@ const OutstandingsPage: React.FC = () => {
                             setCurrentPage(Math.max(1, currentPage - 1))
                           }
                           disabled={currentPage === 1}
-                          className={`px-3 py-1 rounded ${currentPage === 1
-                            ? "bg-gray-200 cursor-not-allowed"
-                            : "bg-blue-600 text-white hover:bg-blue-700"
-                            }`}
+                          className={`px-3 py-1 rounded ${
+                            currentPage === 1
+                              ? "bg-gray-200 cursor-not-allowed"
+                              : "bg-blue-600 text-white hover:bg-blue-700"
+                          }`}
                         >
                           Previous
                         </button>
                         {Array.from(
                           { length: totalPages },
-                          (_, i) => i + 1
+                          (_, i) => i + 1,
                         ).map((pageNumber) => (
                           <button
                             key={pageNumber}
                             onClick={() => setCurrentPage(pageNumber)}
-                            className={`px-3 py-1 rounded ${currentPage === pageNumber
-                              ? "bg-blue-700 text-white"
-                              : "bg-blue-600 text-white hover:bg-blue-700"
-                              }`}
+                            className={`px-3 py-1 rounded ${
+                              currentPage === pageNumber
+                                ? "bg-blue-700 text-white"
+                                : "bg-blue-600 text-white hover:bg-blue-700"
+                            }`}
                           >
                             {pageNumber}
                           </button>
@@ -804,14 +853,15 @@ const OutstandingsPage: React.FC = () => {
                         <button
                           onClick={() =>
                             setCurrentPage(
-                              Math.min(totalPages, currentPage + 1)
+                              Math.min(totalPages, currentPage + 1),
                             )
                           }
                           disabled={currentPage === totalPages}
-                          className={`px-3 py-1 rounded ${currentPage === totalPages
-                            ? "bg-gray-200 cursor-not-allowed"
-                            : "bg-blue-600 text-white hover:bg-blue-700"
-                            }`}
+                          className={`px-3 py-1 rounded ${
+                            currentPage === totalPages
+                              ? "bg-gray-200 cursor-not-allowed"
+                              : "bg-blue-600 text-white hover:bg-blue-700"
+                          }`}
                         >
                           Next
                         </button>

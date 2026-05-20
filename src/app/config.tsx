@@ -6,5 +6,5 @@
 
 // config.ts
 export default {
-  apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://skmsalesappapi.h2so4.lk'
+  apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'https://skmsalesapptestapi.h2so4.lk'
 }

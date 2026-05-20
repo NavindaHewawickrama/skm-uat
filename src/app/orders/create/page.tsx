@@ -194,7 +194,7 @@ const CreateOrderPage: React.FC = () => {
     )
     .map((loc) => ({
       value: loc.locationCode,
-      label: loc.locationName,
+      label: loc.locationCode,
     }));
 
   const customerOptions = customers
@@ -607,13 +607,47 @@ const CreateOrderPage: React.FC = () => {
     });
 
     const finalY = pdf.lastAutoTable?.finalY ?? 100;
-    const subtotal = outstandingData[0].totalDueAmount || 0;
+    const totalInvoicedAmount = outstandingData.reduce(
+      (sum, row) => sum + row.invoicedAmount,
+      0,
+    );
+    const totalBalanceBefore = outstandingData.reduce(
+      (sum, row) => sum + row.balanceBeforePDCs,
+      0,
+    );
+    const totalReleasedPDCs = outstandingData.reduce(
+      (sum, row) => sum + row.releasedPDCs,
+      0,
+    );
+    const totalBalanceAfter = outstandingData.reduce(
+      (sum, row) => sum + row.balanceAfterPDCs,
+      0,
+    );
+
+    const colInvoiced = 14 + 18 + 18 + 28 + 28;
+    const colBalBefore = colInvoiced + 26;
+    const colReleased = colBalBefore + 22;
+    const colBalAfter = colReleased + 24;
 
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(10);
-    const subtotalLabel = `Total for ${selectedCustomer?.customerName ?? ""}   LKR`;
-    pdf.text(subtotalLabel, leftX, finalY + 8);
-    pdf.text(fmtMoney(subtotal), rightX, finalY + 8, { align: "right" });
+    pdf.text(
+      `Total for ${selectedCustomer?.customerName ?? ""}`,
+      leftX,
+      finalY + 8,
+    );
+    pdf.text(fmtMoney(totalInvoicedAmount), colInvoiced, finalY + 8, {
+      align: "right",
+    });
+    pdf.text(fmtMoney(totalBalanceBefore), colBalBefore, finalY + 8, {
+      align: "right",
+    });
+    pdf.text(fmtMoney(totalReleasedPDCs), colReleased, finalY + 8, {
+      align: "right",
+    });
+    pdf.text(fmtMoney(totalBalanceAfter), colBalAfter, finalY + 8, {
+      align: "right",
+    });
 
     // rule above grand total
     pdf.setDrawColor(150);
@@ -624,8 +658,18 @@ const CreateOrderPage: React.FC = () => {
     pdf.setFont("helvetica", "normal");
     pdf.setFontSize(10);
     pdf.text("Total (LCY)", leftX, finalY + 20);
-    pdf.text(fmtMoney(subtotal), rightX, finalY + 20, { align: "right" });
-
+    pdf.text(fmtMoney(totalInvoicedAmount), colInvoiced, finalY + 20, {
+      align: "right",
+    });
+    pdf.text(fmtMoney(totalBalanceBefore), colBalBefore, finalY + 20, {
+      align: "right",
+    });
+    pdf.text(fmtMoney(totalReleasedPDCs), colReleased, finalY + 20, {
+      align: "right",
+    });
+    pdf.text(fmtMoney(totalBalanceAfter), colBalAfter, finalY + 20, {
+      align: "right",
+    });
     // finalize page count
     pdf.putTotalPages(totalPagesExp);
 
@@ -697,7 +741,7 @@ const CreateOrderPage: React.FC = () => {
       );
 
       setOutstandingData(transformedData);
-      setSelectedCustomerDueAmount(data.totalDueAmount);
+      setSelectedCustomerDueAmount(transformedData[0].totalDueAmount || 0);
       //setFormattedAmount(data.totalDueAmount);
       handleShowAlert(
         "success",

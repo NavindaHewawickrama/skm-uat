@@ -9,6 +9,7 @@ import ViewStatusPopup from "../../components/ViewStatusPopup";
 type OrderforStatus = {
   orderNumber: string;
   customerName: string;
+  locationCode: string;
   salesPersonName: string;
   orderDate: string;
   paymentMethodType: string;
@@ -21,6 +22,7 @@ type OrderType = {
   customerName: string;
   salesPersonName: string;
   orderDate: string;
+  locationCode: string;
   paymentMethodType: string;
   totalAmount: number;
   orderedItems: {
@@ -386,6 +388,9 @@ const PendingOrdersPage: React.FC = () => {
                         Order No
                       </th>
                       <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
+                        Location
+                      </th>
+                      <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                         Customer
                       </th>
                       <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
@@ -430,6 +435,9 @@ const PendingOrdersPage: React.FC = () => {
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
                           {order.orderNumber}
+                        </td>
+                        <td className="px-4 py-3 border text-sm text-center">
+                          {order.locationCode}
                         </td>
                         <td className="px-4 py-3 border text-sm text-center">
                           {order.customerName}
@@ -479,6 +487,7 @@ const PendingOrdersPage: React.FC = () => {
                                   customerName: order.customerName,
                                   salesPersonName: order.salesPersonName,
                                   orderDate: order.orderDate,
+                                  locationCode: order.locationCode,
                                   paymentMethodType: order.paymentMethodType,
                                   totalAmount: order.totalAmount,
                                   status: order.status,
