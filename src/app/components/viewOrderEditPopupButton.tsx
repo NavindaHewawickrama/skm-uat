@@ -11,6 +11,7 @@ interface OrderItem {
   discountPercent: string | number;
   total: string | number;
   specialNote?: string;
+  address: string;
 }
 
 interface ModalProps {
@@ -21,6 +22,7 @@ interface ModalProps {
   customerName: string;
   invoiceNumber?: string | null;
   specialNote?: string;
+  address?: string;
 }
 
 const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
@@ -31,6 +33,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
   customerName = "",
   invoiceNumber = "",
   specialNote = "",
+  address= ""
 }) => {
   // console.log(orderDetails);
 
@@ -62,6 +65,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
       pdf.text(`Invoice Number: ${invoiceNumber}`, 15, 27, { align: "left" });
     }
     pdf.text(`Note: ${specialNote || ""}`, 15, invoiceNumber ? 33 : 27, { align: "left" });
+    pdf.text(`Address: ${address || ""}`, 15, invoiceNumber ? 39 : 33, { align: "left" });
 
     //pdf.text({}, 105, 15, { align: "center" });
     const currentDate = new Date().toLocaleDateString("en-US", {
@@ -120,7 +124,7 @@ const ViewOrderEditPopupButton: React.FC<ModalProps> = ({
     autoTable(pdf, {
       head: [tableColumn],
       body: tableRows,
-      startY: invoiceNumber ? 38 : 33,
+      startY: invoiceNumber ? 44 : 39,
       theme: "grid",
       styles: { fontSize: 10, cellPadding: 3 },
       headStyles: {

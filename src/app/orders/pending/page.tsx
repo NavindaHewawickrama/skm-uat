@@ -25,6 +25,7 @@ type OrderType = {
   locationCode: string;
   paymentMethodType: string;
   totalAmount: number;
+  address: string;
   orderedItems: {
     itemCode: string;
     description: string;
@@ -32,6 +33,7 @@ type OrderType = {
     quantity: string;
     discountPercent: number;
     total: number;
+    address: string; 
   }[];
   items:
     | string
@@ -61,6 +63,7 @@ type ItemsType = {
   quantity: string;
   discountPercent: number;
   total: number;
+  address: string; 
 };
 
 const PendingOrdersPage: React.FC = () => {
@@ -89,6 +92,7 @@ const PendingOrdersPage: React.FC = () => {
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
   const [selectedOrderSpecialNote, setSelectedOrderSpecialNote] =
     useState<string>("");
+    const [selectedOrderAddress, setSelectedOrderAddress] = useState<string>("");
 
   // Fetch pending order data from API
   useEffect(() => {
@@ -255,6 +259,7 @@ const PendingOrdersPage: React.FC = () => {
       setSelectedOrderNumber(order.orderNumber);
       setSelectedOrderCustomerName(order.customerName);
       setSelectedOrderSpecialNote(order.specialNote || "");
+      setSelectedOrderAddress(order.address || "");
     } else {
       setSelectedOrderItems([]);
     }
@@ -569,6 +574,7 @@ const PendingOrdersPage: React.FC = () => {
             orderNumber={selectedOrderNumber ?? 0}
             customerName={selectedOrderCustomerName ?? ""}
             specialNote={selectedOrderSpecialNote}
+            address={selectedOrderAddress}
           />
           <ViewStatusPopup
             open={statusViewOpen}

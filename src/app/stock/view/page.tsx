@@ -173,6 +173,7 @@ const StockView = () => {
         item.itemCode.toLowerCase(),
         item.itemName.toLowerCase(),
         item.location.toLowerCase(),
+        item.locationCode.toLowerCase(),
         item.category.toLowerCase(),
         item.subCategory.toLowerCase(),
         item.itemCategory.toLowerCase(),
@@ -468,7 +469,7 @@ const StockView = () => {
                         {item.itemName}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-xs text-center">
-                        {item.location}
+                        {item.locationCode}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900">
                         {item.stock == "0+" ? "0" : item.stock}

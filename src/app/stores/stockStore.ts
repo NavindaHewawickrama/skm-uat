@@ -12,6 +12,7 @@ interface StockItem {
     itemCode: string;
     itemName: string;
     location: string;
+    locationCode: string;
     stock: number | string;
     unitPrice: number;
     itemCategory: string;
@@ -24,6 +25,7 @@ interface ApiStockItem {
     itemCode: string;
     itemName: string;
     location: string;
+    locationCode: string;
     stock: number | string;
     unitPrice: number;
     itemCategory: string;
@@ -101,6 +103,7 @@ export const useStockStore = create<StockState>()(
                             itemCode: item.itemCode,
                             itemName: item.itemName,
                             location: item.location,
+                            locationCode: item.locationCode,
                             stock: item.stock,
                             unitPrice: item.unitPrice,
                             itemCategory: item.itemCategory,

@@ -24,6 +24,7 @@ type OrderType = {
   orderDate: string;
   paymentMethodType: string;
   totalAmount: number;
+  address: string;
   orderedItems: {
     itemCode: string;
     description: string;
@@ -31,6 +32,7 @@ type OrderType = {
     quantity: string;
     discountPercent: number;
     total: number;
+    address: string;
   }[];
   items:
     | string
@@ -61,6 +63,7 @@ type ItemsType = {
   quantity: string;
   discountPercent: number;
   total: number;
+  address: string;
 };
 
 const ProcessingOrdersPage: React.FC = () => {
@@ -89,6 +92,7 @@ const ProcessingOrdersPage: React.FC = () => {
   const [selectedOrderId, setSelectedOrderId] = useState<number | null>(null);
   const [selectedRowIndex, setSelectedRowIndex] = useState<number | null>(null);
   const [selectedOrderSpecialNote, setSelectedOrderSpecialNote] = useState<string>("");
+  const [selectedOrderAddress, setSelectedOrderAddress] = useState<string>("");
 
   // Fetch processing order data from API
   useEffect(() => {
@@ -255,6 +259,7 @@ const ProcessingOrdersPage: React.FC = () => {
       setSelectedOrderNumber(order.orderNumber);
       setSelectedOrderCustomerName(order.customerName);
       setSelectedOrderSpecialNote(order.specialNote || "");
+      setSelectedOrderAddress(order.address || "");
     } else {
       setSelectedOrderItems([]);
     }
@@ -615,6 +620,7 @@ const ProcessingOrdersPage: React.FC = () => {
             orderNumber={selectedOrderNumber ?? 0}
             customerName={selectedOrderCustomerName ?? ""}
             specialNote={selectedOrderSpecialNote}
+            address={selectedOrderAddress}
           />
           <ViewStatusPopup
             open={statusViewOpen}
