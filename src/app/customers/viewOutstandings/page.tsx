@@ -7,6 +7,7 @@ import CustomerSelectionPopup from "../../components/CustomerSelectionPopup";
 import Alert from "../../components/Alert";
 import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
+import { useOrderCreationData } from "../../hooks/useOrderCreationData";
 
 type OrderType = {
   orderNumber: number;
@@ -71,6 +72,14 @@ interface Invoice {
 
 
 const OutstandingsPage: React.FC = () => {
+
+  const {
+    customers,
+    isLoadingCustomers,
+    refreshAll
+  } = useOrderCreationData(true);
+
+
   const [sideNavOpen, setSideNavOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [entriesPerPage, setEntriesPerPage] = useState(50);
@@ -78,7 +87,7 @@ const OutstandingsPage: React.FC = () => {
   const [isCustomerPopupOpen, setIsCustomerPopupOpen] = useState(false);
   const [userRoleType, setUserRoleType] = useState<string | null>(null);
   const [pendingOrders, setPendingOrders] = useState<OrderType[]>([]);
-  const [customers, setCustomers] = useState<Customer[]>([]);
+  // const [customers, setCustomers] = useState<Customer[]>([]);
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
@@ -127,31 +136,33 @@ const OutstandingsPage: React.FC = () => {
     );
     // const pendingOrderList = sessionStorage.getItem("notificationsData");
     // setPendingOrders(pendingOrderList ? JSON.parse(pendingOrderList) : []);
-    fetchUserCustomerDetails();
+   // fetchUserCustomerDetails();
   }, []);
 
-  const fetchUserCustomerDetails = async () => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(`/api/orders/getCustomers`, {
-        method: "GET",
-        credentials: "include",
-      });
+  // const fetchUserCustomerDetails = async () => {
+  //   try {
+  //     setIsLoading(true);
+  //     const response = await fetch(`/api/orders/getCustomers`, {
+  //       method: "GET",
+  //       credentials: "include",
+  //     });
 
-      if (!response.ok) {
-        throw Error("Failed to fetch pending order data");
-      } else {
-        const data = await response.json();
-        //console.log(data);
-        setCustomers(data);
-      }
-      setIsLoading(false);
-    } catch (err) {
-      console.error("Error fetching pending order data:", err);
-    }
-  };
+  //     if (!response.ok) {
+  //       throw Error("Failed to fetch pending order data");
+  //     } else {
+  //       const data = await response.json();
+  //       //console.log(data);
+  //       setCustomers(data);
+  //     }
+  //     setIsLoading(false);
+  //   } catch (err) {
+  //     console.error("Error fetching pending order data:", err);
+  //   }
+  // };
 
   // Calculate total due amount from actual data
+
+
   const totalDueAmountClean = Array.from(
     outstandingInvoices
       .reduce((customerMap, invoice) => {
@@ -503,7 +514,7 @@ const OutstandingsPage: React.FC = () => {
     window.open(url, "_blank");
   };
 
-  if (isLoading) {
+  if (isLoading || isLoadingCustomers) {
     return (
       <div className="h-screen w-screen bg-gray-100 flex flex-col overflow-hidden">
         <AppBar
