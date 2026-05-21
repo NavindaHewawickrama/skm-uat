@@ -63,6 +63,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
 
       // Show location change option if status is Processing
       if (selectedOrder.status === "Processing") {
+        console.log("location is changing..", showLocationChange)
         setShowLocationChange(true);
         setCurrentLocation("Current Location Code");
       }
@@ -112,6 +113,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
         handleShowAlert("error", "Reject reason is required for Rejected status.");
         return;
       }
+      console.log("Current location", currentLocation);
 
       // STEP 1: If location needs to be changed, do it FIRST
       let locationChanged = false;
@@ -180,7 +182,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
                 errorMessage = parsedDetails.message;
               }
             } catch (e) {
-              errorMessage = typeof result.details === "string" ? result.details : result.error || errorMessage;
+              errorMessage = typeof result.details === "string" ? result.details : result.error || errorMessage || e;
             }
           }
           handleShowAlert("error", errorMessage);

@@ -33,10 +33,10 @@ type OrderType = {
   trackingNumber: string | null;
 };
 
-interface Customer {
-  customerCode: string;
-  customerName: string;
-}
+// interface Customer {
+//   customerCode: string;
+//   customerName: string;
+// }
 
 interface CustomerOutstandingData {
   customerName: string;
@@ -75,7 +75,7 @@ const OutstandingsPage: React.FC = () => {
   const {
     customers,
     isLoadingCustomers,
-    refreshAll
+   // refreshAll
   } = useOrderCreationData(true);
 
 
@@ -511,7 +511,7 @@ const OutstandingsPage: React.FC = () => {
     const colInvoiced = 14 + 18 + 18 + 30 + 28 + 22;
     const colBalBefore = colInvoiced + 24;
     const colReleased = colBalBefore + 22;
-    const colBalAfter = colReleased + 24;
+  //  const colBalAfter = colReleased + 24;
 
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(10);
