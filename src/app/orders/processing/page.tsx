@@ -51,7 +51,7 @@ type OrderType = {
   trackingNumber: string | null;
   rejectedReason: string;
   description?: string;
-  location: string | null;
+  locationCode: string | null;
 };
 
 type ItemsType = {
@@ -389,7 +389,7 @@ const ProcessingOrdersPage: React.FC = () => {
                       </th>
                       {userRoleType?.toLowerCase() === "admin" && (
                         <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
-                          Order Location
+                          Location
                         </th>
                       )}
                       <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
@@ -443,7 +443,7 @@ const ProcessingOrdersPage: React.FC = () => {
                         </td>
                         {userRoleType?.toLowerCase() === "admin" && (
                           <td className="px-4 py-3 border text-sm text-center">
-                            {order.location ? order.location : "N/A"}
+                            {order.locationCode ? order.locationCode : "N/A"}
                           </td>
                         )}
                         <td className="px-4 py-3 border text-sm text-center">
