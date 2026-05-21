@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Alert from "../components/Alert";
+import { useOrderCreationData } from "../hooks/useOrderCreationData";
 
 interface OrderforStatus {
   orderNumber: string;
@@ -32,6 +33,10 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertMessage, setAlertMessage] = useState("");
   const [alertType, setAlertType] = useState("");
+  const [selectedLocation, setSelectedLocation] = useState("");
+  const [showLocationChange, setShowLocationChange] = useState(false);
+  const { locations, isLoadingLocations } = useOrderCreationData(true);
+  const [currentLocation, setCurrentLocation] = useState("");
 
   useEffect(() => {
     if (open && selectedOrder) {
@@ -52,6 +57,15 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
       setShowAlert(false);
       setAlertMessage("");
       setAlertType("");
+
+      setSelectedLocation(""); // Reset location
+      setShowLocationChange(false); // Reset location change flag
+
+      // Show location change option if status is Processing
+      if (selectedOrder.status === "Processing") {
+        setShowLocationChange(true);
+        setCurrentLocation("Current Location Code");
+      }
     }
   }, [open, selectedOrder]);
 
@@ -77,7 +91,7 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
 
     try {
       setLoading(true);
-      setShowAlert(false); // Hide any existing alerts
+      setShowAlert(false);
 
       const requestBody = {
         orderNumber: selectedOrder.orderNumber,
@@ -99,6 +113,35 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
         return;
       }
 
+      // STEP 1: If location needs to be changed, do it FIRST
+      let locationChanged = false;
+      if (selectedStatus === "1" && selectedLocation && selectedLocation !== "") {
+        console.log("Changing location first...");
+        const locationResponse = await fetch("/api/orders/changeLocation", {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            orderNumber: selectedOrder.orderNumber,
+            locationCode: selectedLocation
+          }),
+        });
+
+        const locationResult = await locationResponse.json();
+
+        if (locationResponse.ok) {
+          locationChanged = true;
+          console.log("Location changed successfully");
+        } else {
+          const locationError = locationResult.error || "Failed to change location";
+          handleShowAlert("error", `Location change failed: ${locationError}`);
+          return; // Stop if location change fails
+        }
+      }
+
+      // STEP 2: Then change the status
+      console.log("Changing status...");
       const response = await fetch("/api/orders/changeStatus", {
         method: "POST",
         headers: {
@@ -109,32 +152,17 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
 
       const result = await response.json();
 
-      if (response.ok) {
-        // Success case - show backend success message
-        const successMessage = result.message || "Order status updated successfully";
-        handleShowAlert("success", successMessage);
-
-        // Delay closing modal to show success message
-        setTimeout(() => {
-          onClose();
-          window.location.reload();
-        }, 1500);
-
-      } else {
-        // Error case - check for 403 status first
+      if (!response.ok) {
+        // Handle status update error
         if (response.status === 403) {
           handleShowAlert("error", "No permission to change status");
         } else {
-          // Show backend error message for other errors
           let errorMessage = result.error || "Failed to update order status";
-
-          // If there are additional details from backend, try to extract them
           if (result.details) {
             try {
               const parsedDetails = JSON.parse(result.details);
               if (parsedDetails.errors && typeof parsedDetails.errors === 'object') {
                 const validationErrors: string[] = [];
-
                 Object.keys(parsedDetails.errors).forEach(field => {
                   const fieldErrors = parsedDetails.errors[field];
                   if (Array.isArray(fieldErrors)) {
@@ -143,7 +171,6 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
                     validationErrors.push(fieldErrors);
                   }
                 });
-
                 if (validationErrors.length > 0) {
                   errorMessage = validationErrors.join(', ');
                 }
@@ -153,18 +180,31 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
                 errorMessage = parsedDetails.message;
               }
             } catch (e) {
-              console.error("Error parsing details:", e);
               errorMessage = typeof result.details === "string" ? result.details : result.error || errorMessage;
             }
           }
-
           handleShowAlert("error", errorMessage);
         }
         console.error("Status update failed:", result);
+        return;
       }
 
+      // Success message
+      if (locationChanged) {
+        handleShowAlert("success", "Order location and status updated successfully");
+      } else {
+        const successMessage = result.message || "Order status updated successfully";
+        handleShowAlert("success", successMessage);
+      }
+
+      // Delay closing modal to show success message
+      setTimeout(() => {
+        onClose();
+        window.location.reload();
+      }, 1500);
+
     } catch (error) {
-      console.error("Error updating status:", error);
+      console.error("Error updating:", error);
       handleShowAlert("error", "Network error occurred");
     } finally {
       setLoading(false);
@@ -261,6 +301,32 @@ const ViewStatus: React.FC<ModalProps> = ({ open, onClose, selectedOrder }) => {
                 placeholder="Please provide reason for rejection..."
                 required
               />
+            </div>
+          )}
+
+          {/*Conditional Location Change for processing status */}
+          {selectedStatus === "1" && (
+            <div className="mb-3 sm:mb-4">
+              <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1">
+                Change Location (Optional)
+              </label>
+              <select
+                id="location"
+                value={selectedLocation}
+                onChange={(e) => setSelectedLocation(e.target.value)}
+                className="block w-full border border-gray-300 rounded-md p-2"
+                disabled={loading || isLoadingLocations}
+              >
+                <option value="">No Change (Keep Current Location)</option>
+                {locations.map((location) => (
+                  <option key={location.locationCode} value={location.locationCode}>
+                    {location.locationCode} - {location.locationName}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Select a new location for this order if needed
+              </p>
             </div>
           )}
 
