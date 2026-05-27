@@ -120,7 +120,7 @@ class TokenManager {
   private refreshPromise: Promise<string | null> | null = null;
   private isRefreshing = false;
 
-  private constructor() {}
+  private constructor() { }
 
   public static getInstance(): TokenManager {
     if (!TokenManager.instance) {
@@ -218,7 +218,7 @@ class TokenManager {
     if (this.isRefreshing && this.refreshPromise) {
       console.log('Token refresh already in progress, waiting...');
       const newToken = await this.refreshPromise;
-      
+
       if (newToken) {
         const newDecoded = this.decodeJWT(newToken);
         return {
@@ -231,12 +231,14 @@ class TokenManager {
     }
 
     // Start a new refresh process
-    this.isRefreshing = true;
-    this.refreshPromise = this.refreshAccessToken();
+    if (!this.isRefreshing) {
+      this.isRefreshing = true;
+      this.refreshPromise = this.refreshAccessToken();
+    }
 
     try {
       const newToken = await this.refreshPromise;
-      
+
       if (newToken) {
         const newDecoded = this.decodeJWT(newToken);
         return {

@@ -745,26 +745,26 @@ const OutstandingsPage: React.FC = () => {
                     <table className="min-w-full bg-white border border-gray-200">
                       <thead className="bg-gray-200">
                         <tr>
-                          <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                          <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                             Posting Date
                           </th>
-                          <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                          <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                             Customer
                           </th>
-                          <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                          <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                             Invoice No
                           </th>
 
-                          <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                          <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                             Invoiced Amount
                           </th>
-                          <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                          <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                             Balance Before PDCs
                           </th>
-                          <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                          <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                             Released PDCs
                           </th>
-                          <th className="px-4 py-3 text-left text-sm font-bold text-black tracking-wider border">
+                          <th className="px-4 py-3 text-center text-sm font-bold text-black tracking-wider border">
                             Balance After PDCs
                           </th>
                         </tr>
@@ -775,17 +775,17 @@ const OutstandingsPage: React.FC = () => {
                             key={`${invoice.customerName}-${invoice.invoiceNumber}-${index}`}
                             className="hover:bg-gray-50"
                           >
-                            <td className="px-4 py-3 border text-sm">
+                            <td className="px-4 py-3 border text-sm text-center">
                               {invoice.invoiceDate}
                             </td>
-                            <td className="px-4 py-3 border text-sm">
+                            <td className="px-4 py-3 border text-sm text-center">
                               {invoice.customerName}
                             </td>
-                            <td className="px-4 py-3 border text-sm">
+                            <td className="px-4 py-3 border text-sm text-center">
                               {invoice.invoiceNumber}
                             </td>
 
-                            <td className="px-4 py-3 border text-sm text-right">
+                            <td className="px-4 py-3 border text-sm text-center">
                               {Number(
                                 invoice.invoicedAmount.toFixed(2),
                               ).toLocaleString("en-US", {
@@ -793,7 +793,7 @@ const OutstandingsPage: React.FC = () => {
                                 maximumFractionDigits: 2,
                               })}
                             </td>
-                            <td className="px-4 py-3 border text-sm text-right">
+                            <td className="px-4 py-3 border text-sm text-center">
                               {Number(
                                 invoice.balanceBeforePDCs.toFixed(2),
                               ).toLocaleString("en-US", {
@@ -801,7 +801,7 @@ const OutstandingsPage: React.FC = () => {
                                 maximumFractionDigits: 2,
                               })}
                             </td>
-                            <td className="px-4 py-3 border text-sm text-right">
+                            <td className="px-4 py-3 border text-sm text-center">
                               {Number(
                                 invoice.releasedPDCs.toFixed(2),
                               ).toLocaleString("en-US", {
@@ -809,7 +809,7 @@ const OutstandingsPage: React.FC = () => {
                                 maximumFractionDigits: 2,
                               })}
                             </td>
-                            <td className="px-4 py-3 border text-sm text-right font-medium">
+                            <td className="px-4 py-3 border text-sm text-center font-medium">
                               {Number(
                                 invoice.balanceAfterPDCs.toFixed(2),
                               ).toLocaleString("en-US", {

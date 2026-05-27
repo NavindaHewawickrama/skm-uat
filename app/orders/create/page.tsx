@@ -75,7 +75,14 @@ interface Customer {
   balanceCredit: number;
   paymentTermCode: string;
   outstandingData?: CustomerOutstandingData[]; // optional field for outstanding data
-  // add more fields if necessary
+  thisYear?: {
+    loyaltyPointsOnInvoices: number;
+    loyaltyPointsOnCrMemos: number;
+  };
+  lastYear?: {
+    loyaltyPointsOnInvoices: number;
+    loyaltyPointsOnCrMemos: number;
+  };
 }
 
 interface SubstituteItem {
@@ -173,6 +180,9 @@ const CreateOrderPage: React.FC = () => {
   const [userName, setUserName] = useState<string | null>(null);
   const [isLoadingDueAmount, setIsLoadingDueAmount] = useState(false);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
+  const [loyaltyPointsYear, setLoyaltyPointsYear] = useState<
+    "thisYear" | "lastYear"
+  >("thisYear");
 
   const {
     customers,
@@ -187,7 +197,6 @@ const CreateOrderPage: React.FC = () => {
     getCustomerByCode,
     //  refreshAll
   } = useOrderCreationData(true);
-
 
   const locationOptions = locations
     .filter(
@@ -214,8 +223,6 @@ const CreateOrderPage: React.FC = () => {
       value: customer.customerCode,
       label: customer.customerName,
     }));
-
-
 
   useEffect(() => {
     if (!location) {
@@ -301,7 +308,10 @@ const CreateOrderPage: React.FC = () => {
   // Add item to order list
   const addToList = () => {
     if (orderItems.length >= 14) {
-      handleShowAlert("error", "14 Items are already selected. Cannot add more items to the list");
+      handleShowAlert(
+        "error",
+        "14 Items are already selected. Cannot add more items to the list",
+      );
       return;
     }
 
@@ -317,7 +327,7 @@ const CreateOrderPage: React.FC = () => {
 
     // Check if item already exists in the order list
     const existingItemIndex = orderItems.findIndex(
-      (item) => item.itemCode === selectedItem
+      (item) => item.itemCode === selectedItem,
     );
 
     let updatedOrderItems;
@@ -328,20 +338,26 @@ const CreateOrderPage: React.FC = () => {
       const newQuantity = existingItem.quantity + selectedItemQuantity;
 
       // Calculate new total for this item
-      const newItemTotal = existingItem.unitPrice * newQuantity * (1 - existingItem.discountPercent / 100);
+      const newItemTotal =
+        existingItem.unitPrice *
+        newQuantity *
+        (1 - existingItem.discountPercent / 100);
 
       // Update the existing item
       const updatedItem = {
         ...existingItem,
         quantity: newQuantity,
-        total: newItemTotal
+        total: newItemTotal,
       };
 
       // Create new array with updated item
       updatedOrderItems = [...orderItems];
       updatedOrderItems[existingItemIndex] = updatedItem;
 
-      handleShowAlert("info", `Updated ${selectedItemName} quantity to ${newQuantity}`);
+      handleShowAlert(
+        "info",
+        `Updated ${selectedItemName} quantity to ${newQuantity}`,
+      );
     } else {
       // Item doesn't exist - add as new item
       const newItem = {
@@ -394,10 +410,10 @@ const CreateOrderPage: React.FC = () => {
     const fmtDate = (d?: string) =>
       d
         ? new Date(d).toLocaleDateString("en-US", {
-          month: "2-digit",
-          day: "2-digit",
-          year: "2-digit",
-        })
+            month: "2-digit",
+            day: "2-digit",
+            year: "2-digit",
+          })
         : "";
 
     const nowStr =
@@ -548,7 +564,7 @@ const CreateOrderPage: React.FC = () => {
     const colBalAfter = colReleased + 24;
 
     pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(10);
+    pdf.setFontSize(9);
     pdf.text(
       `Total for ${selectedCustomer?.customerName ?? ""}`,
       leftX,
@@ -631,17 +647,17 @@ const CreateOrderPage: React.FC = () => {
           invoiceNumber: invoice.invoiceNumber,
           invoiceDate: invoice.invoiceDate
             ? new Date(invoice.invoiceDate).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "2-digit",
-            })
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+              })
             : "N/A",
           orderdDate: invoice.orderDate
             ? new Date(invoice.orderDate).toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "short",
-              day: "2-digit",
-            })
+                year: "numeric",
+                month: "short",
+                day: "2-digit",
+              })
             : "N/A",
           invoicedAmount: parseFloat(invoice.totalAmount?.toString() || "0"),
           pdcAmount: parseFloat(invoice.pdcAmount?.toString() || "0"),
@@ -728,13 +744,13 @@ const CreateOrderPage: React.FC = () => {
       setSelectedItemSelectedLocationStock(
         selected.locationWiseInventory
           ? selected.locationWiseInventory.find(
-            (loc) => loc.locationCode === location,
-          )?.inventory !== undefined
+              (loc) => loc.locationCode === location,
+            )?.inventory !== undefined
             ? String(
-              selected.locationWiseInventory.find(
-                (loc) => loc.locationCode === location,
-              )?.inventory,
-            )
+                selected.locationWiseInventory.find(
+                  (loc) => loc.locationCode === location,
+                )?.inventory,
+              )
             : "0"
           : "0",
       );
@@ -900,38 +916,41 @@ const CreateOrderPage: React.FC = () => {
             <div className="bg-white p-6 rounded-md shadow-sm mb-4">
               <h2 className="text-lg font-bold mb-4">Order</h2>
 
-              {/*Location*/}
-              <div className="mb-4 w-[250px]">
-                <label className="block text-gray-700 font-medium mb-1.5">
-                  Location:
-                </label>
-                <Select
-                  className="w-full text-sm"
-                  styles={{
-                    control: (provided) => ({
-                      ...provided,
-                      minHeight: "40px",
-                      height: "40px",
-                    }),
-                  }}
-                  options={locationOptions}
-                  value={locationOptions.find((opt) => opt.value === location)}
-                  onChange={(selected) => setLocation(selected?.value || "")}
-                  placeholder={
-                    isLoadingLocations
-                      ? "Loading locations..."
-                      : "Select a Location"
-                  }
-                  isSearchable
-                  isLoading={isLoadingLocations}
-                  isDisabled={isLoadingLocations}
-                />
-              </div>
-
-              {/* Customer and Totals Row */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {/* Row 1: Location + Customer + Loyalty Points */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                {/*Location*/}
                 <div>
-                  <label className="block text-gray-700 font-medium mb-2">
+                  <label className="block text-gray-700 font-medium mb-1.5">
+                    Location:
+                  </label>
+                  <Select
+                    className="w-full text-sm"
+                    styles={{
+                      control: (provided) => ({
+                        ...provided,
+                        minHeight: "40px",
+                        height: "40px",
+                      }),
+                    }}
+                    options={locationOptions}
+                    value={locationOptions.find(
+                      (opt) => opt.value === location,
+                    )}
+                    onChange={(selected) => setLocation(selected?.value || "")}
+                    placeholder={
+                      isLoadingLocations
+                        ? "Loading locations..."
+                        : "Select a Location"
+                    }
+                    isSearchable
+                    isLoading={isLoadingLocations}
+                    isDisabled={isLoadingLocations}
+                  />
+                </div>
+
+                {/* Customer */}
+                <div>
+                  <label className="block text-gray-700 font-medium mb-1.5">
                     Customer:
                   </label>
                   <Select
@@ -962,6 +981,74 @@ const CreateOrderPage: React.FC = () => {
                     isDisabled={isLoadingCustomers}
                   />
                 </div>
+                {/* Loyalty Points */}
+                <div>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <label className="text-gray-700 font-medium">
+                      Loyalty Points:
+                    </label>
+                    {selectedCustomer && (
+                      <div className="flex rounded overflow-hidden border border-gray-300 text-xs">
+                        <button
+                          onClick={() => setLoyaltyPointsYear("thisYear")}
+                          className={`px-2 py-0.5 transition-colors cursor-pointer ${
+                            loyaltyPointsYear === "thisYear"
+                              ? "bg-blue-900 text-white"
+                              : "bg-white text-gray-600 hover:bg-gray-100"
+                          }`}
+                        >
+                          This Year
+                        </button>
+                        <button
+                          onClick={() => setLoyaltyPointsYear("lastYear")}
+                          className={`px-2 py-0.5 transition-colors border-l border-gray-300 cursor-pointer ${
+                            loyaltyPointsYear === "lastYear"
+                              ? "bg-blue-900 text-white"
+                              : "bg-white text-gray-600 hover:bg-gray-100"
+                          }`}
+                        >
+                          Last Year
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {selectedCustomer ? (
+                    <div className="bg-gray-50 border border-gray-200 rounded p-2.5 space-y-1.5 text-sm">
+                      <div className="flex justify-between">
+                        <span className="text-gray-500">On Invoices:</span>
+                        <span className="text-green-600 font-medium">
+                          {Number(
+                            selectedCustomer?.[loyaltyPointsYear]
+                              ?.loyaltyPointsOnInvoices ?? 0,
+                          ).toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </span>
+                      </div>
+                      {/* <div className="flex justify-between">
+                        <span className="text-gray-500">On CR Memos:</span>
+                        <span className="text-red-500 font-medium">
+                          {Number(
+                            selectedCustomer?.[loyaltyPointsYear]
+                              ?.loyaltyPointsOnCrMemos ?? 0,
+                          ).toLocaleString("en-US", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                          })}
+                        </span>
+                      </div> */}
+                    </div>
+                  ) : (
+                    <div className="bg-gray-50 border border-dashed border-gray-300 rounded p-2.5 text-sm text-gray-400 text-center">
+                      Select a customer to view loyalty points
+                    </div>
+                  )}
+                </div>
+              </div>
+              {/* Row 2: Total Due Amount + Total */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
                 <div>
                   <label className="block text-gray-700 font-medium mb-2">
                     Total Due Amount:
@@ -974,12 +1061,12 @@ const CreateOrderPage: React.FC = () => {
                         isLoadingDueAmount
                           ? "Loading..."
                           : Number(selectedCustomerDueAmount).toLocaleString(
-                            "en-US",
-                            {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                            },
-                          )
+                              "en-US",
+                              {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2,
+                              },
+                            )
                       }
                       readOnly
                     />
@@ -993,10 +1080,11 @@ const CreateOrderPage: React.FC = () => {
                     <button
                       disabled={isLoading}
                       onClick={handleViewDetails}
-                      className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${isLoading
-                        ? "bg-gray-400 cursor-not-allowed"
-                        : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
-                        } text-white`}
+                      className={`font-medium py-2 px-4 mt-4 rounded-md transition duration-300 ${
+                        isLoading
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-blue-900 hover:bg-blue-950 cursor-pointer"
+                      } text-white`}
                     >
                       {isLoading
                         ? isGeneratingPDF
@@ -1025,7 +1113,6 @@ const CreateOrderPage: React.FC = () => {
                   />
                 </div>
               </div>
-              <div></div>
 
               {/* Payment Type and Notes Row */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -1159,12 +1246,13 @@ const CreateOrderPage: React.FC = () => {
                   />
                   {selectedItem && (
                     <span
-                      className={`inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${location === ""
-                        ? "bg-gray-100 text-gray-500"
-                        : parseInt(selectedItemSelectedLocationStock) > 0
-                          ? "bg-green-100 text-green-700 border border-green-300"
-                          : "bg-red-100 text-red-600 border border-red-300"
-                        }`}
+                      className={`inline-block mt-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold ${
+                        location === ""
+                          ? "bg-gray-100 text-gray-500"
+                          : parseInt(selectedItemSelectedLocationStock) > 0
+                            ? "bg-green-100 text-green-700 border border-green-300"
+                            : "bg-red-100 text-red-600 border border-red-300"
+                      }`}
                     >
                       {location === ""
                         ? "Select a location to check stock"
@@ -1182,8 +1270,8 @@ const CreateOrderPage: React.FC = () => {
                   <div className="relative">
                     <select
                       className="block w-full p-2 border border-gray-300 rounded appearance-none"
-                    // value={currentItem.itemName}
-                    // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
+                      // value={currentItem.itemName}
+                      // onChange={(e) => updateCurrentItem("itemName", e.target.value)}
                     >
                       {substitutedItemsList?.length === 0 ? (
                         <option value="" disabled>
@@ -1309,10 +1397,10 @@ const CreateOrderPage: React.FC = () => {
                           <th className="py-2 px-4 border-b text-center">
                             Item No
                           </th>
-                          <th className="py-2 px-4 border-b text-left">
+                          <th className="py-2 px-4 border-b text-center">
                             Item Code
                           </th>
-                          <th className="py-2 px-4 border-b text-left">
+                          <th className="py-2 px-4 border-b text-center">
                             Item Name
                           </th>
                           <th className="py-2 px-4 border-b text-center">
@@ -1336,10 +1424,10 @@ const CreateOrderPage: React.FC = () => {
                             <td className="py-2 px-4 border-b text-center font-medium text-gray-600">
                               {index + 1}
                             </td>
-                            <td className="py-2 px-4 border-b">
+                            <td className="py-2 px-4 border-b text-center">
                               {item.itemCode}
                             </td>
-                            <td className="py-2 px-4 border-b">
+                            <td className="py-2 px-4 border-b text-center">
                               {item.description}
                             </td>
                             <td className="py-2 px-4 border-b text-center">
@@ -1441,10 +1529,11 @@ const CreateOrderPage: React.FC = () => {
                   <button
                     disabled={isSaving}
                     onClick={handleSave}
-                    className={`px-6 py-2 rounded font-medium transition duration-300 ${isSaving
-                      ? "bg-gray-400 cursor-not-allowed"
-                      : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-                      } text-white`}
+                    className={`px-6 py-2 rounded font-medium transition duration-300 ${
+                      isSaving
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+                    } text-white`}
                   >
                     {isSaving ? "Saving..." : "Save"}
                   </button>
